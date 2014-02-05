@@ -17,68 +17,54 @@ Clause::Clause(int nb_variables, bool *literals) {
     }
 }
 
-/*
-Clause::Clause(int nb_variables, std::vector<int> literals) {
-    m_literals = (bool*) malloc(nb_variables*2 + 1);
-    m_nb_variables = nb_variables;
-    memset(m_literals, false, nb_variables*2 + 1);
-    for(int i=0;i<int(literals.size());++i) {
-        assert(i >= -m_nb_variables);
-        assert(i <= m_nb_variables);
-        assert(literals[i] < m_nb_variables);
-        m_literals[literals[i]+m_nb_variables] = true;
-    }
-}*/
-
 Clause::Clause(int nb_variables, std::vector<int> literals) {
     int sub ;
     this->m_literals = (bool*) malloc(nb_variables*2);
     m_nb_variables = nb_variables;
     memset(this->m_literals, false, nb_variables*2);
     for(std::vector<int>::iterator it = literals.begin(); it != literals.end(); ++it) {
-    		assert(*it != 0) ;
-    		if(*it > 0) 
-    			sub = 1 ;
-    		else
-    			sub = 0 ;
+        assert(*it != 0);
+        if(*it > 0)
+            sub = 1 ;
+        else
+            sub = 0 ;
         this->m_literals[nb_variables + *it - sub] = true;
     }
 }
 
 bool Clause::contains_literal(int literal) {
     int sub ;
-    std::cout << literal << " " << m_nb_variables << std::endl;
     assert(literal>=-m_nb_variables);
     assert(literal<=m_nb_variables);
     if(literal > 0)
-    	sub = 1 ;
+        sub = 1;
     else
-    	sub = 0 ;
+        sub = 0;
     return this->m_literals[this->m_nb_variables + literal - sub];
 }
 
 void Clause::add(int literal) {
-		int sub ;
-		if(!this->contains_literal(literal)) {
-			this->m_size ++ ;
-			if(literal > 0)
-				sub = 1 ;
-			else
-				sub = 0 ;
-			this->m_literals[this->m_nb_variables + literal - sub] = true ;
-		}
+    int sub;
+    if(!this->contains_literal(literal)) {
+        this->m_size ++;
+        if(literal > 0)
+            sub = 1;
+        else
+            sub = 0;
+        this->m_literals[this->m_nb_variables + literal - sub] = true;
+    }
 }	
 
 void Clause::remove(int literal) {
-		int sub ;
-		if(this->contains_literal(literal)) {
-			this->m_size -- ;
-			if(literal > 0)
-				sub = 1 ;
-			else
-				sub = 0 ;
-			this->m_literals[this->m_nb_variables + literal - sub] = false ;
-		}
+    int sub ;
+    if(this->contains_literal(literal)) {
+        this->m_size -- ;
+        if(literal > 0)
+            sub = 1;
+        else
+            sub = 0;
+        this->m_literals[this->m_nb_variables + literal - sub] = false;
+    }
 }
 
 Clause* Clause::disjonction(Clause *clause2) {
