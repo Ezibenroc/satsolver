@@ -20,6 +20,7 @@ class Clause {
         
         // Supprime le litéral donné de la clause
         void remove(int literal) ;
+        Clause* disjonction(Clause *clause2);
 };
 
 }

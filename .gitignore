@@ -2,4 +2,10 @@
 *.swo
 *~
 build/
-
+*.a
+*.o
+main
+testrunner
+Makefile
+CMakeFiles
+CMakeCache.txt
