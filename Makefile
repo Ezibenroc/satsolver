@@ -1,5 +1,5 @@
 CXX = g++
-CPP_FILES = `ls satsolver/*.cpp`
+CPP_FILES = `ls src/*.cpp`
 
 ARCHIVE_NAME=CornebizeLorentz
 
