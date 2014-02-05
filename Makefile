@@ -14,7 +14,7 @@ archive:
 	gzip $(ARCHIVE_NAME).tar
 
 main: src/*.cpp src/*.h
-	$(CXX) -Wall -g -o main main.c $(CPP_FILES)
+	$(CXX) -Wall -g -pedantic -o main $(CPP_FILES)
 
 clean:
 	rm --force main
