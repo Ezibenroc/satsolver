@@ -7,14 +7,12 @@ add_definitions(-g)
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 
+include_directories ("${PROJECT_SOURCE_DIR}")
 
 add_library(Structures src/structures.cpp)
-include_directories ("${PROJECT_SOURCE_DIR}")
 
 add_executable(main src/main.cpp)
 target_link_libraries(main Structures)
-
-MESSAGE("${CMAKE_MODULE_PATH}")
 
 find_package(CppUnit)
 if (CPPUNIT_FOUND)
