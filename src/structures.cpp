@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include "structures.h"
 
@@ -29,6 +31,15 @@ Clause::Clause(int nb_variables, std::vector<int> literals) {
         else
             sub = 0 ;
         this->m_literals[nb_variables + *it - sub] = true;
+    }
+}
+
+Clause::Clause(const Clause &c){
+    this->m_literals = (bool*) malloc(c.m_nb_variables*2);
+    this->m_nb_variables = c.m_nb_variables ;
+    this->m_size = c.m_size ;
+    for(int i = 0 ; i < this->m_nb_variables*2 ; i++) {
+    	this->m_literals[i] = c.m_literals[i] ;
     }
 }
 
@@ -67,10 +78,33 @@ void Clause::remove(int literal) {
     }
 }
 
+/* A PRIORI INUTILE : pas d'union dans DPLL
 Clause* Clause::disjonction(Clause *clause2) {
     assert(m_nb_variables == clause2->m_nb_variables);
-    bool *new_literals = (bool*) malloc(m_nb_variables*2 + 1);
-    for (int i=0; i<m_nb_variables*2+1; i++)
+    bool *new_literals = (bool*) malloc(m_nb_variables*2);
+    for (int i=0; i<m_nb_variables*2; i++)
         new_literals[i] = m_literals[i] || clause2->m_literals[i];
     return new Clause(m_nb_variables, new_literals);
+}*/
+
+std::string Clause::to_string() {
+	std::ostringstream oss;
+	bool flag = false ;
+	oss << "{" ;
+	for(int i = 1 ; i <= this->m_nb_variables ; i++) {
+		if(this->contains_literal(-i)) {
+			if(flag)
+				oss << "," ;
+			flag = true ;
+			oss << -i ;
+		}
+		if(this->contains_literal(i)) {
+			if(flag)
+				oss << "," ;
+			flag = true ;
+			oss << i ;
+		}
+	}
+	oss << "}" ;
+	return oss.str() ;
 }
