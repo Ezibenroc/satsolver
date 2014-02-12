@@ -108,3 +108,14 @@ std::string Clause::to_string() {
 	oss << "}" ;
 	return oss.str() ;
 }
+
+std::set<int> Clause::to_set() {
+    std::set<int> set;
+	for(int i = 1 ; i <= this->m_nb_variables ; i++) {
+		if(this->contains_literal(-i))
+            set.insert(-i);
+		if(this->contains_literal(i))
+            set.insert(i);
+    }
+    return set;
+}

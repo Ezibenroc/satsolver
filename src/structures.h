@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <set>
 
 namespace satsolver {
 
@@ -17,7 +18,7 @@ class Clause {
 				// Test si le litéral donné appartient à la clause
         bool contains_literal(int literal);
         
-        // Aoute le litéral donné à la clause
+        // Ajoute le litéral donné à la clause
         void add(int literal) ;
         
         // Supprime le litéral donné de la clause
@@ -25,6 +26,9 @@ class Clause {
         
         // Renvoie la représentation textuelle de la clause
         std::string to_string() ;
+
+        // Renvoie un ensemble contenant tous les entiers de la clause. 
+        std::set<int> to_set() ;
        
        // A PRIORI INUTILE : pas d'union dans DPLL 
        // Clause* disjonction(Clause *clause2);
