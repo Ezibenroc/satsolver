@@ -38,6 +38,7 @@ class Clause {
         Clause(int nb_variables, bool *literals);
         Clause(int nb_variables, std::vector<int> literals);
         Clause(const satsolver::Clause &c) ; // initialise une nouvelle clause, copie de la clause donnée
+        ~Clause();
 				
 				// Test si le litéral donné appartient à la clause
         bool contains_literal(int literal);

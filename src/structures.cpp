@@ -55,6 +55,10 @@ Clause::Clause(const Clause &c){
     this->nb_false = c.nb_false ;
 }
 
+Clause::~Clause() {
+    free(this->literals);
+}
+
 bool Clause::contains_literal(int literal) {
     int sub ;
     assert(literal>=-nb_variables);

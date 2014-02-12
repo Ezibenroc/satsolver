@@ -37,6 +37,8 @@ void StructuresTests::testBasicUsage() {
 	c->remove(3) ;	c->remove(4) ;
     CPPUNIT_ASSERT(c->to_set() == std::set<int>({}));
     CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));*/
+    delete a;
+    delete c;
 }
 
 void StructuresTests::testAffectationCreationUsage(){
