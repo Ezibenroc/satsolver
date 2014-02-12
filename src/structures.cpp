@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "structures.h"
 
@@ -17,11 +18,15 @@ Clause::Clause(int nb_variables, bool *literals) {
     	if(literals[i])
     		this->size ++ ;
     }
+    this->nb_unknown = this->size ;
+    this->nb_true = 0 ;
+    this->nb_false = 0 ;
 }
 
 Clause::Clause(int nb_variables, std::vector<int> literals) {
     int sub ;
     this->literals = (bool*) malloc(nb_variables*2);
+    this->size = 0 ;
     nb_variables = nb_variables;
     memset(this->literals, false, nb_variables*2);
     for(std::vector<int>::iterator it = literals.begin(); it != literals.end(); ++it) {
@@ -31,7 +36,11 @@ Clause::Clause(int nb_variables, std::vector<int> literals) {
         else
             sub = 0 ;
         this->literals[nb_variables + *it - sub] = true;
+        this->size ++ ;
     }
+    this->nb_unknown = this->size ;
+    this->nb_true = 0 ;
+    this->nb_false = 0 ;
 }
 
 Clause::Clause(const Clause &c){
@@ -41,6 +50,9 @@ Clause::Clause(const Clause &c){
     for(int i = 0 ; i < this->nb_variables*2 ; i++) {
     	this->literals[i] = c.literals[i] ;
     }
+    this->nb_unknown = c.nb_unknown ;
+    this->nb_true = c.nb_true ;
+    this->nb_false = c.nb_false ;
 }
 
 bool Clause::contains_literal(int literal) {
@@ -58,6 +70,7 @@ void Clause::add(int literal) {
     int sub;
     if(!this->contains_literal(literal)) {
         this->size ++;
+        this->nb_unknown ++ ;
         if(literal > 0)
             sub = 1;
         else
@@ -66,6 +79,7 @@ void Clause::add(int literal) {
     }
 }	
 
+/* Ne pas utlisier : problème de mis à jour de nb_unknown, nb_true, nb_false
 void Clause::remove(int literal) {
     int sub ;
     if(this->contains_literal(literal)) {
@@ -77,6 +91,7 @@ void Clause::remove(int literal) {
         this->literals[this->nb_variables + literal - sub] = false;
     }
 }
+*/
 
 /* A PRIORI INUTILE : pas d'union dans DPLL
 Clause* Clause::disjonction(Clause *clause2) {
@@ -110,7 +125,7 @@ std::string Clause::to_string() {
 }
 
 std::set<int> Clause::to_set() {
-    std::set<int> set;
+  std::set<int> set;
 	for(int i = 1 ; i <= this->nb_variables ; i++) {
 		if(this->contains_literal(-i))
             set.insert(-i);
@@ -118,4 +133,60 @@ std::set<int> Clause::to_set() {
             set.insert(i);
     }
     return set;
+}
+
+
+bool Clause::is_true() {
+	return this->nb_true > 0 ;
+}
+bool Clause::is_false() {
+	return this->nb_false == this->size ;
+}
+int Clause::monome(Affectation a) {
+	if(this->nb_unknown != 1 || this->nb_true > 0)
+		return 0 ;
+	for(int i = 1 ; i <= this->nb_variables ; i++) {
+		if(this->contains_literal(i) && a.is_unknown(i)) {
+			return i ;
+		}
+		if(this->contains_literal(-i) && a.is_unknown(-i)) {
+			return -i ;
+		}
+	}
+	std::cout << "Error in clause::monome." << std::endl ;
+	exit(EXIT_FAILURE) ;
+}
+
+Affectation::Affectation(int nb_var) {
+	std::vector<int> t ;
+	this->nb_aff = 0 ;
+	this->aff = t ;
+	for(int i = 0 ; i < nb_var ; i++)
+		this->aff.push_back(0) ;
+}
+
+bool Affectation::is_true(int x) {
+	assert(x >= 0 && x < (int) this->aff.size()) ;
+	return this->aff[x-1] == 1 ;
+}
+bool Affectation::is_false(int x) {
+	assert(x >= 0 && x < (int) this->aff.size()) ;
+	return this->aff[x-1] == -1 ;
+}
+bool Affectation::is_unknown(int x) {
+	assert(x >= 0 && x < (int) this->aff.size()) ;
+	return this->aff[x-1] == 0 ;
+}
+
+void Affectation::set_true(int x) {
+	assert(x >= 0 && x < (int) this->aff.size()) ;
+	this->aff[x-1] = 1 ;
+}
+void Affectation::set_false(int x) {
+	assert(x >= 0 && x < (int) this->aff.size()) ;
+	this->aff[x-1] = -1 ;
+}
+void Affectation::set_unknown(int x) {
+	assert(x >= 0 && x < (int) this->aff.size()) ;
+	this->aff[x-1] = 0 ;
 }
