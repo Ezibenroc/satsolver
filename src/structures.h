@@ -6,9 +6,9 @@ namespace satsolver {
 
 class Clause {
     private:
-        int m_size; 				// nombre de literaux dans la clause
-        bool *m_literals;		// clause 
-        int m_nb_variables;	// nombre de variables dans le problème				
+        int size; 				// nombre de literaux dans la clause
+        bool *literals;		// clause 
+        int nb_variables;	// nombre de variables dans le problème				
 
     public:
         Clause(int nb_variables, bool *literals);
