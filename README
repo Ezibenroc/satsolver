@@ -4,3 +4,11 @@ Compiler :
     $ cmake ..
     $ make
 
+Tests
+=====
+
+Les tests unitaires ne sont compilés que si la bibliothèque CppUnit est
+installée (libcppunit-dev sous Debian/Ubuntu).
+Ils sont compilés en même tempsque les autres exécutables, et sont lancés
+par l’exécutable `testrunner`.
+
