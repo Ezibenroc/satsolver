@@ -55,7 +55,6 @@ enum Parser::State Parser::transition(enum Parser::State state) {
                 return IN_COMMENT;
             else if (str == "" || str == "\n")
                 return WAITING_FOR_CLAUSE;
-            this->literals.clear();
             try {
                 this->literals.push_back(std::stoi(str));
             }
@@ -72,6 +71,8 @@ enum Parser::State Parser::transition(enum Parser::State state) {
             }
             else {
                 std::getline(this->stream, str); // Consume remaining characters
+                this->clauses.push_back(Clause(this->variables_count, this->literals));
+                this->literals.clear();
                 return WAITING_FOR_CLAUSE;
             }
 
@@ -92,6 +93,9 @@ enum Parser::State Parser::transition(enum Parser::State state) {
     return state;
 }
 
+std::vector<Clause> Parser::get_clauses() {
+    return this->clauses;
+}
 int Parser::get_variables_count() const {
     return this->variables_count;
 }
