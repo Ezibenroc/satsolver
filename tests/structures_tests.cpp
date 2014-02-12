@@ -31,12 +31,36 @@ void StructuresTests::testBasicUsage() {
     CPPUNIT_ASSERT(c->to_set() == std::set<int>({1,-2,2,-3,4}));
 	c->add(3) ;
 	Clause *a = new Clause(*c) ;
-    CPPUNIT_ASSERT(c->to_set() == std::set<int>({1,-2,2,-3,3,4}));
-	c->remove(-1) ;c->remove(1) ; c->remove(2) ; c->remove(-2) ; c->remove(-3) ;
+    CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));
+/*	c->remove(-1) ;c->remove(1) ; c->remove(2) ; c->remove(-2) ; c->remove(-3) ;
     CPPUNIT_ASSERT(c->to_set() == std::set<int>({3,4}));
 	c->remove(3) ;	c->remove(4) ;
     CPPUNIT_ASSERT(c->to_set() == std::set<int>({}));
-    CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));
+    CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));*/
+}
+
+void StructuresTests::testAffectationCreationUsage(){
+	satsolver::Affectation aff(3) ;
+  CPPUNIT_ASSERT(aff.is_unknown(1));
+  CPPUNIT_ASSERT(aff.is_unknown(2));
+  CPPUNIT_ASSERT(aff.is_unknown(3));
+  CPPUNIT_ASSERT(!aff.is_true(1));
+  CPPUNIT_ASSERT(!aff.is_true(2));
+  CPPUNIT_ASSERT(!aff.is_true(3));
+  CPPUNIT_ASSERT(!aff.is_false(1));
+  CPPUNIT_ASSERT(!aff.is_false(2));
+  CPPUNIT_ASSERT(!aff.is_false(3));
+  aff.set_true(2) ;
+  aff.set_false(3);
+  CPPUNIT_ASSERT(aff.is_unknown(1));
+  CPPUNIT_ASSERT(!aff.is_unknown(2));
+  CPPUNIT_ASSERT(!aff.is_unknown(3));
+  CPPUNIT_ASSERT(!aff.is_true(1));
+  CPPUNIT_ASSERT(aff.is_true(2));
+  CPPUNIT_ASSERT(!aff.is_true(3));
+  CPPUNIT_ASSERT(!aff.is_false(1));
+  CPPUNIT_ASSERT(!aff.is_false(2));
+  CPPUNIT_ASSERT(aff.is_false(3));
 }
 
 CppUnit::Test* StructuresTests::suite() {
@@ -45,5 +69,7 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testClauseCreation));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("testBasicUsage",
                 &StructuresTests::testBasicUsage));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testAffectationCreationUsage",
+                &StructuresTests::testAffectationCreationUsage));
     return suite;
 }

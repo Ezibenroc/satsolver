@@ -23,19 +23,19 @@ Clause::Clause(int nb_variables, bool *literals) {
     this->nb_false = 0 ;
 }
 
-Clause::Clause(int nb_variables, std::vector<int> literals) {
+Clause::Clause(int nb_var, std::vector<int> literals) {
     int sub ;
-    this->literals = (bool*) malloc(nb_variables*2);
+    this->literals = (bool*) malloc(nb_var*2);
     this->size = 0 ;
-    nb_variables = nb_variables;
-    memset(this->literals, false, nb_variables*2);
+    this->nb_variables = nb_var;
+    memset(this->literals, false, nb_var*2);
     for(std::vector<int>::iterator it = literals.begin(); it != literals.end(); ++it) {
         assert(*it != 0);
         if(*it > 0)
             sub = 1 ;
         else
             sub = 0 ;
-        this->literals[nb_variables + *it - sub] = true;
+        this->literals[nb_var + *it - sub] = true;
         this->size ++ ;
     }
     this->nb_unknown = this->size ;
@@ -166,27 +166,27 @@ Affectation::Affectation(int nb_var) {
 }
 
 bool Affectation::is_true(int x) {
-	assert(x >= 0 && x < (int) this->aff.size()) ;
+	assert(x > 0 && x <= (int) this->aff.size()) ;
 	return this->aff[x-1] == 1 ;
 }
 bool Affectation::is_false(int x) {
-	assert(x >= 0 && x < (int) this->aff.size()) ;
+	assert(x > 0 && x <= (int) this->aff.size()) ;
 	return this->aff[x-1] == -1 ;
 }
 bool Affectation::is_unknown(int x) {
-	assert(x >= 0 && x < (int) this->aff.size()) ;
+	assert(x > 0 && x <= (int) this->aff.size()) ;
 	return this->aff[x-1] == 0 ;
 }
 
 void Affectation::set_true(int x) {
-	assert(x >= 0 && x < (int) this->aff.size()) ;
+	assert(x > 0 && x <= (int) this->aff.size()) ;
 	this->aff[x-1] = 1 ;
 }
 void Affectation::set_false(int x) {
-	assert(x >= 0 && x < (int) this->aff.size()) ;
+	assert(x > 0 && x <= (int) this->aff.size()) ;
 	this->aff[x-1] = -1 ;
 }
 void Affectation::set_unknown(int x) {
-	assert(x >= 0 && x < (int) this->aff.size()) ;
+	assert(x > 0 && x <= (int) this->aff.size()) ;
 	this->aff[x-1] = 0 ;
 }
