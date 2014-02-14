@@ -31,7 +31,13 @@ class Clause {
     
         int nb_unknown ; 	// nombre de littéraux non affectés
         int nb_true ;			// nombre de littéraux affectés à vrai
-        int nb_false ; 		// nombre de littéraux affectés à faux 			
+        int nb_false ; 		// nombre de littéraux affectés à faux 
+        
+        
+        void decr_true() ;
+        void incr_true() ;
+        void decr_false() ;
+        void incr_false() ;			
 
     public:   
     
@@ -59,16 +65,15 @@ class Clause {
        // A PRIORI INUTILE : pas d'union dans DPLL 
        // Clause* disjonction(Clause *clause2);
        
+       // Modifie nb_false et nb_unknown, en supposant que x était avant indéterminé
+       void set_false(int x) ;
+       // Modifie nb_true et nb_unknown, en supposant que x était avant indéterminé
+       void set_true(int x) ;
+       // Modifie nb_false et nb_unknown, en supposant que x était avant faux
+       void unset_false(int x) ;
+       // Modifie nb_true et nb_unknown, en supposant que x était avant vrai
+       void unset_true(int x) ;
        
-       // Incrémente nb_true, décréente nb_unknown
-       void incr_true() ;
-       // Incrémente nb_false, décréente nb_unknown
-       void incr_false() ;
-       // Décrémente nb_true, incrémente nb_unknown
-       void decr_true() ;
-       // Décrémente nb_true, incrémente nb_unknown
-       void decr_false() ;
-       // Renvoie vrai si la clause est vraie, i.e. si nb_true > 0
        bool is_true() ;
        // Renvoie vrai si la clause est fausse, i.e. si nb_false = size
        bool is_false() ;

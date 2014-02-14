@@ -182,6 +182,34 @@ void Clause::decr_false() {
 	this->nb_unknown ++ ;
 }
 
+
+void Clause::set_false(int x) {
+	if(this->contains_literal(x))
+		this->incr_false() ;
+	if(this->contains_literal(-x))
+		this->incr_true() ;
+}
+void Clause::set_true(int x) {
+	if(this->contains_literal(x))
+		this->incr_true() ;
+	if(this->contains_literal(-x))
+		this->incr_false() ;
+}
+void Clause::unset_false(int x) {
+	if(this->contains_literal(x))
+		this->decr_false() ;
+	if(this->contains_literal(-x))
+		this->decr_true() ;
+}
+void Clause::unset_true(int x) {
+	if(this->contains_literal(x))
+		this->decr_true() ;
+	if(this->contains_literal(-x))
+		this->decr_false() ;
+}
+
+
+
 Affectation::Affectation(int nb_var) {
 	std::vector<int> t ;
 	this->nb_aff = 0 ;
