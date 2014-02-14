@@ -64,6 +64,45 @@ void StructuresTests::testAffectationCreationUsage(){
   CPPUNIT_ASSERT(!aff.is_false(2));
   CPPUNIT_ASSERT(aff.is_false(3));
 }
+void StructuresTests::testAffClauses() {
+	satsolver::Affectation aff(3) ;
+	std::vector <int> v = {1,2,-3} ;
+	Clause *c = new Clause(3,v) ;
+	CPPUNIT_ASSERT(!c->is_true()) ;
+	CPPUNIT_ASSERT(!c->is_false()) ;
+	CPPUNIT_ASSERT(!c->monome(aff)) ;
+	aff.set_true(2) ;
+	c->incr_true() ;
+	CPPUNIT_ASSERT(c->is_true()) ;
+	CPPUNIT_ASSERT(!c->is_false()) ;
+	CPPUNIT_ASSERT(!c->monome(aff)) ;	
+	aff.set_false(2) ;
+	c->decr_true() ;
+	c->incr_false() ;
+	aff.set_true(-3) ;
+	c->incr_true() ;
+	CPPUNIT_ASSERT(c->is_true()) ;
+	CPPUNIT_ASSERT(!c->is_false()) ;
+	CPPUNIT_ASSERT(!c->monome(aff)) ;
+	aff.set_false(-3) ;
+	c->decr_true() ;
+	c->incr_false() ;
+	CPPUNIT_ASSERT(!c->is_true()) ;
+	CPPUNIT_ASSERT(!c->is_false()) ;
+	CPPUNIT_ASSERT(c->monome(aff)==1) ;
+	aff.set_unknown(-3) ;
+	c->decr_false() ;
+	aff.set_false(1) ;
+	c->incr_false() ;
+	CPPUNIT_ASSERT(!c->is_true()) ;
+	CPPUNIT_ASSERT(!c->is_false()) ;
+	CPPUNIT_ASSERT(c->monome(aff)==-3) ;
+	aff.set_false(-3) ;
+	c->incr_false() ;
+	CPPUNIT_ASSERT(!c->is_true()) ;
+	CPPUNIT_ASSERT(c->is_false()) ;
+	CPPUNIT_ASSERT(!c->monome(aff)) ;
+}
 
 CppUnit::Test* StructuresTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("StructuresTests");
@@ -73,5 +112,7 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testBasicUsage));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("testAffectationCreationUsage",
                 &StructuresTests::testAffectationCreationUsage));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testAffClauses",
+                &StructuresTests::testAffClauses));
     return suite;
 }

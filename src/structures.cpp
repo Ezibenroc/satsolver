@@ -161,6 +161,27 @@ int Clause::monome(Affectation a) {
 	exit(EXIT_FAILURE) ;
 }
 
+void Clause::incr_true() {
+	assert(this->nb_true < this->nb_variables && this->nb_unknown > 0) ;
+	this->nb_true ++ ;
+	this->nb_unknown -- ;
+}
+void Clause::incr_false() {
+	assert(this->nb_false < this->nb_variables && this->nb_unknown > 0) ;
+	this->nb_false ++ ;
+	this->nb_unknown -- ;
+}
+void Clause::decr_true() {
+	assert(this->nb_unknown < this->nb_variables && this->nb_true > 0) ;
+	this->nb_true -- ;
+	this->nb_unknown ++ ;
+}
+void Clause::decr_false() {
+	assert(this->nb_unknown < this->nb_variables && this->nb_false > 0) ;
+	this->nb_false -- ;
+	this->nb_unknown ++ ;
+}
+
 Affectation::Affectation(int nb_var) {
 	std::vector<int> t ;
 	this->nb_aff = 0 ;
@@ -170,27 +191,39 @@ Affectation::Affectation(int nb_var) {
 }
 
 bool Affectation::is_true(int x) {
-	assert(x > 0 && x <= (int) this->aff.size()) ;
-	return this->aff[x-1] == 1 ;
+	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
+	if(x>0)
+		return this->aff[x-1] == 1 ;
+	else
+		return this->aff[x-1] == -1 ;
 }
 bool Affectation::is_false(int x) {
-	assert(x > 0 && x <= (int) this->aff.size()) ;
-	return this->aff[x-1] == -1 ;
+	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
+	if(x>0)
+		return this->aff[x-1] == -1 ;
+	else
+		return this->aff[x-1] == 1 ;
 }
 bool Affectation::is_unknown(int x) {
-	assert(x > 0 && x <= (int) this->aff.size()) ;
-	return this->aff[x-1] == 0 ;
+	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
+	return this->aff[abs(x)-1] == 0 ;
 }
 
 void Affectation::set_true(int x) {
-	assert(x > 0 && x <= (int) this->aff.size()) ;
-	this->aff[x-1] = 1 ;
+	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
+	if(x>0)
+		this->aff[x-1] = 1 ;
+	else
+		this->aff[x-1] = -1 ;
 }
 void Affectation::set_false(int x) {
-	assert(x > 0 && x <= (int) this->aff.size()) ;
-	this->aff[x-1] = -1 ;
+	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
+	if(x>0)
+		this->aff[x-1] = -1 ;
+	else
+		this->aff[x-1] = 1 ;
 }
 void Affectation::set_unknown(int x) {
-	assert(x > 0 && x <= (int) this->aff.size()) ;
-	this->aff[x-1] = 0 ;
+	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
+	this->aff[abs(x)-1] = 0 ;
 }

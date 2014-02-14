@@ -27,13 +27,13 @@ class Clause {
     private:
         int size; 				// nombre de literaux dans la clause
         bool *literals;		// clause 
-        int nb_variables;	// nombre de variables dans le problème				
-
-    public:
+        int nb_variables;	// nombre de variables dans le problème	
     
         int nb_unknown ; 	// nombre de littéraux non affectés
         int nb_true ;			// nombre de littéraux affectés à vrai
-        int nb_false ; 		// nombre de littéraux affectés à faux    
+        int nb_false ; 		// nombre de littéraux affectés à faux 			
+
+    public:   
     
         Clause(int nb_variables, bool *literals);
         Clause(int nb_variables, std::vector<int> literals);
@@ -59,6 +59,15 @@ class Clause {
        // A PRIORI INUTILE : pas d'union dans DPLL 
        // Clause* disjonction(Clause *clause2);
        
+       
+       // Incrémente nb_true, décréente nb_unknown
+       void incr_true() ;
+       // Incrémente nb_false, décréente nb_unknown
+       void incr_false() ;
+       // Décrémente nb_true, incrémente nb_unknown
+       void decr_true() ;
+       // Décrémente nb_true, incrémente nb_unknown
+       void decr_false() ;
        // Renvoie vrai si la clause est vraie, i.e. si nb_true > 0
        bool is_true() ;
        // Renvoie vrai si la clause est fausse, i.e. si nb_false = size
