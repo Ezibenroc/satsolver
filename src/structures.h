@@ -24,7 +24,7 @@ class Affectation {
 };
 
 class Clause {
-    private:
+		private:
         int size; 				// nombre de literaux dans la clause
         bool *literals;		// clause 
         int nb_variables;	// nombre de variables dans le problème	
@@ -54,6 +54,9 @@ class Clause {
         
         // Test si la clause est une tautologie
         bool is_tautology() ;
+        
+        // Renvoie le nombre de littéraux
+        int get_size() ;
         
         // Supprime le litéral donné de la clause
         // Non utilisé dans l'algorithme.
@@ -85,5 +88,16 @@ class Clause {
        int monome(Affectation a) ; 
 };
 
+
+class Formula {
+		private :
+			std::vector<satsolver::Clause> clauses ;
+			satsolver::Affectation aff ;
+			
+		public :
+			Formula(std::vector<satsolver::Clause> v, int nb_variables) ;
+/*			~Formula() ;
+*/
+};
 
 }

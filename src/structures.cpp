@@ -59,6 +59,10 @@ Clause::~Clause() {
     free(this->literals);
 }
 
+int Clause::get_size() {
+	return this->size ;
+}
+
 bool Clause::contains_literal(int literal) {
     int sub ;
     assert(literal>=-nb_variables);
@@ -263,3 +267,12 @@ void Affectation::set_unknown(int x) {
 	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
 	this->aff[abs(x)-1] = 0 ;
 }
+
+
+Formula::Formula(std::vector<Clause> v, int nb_variables) {
+	this->clauses = v ;
+	this->aff = Affectation(nb_variables) ;
+}/*
+Formula::~Formula() {
+	
+}*/
