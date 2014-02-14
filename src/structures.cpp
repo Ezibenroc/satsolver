@@ -269,9 +269,7 @@ void Affectation::set_unknown(int x) {
 }
 
 
-Formula::Formula(std::vector<Clause> v, int nb_variables) {
-	this->clauses = v ;
-	this->aff = Affectation(nb_variables) ;
+Formula::Formula(std::vector<Clause> v, int nb_variables) : clauses(v), aff(Affectation(nb_variables)) {
 }/*
 Formula::~Formula() {
 	
