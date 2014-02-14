@@ -26,12 +26,16 @@ void StructuresTests::testClauseCreation() {
 void StructuresTests::testBasicUsage() {
 	std::vector <int> v = {1,2,-3,4,} ;
 	Clause *c = new Clause(4,v) ;
-    CPPUNIT_ASSERT(c->to_set() == std::set<int>({1,2,-3,4}));
+  CPPUNIT_ASSERT(c->to_set() == std::set<int>({1,2,-3,4}));
+  CPPUNIT_ASSERT(!c->is_tautology()) ;
 	c->add(-2) ;
-    CPPUNIT_ASSERT(c->to_set() == std::set<int>({1,-2,2,-3,4}));
+  CPPUNIT_ASSERT(c->is_tautology()) ;
+  CPPUNIT_ASSERT(c->to_set() == std::set<int>({1,-2,2,-3,4}));
 	c->add(3) ;
+  CPPUNIT_ASSERT(c->is_tautology()) ;
 	Clause *a = new Clause(*c) ;
-    CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));
+  CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));
+  CPPUNIT_ASSERT(a->is_tautology()) ;
 /*	c->remove(-1) ;c->remove(1) ; c->remove(2) ; c->remove(-2) ; c->remove(-3) ;
     CPPUNIT_ASSERT(c->to_set() == std::set<int>({3,4}));
 	c->remove(3) ;	c->remove(4) ;

@@ -52,6 +52,9 @@ class Clause {
         // Ajoute le litéral donné à la clause
         void add(int literal) ;
         
+        // Test si la clause est une tautologie
+        bool is_tautology() ;
+        
         // Supprime le litéral donné de la clause
         // Non utilisé dans l'algorithme.
        	// void remove(int literal) ;

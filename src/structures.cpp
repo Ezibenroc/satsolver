@@ -81,6 +81,14 @@ void Clause::add(int literal) {
             sub = 0;
         this->literals[this->nb_variables + literal - sub] = true;
     }
+}
+
+bool Clause::is_tautology() {
+		for(int i = 1 ; i <= this->nb_variables ; i++) {
+			if(this->contains_literal(i) && this->contains_literal(-i))
+				return true ;
+		}
+		return false ;
 }	
 
 /* Ne pas utlisier : problème de mis à jour de nb_unknown, nb_true, nb_false
