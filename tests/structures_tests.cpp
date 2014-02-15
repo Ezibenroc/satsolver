@@ -4,6 +4,13 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>
 #include <vector>
+//////////////////
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <sstream>
+#include <string>
+///////////////////
 #include "structures.cpp"
 #include "structures_tests.h"
 
@@ -106,6 +113,32 @@ void StructuresTests::testAffClauses() {
 	CPPUNIT_ASSERT(!c->is_true()) ;
 	CPPUNIT_ASSERT(c->is_false()) ;
 	CPPUNIT_ASSERT(!c->monome(aff)) ;
+	delete c ;
+}
+
+void StructuresTests::testUnitPropagation() {
+	std::vector <int> v = {1,2,-3} ;
+	Clause *c = new Clause(3,v) ;
+	std::vector <int> w = {-1,2} ;
+	Clause *d = new Clause(3,w) ;
+	std::vector <int> x = {-1,-2,-3} ;
+	Clause *e = new Clause(3,x) ;
+	std::vector <int> y = {1} ;
+	Clause *b = new Clause(3,y) ;		
+	std::vector<Clause> g ;
+	g.push_back(*c) ;
+	g.push_back(*d) ;
+	g.push_back(*e) ;
+	g.push_back(*b) ;
+	Formula *f = new Formula(g,3) ;
+  CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
+	CPPUNIT_ASSERT(f->unit_propagation()) ;
+ 	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{2},{-2,-3}}));
+	CPPUNIT_ASSERT(f->unit_propagation()) ;
+ 	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-3}}));
+	CPPUNIT_ASSERT(f->unit_propagation()) ;
+ 	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({}));
+	CPPUNIT_ASSERT(!f->unit_propagation()) ;
 }
 
 CppUnit::Test* StructuresTests::suite() {
@@ -118,5 +151,7 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testAffectationCreationUsage));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("testAffClauses",
                 &StructuresTests::testAffClauses));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testUnitPropagation",
+                &StructuresTests::testUnitPropagation));
     return suite;
 }
