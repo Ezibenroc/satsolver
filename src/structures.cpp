@@ -235,14 +235,14 @@ bool Affectation::is_true(int x) {
 	if(x>0)
 		return this->aff[x-1] == 1 ;
 	else
-		return this->aff[x-1] == -1 ;
+		return this->aff[abs(x)-1] == -1 ;
 }
 bool Affectation::is_false(int x) {
 	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
 	if(x>0)
 		return this->aff[x-1] == -1 ;
 	else
-		return this->aff[x-1] == 1 ;
+		return this->aff[abs(x)-1] == 1 ;
 }
 bool Affectation::is_unknown(int x) {
 	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
@@ -254,14 +254,14 @@ void Affectation::set_true(int x) {
 	if(x>0)
 		this->aff[x-1] = 1 ;
 	else
-		this->aff[x-1] = -1 ;
+		this->aff[abs(x)-1] = -1 ;
 }
 void Affectation::set_false(int x) {
 	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
 	if(x>0)
 		this->aff[x-1] = -1 ;
 	else
-		this->aff[x-1] = 1 ;
+		this->aff[abs(x)-1] = 1 ;
 }
 void Affectation::set_unknown(int x) {
 	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
