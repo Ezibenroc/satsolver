@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
-#include "structures.h"
 #include <vector>
+
+#include "parser.h"
 
 using namespace satsolver;
 int main(void) {

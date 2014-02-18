@@ -9,17 +9,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 
-add_library(Structures src/structures.cpp)
+add_library(Affectation src/structures/affectation.cpp)
+add_library(Clause src/structures/clause.cpp)
+add_library(Formula src/structures/formula.cpp)
 add_library(Parser src/parser.cpp)
 
 add_executable(main src/main.cpp)
-target_link_libraries(main Structures)
+target_link_libraries(main Affectation Clause Formula)
 target_link_libraries(main Parser)
 
 find_package(CppUnit)
 if (CPPUNIT_FOUND)
     add_library(StructuresTests tests/structures_tests.cpp)
-    target_link_libraries(StructuresTests Structures)
+    target_link_libraries(StructuresTests Affectation Clause Formula)
     target_link_libraries(StructuresTests cppunit)
 
     add_library(ParserTests tests/parser_tests.cpp)

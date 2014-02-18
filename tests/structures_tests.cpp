@@ -3,16 +3,20 @@
 #include <cppunit/TestAssert.h>
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>
+
 #include <vector>
-//////////////////
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <sstream>
 #include <string>
-///////////////////
-#include "structures.cpp"
+
+#include "structures/clause.h"
+#include "structures/formula.h"
+#include "structures/affectation.h"
 #include "structures_tests.h"
+
+using namespace satsolver;
 
 void StructuresTests::testClauseCreation() {
     std::vector<int> v(2);

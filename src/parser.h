@@ -7,7 +7,7 @@
 #include <string>
 #include <exception>
 
-#include "structures.h"
+#include "structures/clause.h"
 
 namespace satsolver {
 
