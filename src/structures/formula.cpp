@@ -1,5 +1,7 @@
 #include "formula.h"
 #include <vector>
+#include <sstream>
+#include <iostream>
 
 using namespace satsolver;
 
@@ -14,6 +16,16 @@ Formula::Formula(const satsolver::Formula &f) {
 Formula::~Formula() {
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++)
 		delete this->clauses[i] ;
+}
+
+std::string Formula::to_string() {
+	std::ostringstream oss;
+	if(this->clauses.size() == 0)
+		return "EMPTY FORMULA" ;
+	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+		oss << this->clauses[i]->to_string() << "\n" ;
+	}
+	return oss.str() ;
 }
 
 std::set<std::set<int> > Formula::to_set() {

@@ -2,6 +2,7 @@
 #define STRUCTURES_FORMULA_H
 
 #include <vector>
+#include <string>
 
 #include "clause.h"
 
@@ -19,6 +20,9 @@ class Formula {
 			Formula(std::vector<satsolver::Clause*> v, int nb_variables) ;
 			Formula(const satsolver::Formula &f) ;
 			~Formula() ;			
+			
+        // Renvoie la représentation textuelle de la formule
+        std::string to_string() ;
 			
       // Renvoie un ensemble d'ensembles d'entiers, selon l'affectation
       // Chaque ensemble de cet ensemble représente une clause
