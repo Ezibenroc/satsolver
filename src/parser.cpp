@@ -7,6 +7,10 @@ using namespace satsolver;
 Parser::Parser(std::istream &_stream) : stream(_stream) {
     this->parse();
 }
+Parser::~Parser() {
+	for(unsigned int i = 0 ; i < this->clauses.size() ; i++)
+		delete this->clauses[i];
+}
 
 void Parser::parse() {
     enum Parser::State state = WAITING_FOR_HEADER;
@@ -71,7 +75,7 @@ enum Parser::State Parser::transition(enum Parser::State state) {
             }
             else {
                 std::getline(this->stream, str); // Consume remaining characters
-                this->clauses.push_back(Clause(this->variables_count, this->literals));
+                this->clauses.push_back(new Clause(this->variables_count, this->literals));
                 this->literals.clear();
                 return WAITING_FOR_CLAUSE;
             }
@@ -93,8 +97,11 @@ enum Parser::State Parser::transition(enum Parser::State state) {
     return state;
 }
 
-std::vector<Clause> Parser::get_clauses() {
+std::vector<Clause*> Parser::get_clauses() {
     return this->clauses;
+}
+Formula* Parser::get_formula() {
+    return new Formula(this->clauses, this->variables_count);
 }
 int Parser::get_variables_count() const {
     return this->variables_count;
