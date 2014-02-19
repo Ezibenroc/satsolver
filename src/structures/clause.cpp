@@ -16,9 +16,6 @@ Clause::Clause(int nb_variables, bool *literals) {
     	if(literals[i])
     		this->size ++ ;
     }
-    this->nb_unknown = this->size ;
-    this->nb_true = 0 ;
-    this->nb_false = 0 ;
 }
 
 Clause::Clause(int nb_var, std::vector<int> literals) {
@@ -36,9 +33,6 @@ Clause::Clause(int nb_var, std::vector<int> literals) {
         this->literals[nb_var + *it - sub] = true;
         this->size ++ ;
     }
-    this->nb_unknown = this->size ;
-    this->nb_true = 0 ;
-    this->nb_false = 0 ;
 }
 
 Clause::Clause(const Clause &c){
@@ -48,9 +42,6 @@ Clause::Clause(const Clause &c){
     for(int i = 0 ; i < this->nb_variables*2 ; i++) {
     	this->literals[i] = c.literals[i] ;
     }
-    this->nb_unknown = c.nb_unknown ;
-    this->nb_true = c.nb_true ;
-    this->nb_false = c.nb_false ;
 }
 
 Clause::~Clause() {
@@ -59,6 +50,10 @@ Clause::~Clause() {
 
 int Clause::get_size() {
 	return this->size ;
+}
+
+bool Clause::is_empty() {
+	return this->size == 0 ;
 }
 
 bool Clause::contains_literal(int literal) {
@@ -76,7 +71,6 @@ void Clause::add(int literal) {
     int sub;
     if(!this->contains_literal(literal)) {
         this->size ++;
-        this->nb_unknown ++ ;
         if(literal > 0)
             sub = 1;
         else
@@ -85,15 +79,6 @@ void Clause::add(int literal) {
     }
 }
 
-bool Clause::is_tautology() {
-		for(int i = 1 ; i <= this->nb_variables ; i++) {
-			if(this->contains_literal(i) && this->contains_literal(-i))
-				return true ;
-		}
-		return false ;
-}	
-
-/* Ne pas utlisier : problème de mis à jour de nb_unknown, nb_true, nb_false
 void Clause::remove(int literal) {
     int sub ;
     if(this->contains_literal(literal)) {
@@ -105,16 +90,15 @@ void Clause::remove(int literal) {
         this->literals[this->nb_variables + literal - sub] = false;
     }
 }
-*/
 
-/* A PRIORI INUTILE : pas d'union dans DPLL
-Clause* Clause::disjonction(Clause *clause2) {
-    assert(nb_variables == clause2->nb_variables);
-    bool *new_literals = (bool*) malloc(nb_variables*2);
-    for (int i=0; i<nb_variables*2; i++)
-        new_literals[i] = literals[i] || clause2->literals[i];
-    return new Clause(nb_variables, new_literals);
-}*/
+bool Clause::is_tautology() {
+		for(int i = 1 ; i <= this->nb_variables ; i++) {
+			if(this->contains_literal(i) && this->contains_literal(-i))
+				return true ;
+		}
+		return false ;
+}	
+
 
 std::string Clause::to_string() {
 	std::ostringstream oss;
@@ -150,71 +134,17 @@ std::set<int> Clause::to_set() {
 }
 
 
-bool Clause::is_true() {
-	return this->nb_true > 0 ;
-}
-bool Clause::is_false() {
-	return this->nb_false == this->size ;
-}
-int Clause::monome(Affectation a) {
-	if(this->nb_unknown != 1 || this->nb_true > 0)
+int Clause::monome() {
+	if(this->size != 1)
 		return 0 ;
 	for(int i = 1 ; i <= this->nb_variables ; i++) {
-		if(this->contains_literal(i) && a.is_unknown(i)) {
+		if(this->contains_literal(i)) {
 			return i ;
 		}
-		if(this->contains_literal(-i) && a.is_unknown(-i)) {
+		if(this->contains_literal(-i)) {
 			return -i ;
 		}
 	}
 	std::cout << "Error in clause::monome." << std::endl ;
 	exit(EXIT_FAILURE) ;
 }
-
-void Clause::incr_true() {
-	assert(this->nb_true < this->nb_variables && this->nb_unknown > 0) ;
-	this->nb_true ++ ;
-	this->nb_unknown -- ;
-}
-void Clause::incr_false() {
-	assert(this->nb_false < this->nb_variables && this->nb_unknown > 0) ;
-	this->nb_false ++ ;
-	this->nb_unknown -- ;
-}
-void Clause::decr_true() {
-	assert(this->nb_unknown < this->nb_variables && this->nb_true > 0) ;
-	this->nb_true -- ;
-	this->nb_unknown ++ ;
-}
-void Clause::decr_false() {
-	assert(this->nb_unknown < this->nb_variables && this->nb_false > 0) ;
-	this->nb_false -- ;
-	this->nb_unknown ++ ;
-}
-
-
-void Clause::set_false(int x) {
-	if(this->contains_literal(x))
-		this->incr_false() ;
-	if(this->contains_literal(-x))
-		this->incr_true() ;
-}
-void Clause::set_true(int x) {
-	if(this->contains_literal(x))
-		this->incr_true() ;
-	if(this->contains_literal(-x))
-		this->incr_false() ;
-}
-void Clause::unset_false(int x) {
-	if(this->contains_literal(x))
-		this->decr_false() ;
-	if(this->contains_literal(-x))
-		this->decr_true() ;
-}
-void Clause::unset_true(int x) {
-	if(this->contains_literal(x))
-		this->decr_true() ;
-	if(this->contains_literal(-x))
-		this->decr_false() ;
-}
-
