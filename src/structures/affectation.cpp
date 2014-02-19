@@ -15,21 +15,21 @@ Affectation::Affectation(int nb_var) {
 		this->aff.push_back(0) ;
 }
 
-bool Affectation::is_true(int x) {
+bool Affectation::is_true(int x) const {
 	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
 	if(x>0)
 		return this->aff[x-1] == 1 ;
 	else
         return this->is_false(-x);
 }
-bool Affectation::is_false(int x) {
+bool Affectation::is_false(int x) const {
 	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
 	if(x>0)
 		return this->aff[x-1] == -1 ;
 	else
         return this->is_true(-x);
 }
-bool Affectation::is_unknown(int x) {
+bool Affectation::is_unknown(int x) const {
 	assert(abs(x) <= (int) this->aff.size() && x!=0) ;
     if (x>0)
         return this->aff[x-1] == 0 ;
@@ -59,7 +59,7 @@ void Affectation::set_unknown(int x) {
         this->set_unknown(-x);
 }
 
-std::string Affectation::to_string() {
+std::string Affectation::to_string() const {
 	std::ostringstream oss;
 	oss << "{" ;
 	for(unsigned int i = 1 ; i <= this->aff.size() ; i++) {
@@ -75,3 +75,15 @@ std::string Affectation::to_string() {
 	oss << "}" ;
 	return oss.str() ;
 }
+
+std::set<int>* Affectation::to_set() const {
+    std::set<int> *set = new std::set<int>();
+	for(unsigned int i = 1 ; i <= this->aff.size() ; i++) {
+		if(this->is_true(i))
+			set->insert(i);
+        else if(this->is_false(i))
+			set->insert(-i);
+	}
+    return set;
+}
+

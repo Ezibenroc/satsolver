@@ -22,15 +22,16 @@ class Formula {
 			// Renvoie le premier entier x tel qu'il existe une clause monome {x} (0 s'il n'existe pas)
 			int find_monome() const;
 			
-        // Renvoie la représentation textuelle de la formule
-        std::string to_string() const;
+            // Renvoie la représentation textuelle de la formule
+            std::string to_string() const;
 			
-      // Renvoie un ensemble d'ensembles d'entiers, selon l'affectation
-      // Chaque ensemble de cet ensemble représente une clause
-      // Une clause vraie ne sera pas mise dans l'ensemble
-      // Une clause fausse sera un ensemble vide
-      // Les clauses ne contiendront que des littéraux indeterminés
-      std::set<std::set<int> > to_set() ;
+            // Renvoie un ensemble d'ensembles d'entiers, selon l'affectation
+            // Chaque ensemble de cet ensemble représente une clause
+            // Une clause vraie ne sera pas mise dans l'ensemble
+            // Une clause fausse sera un ensemble vide
+            // Les clauses ne contiendront que des littéraux indeterminés
+            std::set<std::set<int> > to_set() ;
+            std::set<Clause*> to_clauses_set() ;
 			
 			// Affectation d'un litéral x
 			void set_true(int x) ;

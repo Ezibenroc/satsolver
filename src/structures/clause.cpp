@@ -20,7 +20,7 @@ Clause::Clause(int nb_variables, bool *literals) {
 
 Clause::Clause(int nb_var, std::vector<int> literals) {
     int sub ;
-    this->literals = (bool*) malloc(nb_var*2);
+    this->literals = (bool*) malloc(sizeof(bool)*nb_var*2);
     this->size = 0 ;
     this->nb_variables = nb_var;
     memset(this->literals, false, nb_var*2);
@@ -30,18 +30,23 @@ Clause::Clause(int nb_var, std::vector<int> literals) {
             sub = 1 ;
         else
             sub = 0 ;
-        this->literals[nb_var + *it - sub] = true;
-        this->size ++ ;
+        if (!this->literals[nb_var + *it - sub]) {
+            this->literals[nb_var + *it - sub] = true;
+            this->size ++ ;
+        }
     }
 }
 
 Clause::Clause(const Clause &c){
-    this->literals = (bool*) malloc(c.nb_variables*2);
+    this->literals = (bool*) malloc(sizeof(bool)*c.nb_variables*2);
     this->nb_variables = c.nb_variables ;
-    this->size = c.size ;
+    this->size = 0;
     for(int i = 0 ; i < this->nb_variables*2 ; i++) {
-    	this->literals[i] = c.literals[i] ;
+    	this->literals[i] = c.literals[i];
+        if (c.literals[i])
+            this->size++;
     }
+    assert(this->size == c.size);
 }
 
 Clause::~Clause() {
@@ -75,6 +80,7 @@ void Clause::add(int literal) {
             sub = 1;
         else
             sub = 0;
+        assert(!this->literals[this->nb_variables + literal - sub]);
         this->literals[this->nb_variables + literal - sub] = true;
     }
 }
@@ -87,6 +93,7 @@ void Clause::remove(int literal) {
             sub = 1;
         else
             sub = 0;
+        assert(this->literals[this->nb_variables + literal - sub]);
         this->literals[this->nb_variables + literal - sub] = false;
     }
 }
@@ -103,22 +110,20 @@ bool Clause::is_tautology() {
 std::string Clause::to_string() {
 	std::ostringstream oss;
 	bool flag = false ;
-	oss << "{" ;
 	for(int i = 1 ; i <= this->nb_variables ; i++) {
 		if(this->contains_literal(-i)) {
 			if(flag)
-				oss << "," ;
+				oss << " " ;
 			flag = true ;
 			oss << -i ;
 		}
 		if(this->contains_literal(i)) {
 			if(flag)
-				oss << "," ;
+				oss << " " ;
 			flag = true ;
 			oss << i ;
 		}
 	}
-	oss << "}" ;
 	return oss.str() ;
 }
 

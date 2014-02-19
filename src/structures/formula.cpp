@@ -35,11 +35,19 @@ std::string Formula::to_string() const {
 }
 
 std::set<std::set<int> > Formula::to_set() {
-  std::set<std::set<int> > set;
-  for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-			set.insert(this->clauses[i]->to_set()) ;
-	}
-	return set ;
+    std::set<std::set<int> > set;
+    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+        set.insert(this->clauses[i]->to_set()) ;
+    }
+    return set ;
+}
+
+std::set<Clause*> Formula::to_clauses_set() {
+    std::set<Clause*> set;
+    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+        set.insert(this->clauses[i]) ;
+    }
+    return set ;
 }
 
 void Formula::set_true(int x) {
