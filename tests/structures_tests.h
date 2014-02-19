@@ -7,7 +7,7 @@ class StructuresTests : public CppUnit::TestFixture {
         void testClauseCreation();
         void testBasicUsage();
         void testAffectationCreationUsage();
-        void testAffClauses() ;
+				void testFormula() ;
         void testUnitPropagation() ;
     public:
         static CppUnit::Test* suite();

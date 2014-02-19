@@ -79,45 +79,33 @@ void StructuresTests::testAffectationCreationUsage(){
   CPPUNIT_ASSERT(!aff.is_false(2));
   CPPUNIT_ASSERT(aff.is_false(3));
 }
-void StructuresTests::testAffClauses() {
-	satsolver::Affectation aff(3) ;
+
+void StructuresTests::testFormula() {
 	std::vector <int> v = {1,2,-3} ;
 	Clause *c = new Clause(3,v) ;
-	CPPUNIT_ASSERT(!c->is_true()) ;
-	CPPUNIT_ASSERT(!c->is_false()) ;
-	CPPUNIT_ASSERT(!c->monome(aff)) ;
-	aff.set_true(2) ;
-	c->set_true(2) ;
-	CPPUNIT_ASSERT(c->is_true()) ;
-	CPPUNIT_ASSERT(!c->is_false()) ;
-	CPPUNIT_ASSERT(!c->monome(aff)) ;	
-	aff.set_false(2) ;
-	c->unset_true(2) ;
-	c->set_false(2) ;
-	aff.set_true(-3) ;
-	c->set_true(-3) ;
-	CPPUNIT_ASSERT(c->is_true()) ;
-	CPPUNIT_ASSERT(!c->is_false()) ;
-	CPPUNIT_ASSERT(!c->monome(aff)) ;
-	aff.set_false(-3) ;
-	c->unset_true(-3) ;
-	c->set_false(-3) ;
-	CPPUNIT_ASSERT(!c->is_true()) ;
-	CPPUNIT_ASSERT(!c->is_false()) ;
-	CPPUNIT_ASSERT(c->monome(aff)==1) ;
-	aff.set_unknown(-3) ;
-	c->unset_false(-3) ;
-	aff.set_false(1) ;
-	c->set_false(1) ;
-	CPPUNIT_ASSERT(!c->is_true()) ;
-	CPPUNIT_ASSERT(!c->is_false()) ;
-	CPPUNIT_ASSERT(c->monome(aff)==-3) ;
-	aff.set_false(-3) ;
-	c->set_false(-3) ;
-	CPPUNIT_ASSERT(!c->is_true()) ;
-	CPPUNIT_ASSERT(c->is_false()) ;
-	CPPUNIT_ASSERT(!c->monome(aff)) ;
-	delete c ;
+	std::vector <int> w = {-1,2} ;
+	Clause *d = new Clause(3,w) ;
+	std::vector <int> x = {-1,-2,-3} ;
+	Clause *e = new Clause(3,x) ;
+	std::vector <int> y = {1} ;
+	Clause *b = new Clause(3,y) ;		
+	std::vector<Clause*> g ;
+	g.push_back(c) ;
+	g.push_back(d) ;
+	g.push_back(e) ;
+	g.push_back(b) ;
+	Formula *f = new Formula(g,3) ;
+  CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
+  f->set_true(3) ;
+  CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2},{-1,2},{-1,-2},{1}}));
+  f->set_true(-1) ;
+  for(auto c : f->to_set()) {
+  	for(auto i : c) {
+  		std::cout << i << " " ;
+  	}
+  	std::cout << std::endl ;
+  }
+  CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{2},{}}));
 }
 
 void StructuresTests::testUnitPropagation() {
@@ -154,9 +142,9 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testBasicUsage));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("testAffectationCreationUsage",
                 &StructuresTests::testAffectationCreationUsage));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testAffClauses",
-                &StructuresTests::testAffClauses));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testUnitPropagation",
-                &StructuresTests::testUnitPropagation));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testFormula",
+                &StructuresTests::testFormula));
+//    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testUnitPropagation",
+//                &StructuresTests::testUnitPropagation));
     return suite;
 }
