@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project(satsolver)
 
 add_definitions(-std=c++0x)
-add_definitions(-g -Wall -Wextra -pedantic -fmax-errors=5)
+add_definitions(-g -Wall -Wextra -pedantic -fmax-errors=1)
 
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
