@@ -129,11 +129,11 @@ void StructuresTests::testUnitPropagation() {
 	Clause *e = new Clause(3,x) ;
 	std::vector <int> y = {1} ;
 	Clause *b = new Clause(3,y) ;		
-	std::vector<Clause> g ;
-	g.push_back(*c) ;
-	g.push_back(*d) ;
-	g.push_back(*e) ;
-	g.push_back(*b) ;
+	std::vector<Clause*> g ;
+	g.push_back(c) ;
+	g.push_back(d) ;
+	g.push_back(e) ;
+	g.push_back(b) ;
 	Formula *f = new Formula(g,3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
 	CPPUNIT_ASSERT(f->unit_propagation()) ;
@@ -143,6 +143,7 @@ void StructuresTests::testUnitPropagation() {
 	CPPUNIT_ASSERT(f->unit_propagation()) ;
  	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({}));
 	CPPUNIT_ASSERT(!f->unit_propagation()) ;
+    delete f;
 }
 
 CppUnit::Test* StructuresTests::suite() {

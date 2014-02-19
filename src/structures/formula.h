@@ -10,7 +10,7 @@ namespace satsolver {
 
 class Formula {
 		private :
-			std::vector<satsolver::Clause> clauses ;
+			std::vector<satsolver::Clause*> clauses ;
 			satsolver::Affectation aff ;
 			int nb_variables ;
 			
@@ -18,7 +18,7 @@ class Formula {
 			int find_monome() ;
 			
 		public :
-			Formula(std::vector<satsolver::Clause> v, int nb_variables) ;
+			Formula(std::vector<satsolver::Clause*> v, int nb_variables) ;
 			~Formula() ;			
 			
       // Renvoie un ensemble d'ensembles d'entiers, selon l'affectation
