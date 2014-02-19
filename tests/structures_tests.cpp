@@ -99,13 +99,8 @@ void StructuresTests::testFormula() {
   f->set_true(3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2},{-1,2},{-1,-2},{1}}));
   f->set_true(-1) ;
-  for(auto c : f->to_set()) {
-  	for(auto i : c) {
-  		std::cout << i << " " ;
-  	}
-  	std::cout << std::endl ;
-  }
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{2},{}}));
+  delete f ;
 }
 
 void StructuresTests::testUnitPropagation() {
@@ -131,7 +126,7 @@ void StructuresTests::testUnitPropagation() {
 	CPPUNIT_ASSERT(f->unit_propagation()) ;
  	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({}));
 	CPPUNIT_ASSERT(!f->unit_propagation()) ;
-    delete f;
+  delete f;
 }
 
 CppUnit::Test* StructuresTests::suite() {
@@ -144,7 +139,7 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testAffectationCreationUsage));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("testFormula",
                 &StructuresTests::testFormula));
-//    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testUnitPropagation",
-//                &StructuresTests::testUnitPropagation));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testUnitPropagation",
+                &StructuresTests::testUnitPropagation));
     return suite;
 }

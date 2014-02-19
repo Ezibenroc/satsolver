@@ -26,8 +26,11 @@ std::set<std::set<int> > Formula::to_set() {
 
 void Formula::set_true(int x) {
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-		if(this->clauses[i]->contains_literal(x))
-			this->clauses.erase(this->clauses.begin() + i) ;
+		if(this->clauses[i]->contains_literal(x)) {
+			this->clauses[i] = this->clauses[this->clauses.size()-1] ;
+			this->clauses.pop_back() ;
+			i-- ;
+		}
 		else
 			this->clauses[i]->remove(-x) ;
 	}
