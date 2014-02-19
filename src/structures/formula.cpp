@@ -14,8 +14,7 @@ Formula::Formula(const satsolver::Formula &f) {
 }
 
 Formula::~Formula() {
-	for(unsigned i = 0 ; i < this->clauses.size() ; i++)
-		delete this->clauses[i] ;
+	this->clauses.clear() ;
 }
 
 std::string Formula::to_string() {
