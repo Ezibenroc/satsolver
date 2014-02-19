@@ -1,6 +1,7 @@
 #ifndef STRUCTURES_AFFECTATION_H
 #define STRUCTURES_AFFECTATION_H
 
+#include <string>
 #include <vector>
 
 namespace satsolver {
@@ -22,6 +23,8 @@ class Affectation {
 			void set_true(int x) ;
 			void set_false(int x) ;
 			void set_unknown(int x) ;
+
+            std::string to_string();
 };
 
 }
