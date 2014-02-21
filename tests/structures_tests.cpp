@@ -32,7 +32,20 @@ void StructuresTests::testClauseCreation() {
     CPPUNIT_ASSERT(clause->contains_literal(3));
     CPPUNIT_ASSERT(!clause->contains_literal(4));
     CPPUNIT_ASSERT(!clause->contains_literal(5));
+    satsolver::Clause *c2 = new Clause(*clause) ;
+    clause->remove(3) ; clause->remove(2) ;
+    CPPUNIT_ASSERT(!c2->contains_literal(-5));
+    CPPUNIT_ASSERT(!c2->contains_literal(-4));
+    CPPUNIT_ASSERT(!c2->contains_literal(-3));
+    CPPUNIT_ASSERT(c2->contains_literal(-2));
+    CPPUNIT_ASSERT(!c2->contains_literal(-1));
+    CPPUNIT_ASSERT(!c2->contains_literal(1));
+    CPPUNIT_ASSERT(!c2->contains_literal(2));
+    CPPUNIT_ASSERT(c2->contains_literal(3));
+    CPPUNIT_ASSERT(!c2->contains_literal(4));
+    CPPUNIT_ASSERT(!c2->contains_literal(5));
     delete clause ;
+    delete c2 ;
 }
 
 void StructuresTests::testBasicUsage() {
@@ -98,11 +111,14 @@ void StructuresTests::testFormula() {
 	g.push_back(b) ;
 	Formula *f = new Formula(g,3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
+  Formula *f2 = new Formula(f) ;
   f->set_true(3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2},{-1,2},{-1,-2},{1}}));
   CPPUNIT_ASSERT_THROW(f->set_true(-1), Conflict);
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{2},{}}));
+  CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
   delete f ;
+  delete f2 ;
 }
 
 void StructuresTests::testUnitPropagation() {

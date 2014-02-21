@@ -16,7 +16,7 @@ class Formula {
 			
 		public :
 			Formula(std::vector<satsolver::Clause*> v, int nb_variables) ;
-			Formula(const satsolver::Formula *f) ;
+			Formula(satsolver::Formula *f) ;
 			~Formula() ;			
 
 			// Renvoie le premier entier x tel qu'il existe une clause monome {x} (0 s'il n'existe pas)
@@ -50,6 +50,7 @@ class Formula {
 
 		  bool is_empty() const;
 		  int get_nb_variables() const;
+		  int get_size() const ;
 		  bool contains_empty_clause() const;
 		  int choose_literal() const; 
 };

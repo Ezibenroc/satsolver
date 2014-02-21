@@ -6,6 +6,7 @@
 
 namespace satsolver {
 
+
     void process(Formula *formula, Affectation *affectation);
     
     Affectation* solve(Formula *formula);

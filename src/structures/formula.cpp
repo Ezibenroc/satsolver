@@ -1,4 +1,5 @@
 #include "formula.h"
+#include <cassert>
 #include <vector>
 #include <sstream>
 #include <iostream>
@@ -9,9 +10,10 @@ using namespace satsolver;
 Formula::Formula(std::vector<Clause*> v, int nb_variables) : clauses(v), nb_variables(nb_variables) {
 }
 
-Formula::Formula(const satsolver::Formula *f) {
+Formula::Formula(satsolver::Formula *f) {
     this->nb_variables = f->nb_variables;
-	for(unsigned int i = 0 ; i < f->clauses.size() ; i++) {
+    this->clauses.reserve(f->clauses.size()) ;
+		for(unsigned int i = 0 ; i < f->clauses.size() ; i++) {
         this->clauses.push_back(new Clause(*(f->clauses[i])));
     }
 }
@@ -128,6 +130,9 @@ int Formula::find_isolated_literal() const {
 bool Formula::is_empty() const {
     return (this->clauses.size() == 0);
 }
+int Formula::get_size() const {
+	return (int) this->clauses.size() ;
+}
 int Formula::get_nb_variables() const {
     return this->nb_variables;
 }
@@ -143,5 +148,6 @@ int Formula::choose_literal() const {
         if (this->clauses[i]->get_size() != 0)
             return *(this->clauses[i]->to_set().begin());
     }
+    std::cout << "Error in choose_literal : all clauses are empty, or there is no clauses." << std::endl ;
     return 0;
 }
