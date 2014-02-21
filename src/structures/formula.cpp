@@ -53,7 +53,7 @@ std::set<Clause*> Formula::to_clauses_set() {
     return set ;
 }
 
-/* Berk, beaucoup de copies... Et une fuite mémoire astronomique.
+/* Beaucoup de copies... Et une fuite mémoire astronomique.
 void Formula::set_true(int x) {
     std::vector<Clause*> new_clauses;
     Clause *new_clause;
@@ -99,14 +99,31 @@ int Formula::find_monome() const {
 	return 0 ;
 }
 
-bool Formula::unit_propagation() {
+/*
+int Formula::unit_propagation() {
 	int literal = find_monome() ;
 	if(literal == 0)
-		return false ;
+		return 0 ;
 	this->set_true(literal) ;
-	return true ;
-}
+	return literal ;
+}*/
 
+int Formula::find_isolated_literal() const {
+	bool pos, neg ;
+	for(int variable = 1 ; variable <= this->nb_variables ; variable ++) {
+		pos = false ; neg = false ;
+		for(unsigned i = 0 ; !(pos && neg) && i < this->clauses.size() ; i++){
+			pos = pos || this->clauses[i]->contains_literal(variable) ;
+			neg = neg || this->clauses[i]->contains_literal(-variable) ;
+		}
+		if(pos && !neg)
+			return variable ;
+		else if(neg && !pos)
+			return -variable ;
+	}
+	return 0 ;
+}
+ 
 
 bool Formula::is_empty() const {
     return (this->clauses.size() == 0);
