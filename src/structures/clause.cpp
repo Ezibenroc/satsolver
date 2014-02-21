@@ -96,6 +96,8 @@ void Clause::remove(int literal) {
         assert(this->literals[this->nb_variables + literal - sub]);
         this->literals[this->nb_variables + literal - sub] = false;
     }
+    if(this->size == 0)
+    	throw Conflict() ;
 }
 
 bool Clause::is_tautology() {

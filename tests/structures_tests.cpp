@@ -48,11 +48,12 @@ void StructuresTests::testBasicUsage() {
 	Clause *a = new Clause(*c) ;
   CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));
   CPPUNIT_ASSERT(a->is_tautology()) ;
-/*	c->remove(-1) ;c->remove(1) ; c->remove(2) ; c->remove(-2) ; c->remove(-3) ;
+	c->remove(-1) ;c->remove(1) ; c->remove(2) ; c->remove(-2) ; c->remove(-3) ;
     CPPUNIT_ASSERT(c->to_set() == std::set<int>({3,4}));
-	c->remove(3) ;	c->remove(4) ;
+	c->remove(3) ;	
+	  CPPUNIT_ASSERT_THROW(c->remove(4), Conflict) ;
     CPPUNIT_ASSERT(c->to_set() == std::set<int>({}));
-    CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));*/
+    CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));
     delete a;
     delete c;
 }
@@ -99,7 +100,7 @@ void StructuresTests::testFormula() {
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
   f->set_true(3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2},{-1,2},{-1,-2},{1}}));
-  f->set_true(-1) ;
+  CPPUNIT_ASSERT_THROW(f->set_true(-1), Conflict);
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{2},{}}));
   delete f ;
 }

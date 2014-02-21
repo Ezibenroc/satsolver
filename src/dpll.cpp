@@ -6,50 +6,53 @@
 
 #include "structures/affectation.h"
 #include "structures/formula.h"
+#include "structures/clause.h"
 #include "dpll.h"
 
 using namespace satsolver;
 
-Formula* set_literal(const Formula *formula, int literal) {
-    Formula *new_formula;
-    new_formula = new Formula(formula);
-    new_formula->set_true(literal);
-    return new_formula;
-}
-
-Affectation* eliminate_monome(const Formula *formula, int literal) {
-    Formula *new_formula = set_literal(formula, literal);
-    return solve(new_formula);
-}
-
-Affectation* satsolver::solve(const Formula *formula) {
+void satsolver::process(Formula *formula, Affectation *affectation) {
     int literal;
-    literal = formula->find_monome();
-    Affectation *affectation;
-    if (formula->is_empty()) {
-        return new Affectation(formula->get_nb_variables());
+    Formula *new_f ;
+    if(formula->is_empty()) {
+    	return ;
     }
-    else if (literal) {
-        affectation = eliminate_monome(formula, literal);
-        affectation->set_true(literal);
-        return affectation;
-    }
-    else if (formula->contains_empty_clause()) {
-        throw Conflict();
-    }
-    else {
-        literal = formula->choose_literal();
-        try {
-            // Make a bet
-            affectation = solve(set_literal(formula, literal));
-            affectation->set_true(literal);
 
-        }
-        catch (Conflict e) {
-            // Bet was wrong
-            affectation = solve(set_literal(formula, -literal));
-            affectation->set_false(literal);
-        }
-        return affectation;
+		// Unitary resolution
+    literal = formula->find_monome() ;
+    if(literal) {
+    	formula->set_true(literal) ;
+    	affectation->set_true(literal) ;
+    	process(formula,affectation) ;
     }
+    
+    // Isolated literal
+    literal = formula->find_isolated_literal() ;
+    if(literal) {
+    	formula->set_true(literal) ;
+    	affectation->set_true(literal) ;
+    	process(formula,affectation) ;
+    }
+    
+    // Make a bet
+    literal = formula->choose_literal();
+    try {
+    	new_f = new Formula(*formula) ;
+    	new_f->set_true(literal) ;
+    	affectation->set_true(literal) ; // pas la peine de copier l'affectation, on s'en sert seulement en écriture dans l'algo
+    	process(new_f,affectation) ;
+    }
+    catch (Conflict e) {
+    	delete new_f ;
+    	formula->set_false(literal) ;
+    	affectation->set_false(literal) ;
+    	process(formula,affectation) ;
+    }
+}
+
+
+Affectation* satsolver::solve(Formula *formula) {
+	Affectation *aff = new Affectation(formula->get_nb_variables()) ;
+	process(formula,aff) ;
+	return aff ;
 }

@@ -7,6 +7,8 @@
 
 namespace satsolver {
 
+class Conflict: public std::exception {};
+
 class Clause {
 		private:
         int size; 				// nombre de literaux dans la clause
@@ -27,7 +29,7 @@ class Clause {
         void add(int literal) ;
         
         // Supprime le litéral donné de la clause
-        // Non utilisé dans l'algorithme.
+        // Renvoie l'exception Conflict si la clause est vide après la suppression
         void remove(int literal) ;
         
         // Test si la clause est une tautologie

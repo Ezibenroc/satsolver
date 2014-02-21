@@ -6,9 +6,10 @@
 
 namespace satsolver {
 
-    class Conflict: public std::exception {};
-
-    Affectation* solve(const Formula *formula);
+    void process(Formula *formula, Affectation *affectation);
+    
+    Affectation* solve(Formula *formula);
+    
 
 }
 
