@@ -17,6 +17,9 @@ Formula::Formula(const satsolver::Formula *f) {
 }
 
 Formula::~Formula() {
+	for(unsigned int i = 0 ; i < this->clauses.size() ; i++) {
+        delete (this->clauses[i]);
+  }
 	this->clauses.clear() ;
 }
 
@@ -50,17 +53,34 @@ std::set<Clause*> Formula::to_clauses_set() {
     return set ;
 }
 
+/* Berk, beaucoup de copies... Et une fuite mémoire astronomique.
 void Formula::set_true(int x) {
     std::vector<Clause*> new_clauses;
     Clause *new_clause;
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
 		if (!this->clauses[i]->contains_literal(x)) {
             new_clause = new Clause(*this->clauses[i]);
-			new_clause->remove(-x);
+						new_clause->remove(-x);
             new_clauses.push_back(new_clause);
         }
 	}
     this->clauses.swap(new_clauses);
+}
+*/
+
+void Formula::set_true(int x) {
+	std::vector<Clause*> old_clauses(this->clauses) ;
+	this->clauses.clear() ;
+	this->clauses.reserve(old_clauses.size()) ;
+	for(unsigned j = 0 ; j < old_clauses.size() ; j++) {
+		if(old_clauses[j]->contains_literal(x)) {
+			delete old_clauses[j] ;
+		}
+		else {
+			this->clauses.push_back(old_clauses[j]) ;
+			this->clauses[this->clauses.size()-1]->remove(-x) ;
+		}
+	}
 }
 
 

@@ -7,7 +7,7 @@ int main(void)
 {
     CppUnit::TextUi::TestRunner runner;
     runner.addTest(StructuresTests::suite());
-    runner.addTest(ParserTests::suite());
+   	runner.addTest(ParserTests::suite());
     runner.addTest(DpllTests::suite());
     runner.run();
     return 0;
