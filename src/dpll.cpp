@@ -51,10 +51,12 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     	new_f = new Formula(formula) ;
     	new_f->set_true(literal) ;
     	affectation->set_true(literal) ; // pas la peine de copier l'affectation, on s'en sert seulement en écriture dans l'algo
-    	return process(new_f,affectation) ;
+    	process(new_f,affectation) ;
+    	delete new_f ; // suppression de new_f dans le cas où c'était satisfiable
+    	return ;
     }
     catch (Conflict e) {
-    	delete new_f ;
+    	delete new_f ; // suppression de new_f dans le cas où c'était insatisfiable
     	if(verbose_dpll) {
     		std::cout << "Made a wrong bet with literal " << literal << std::endl ;
     	}
@@ -67,6 +69,15 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
 
 Affectation* satsolver::solve(Formula *formula) {
 	Affectation *aff = new Affectation(formula->get_nb_variables()) ;
-	process(formula,aff) ;
+	Formula *f = new Formula(formula) ;
+	try {
+		process(formula,aff) ;
+	}
+	catch (Conflict e) {
+		delete f ;
+		delete aff ;
+		throw e ;
+	}
+	delete f ;
 	return aff ;
 }

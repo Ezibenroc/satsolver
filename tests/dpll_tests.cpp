@@ -49,6 +49,7 @@ void DpllTests::testBasicUsage() {
     CPPUNIT_ASSERT(solution->is_false(1));
     CPPUNIT_ASSERT(solution->is_true(2));
     CPPUNIT_ASSERT(solution->is_true(3));
+    delete solution ;
     delete f ;
     f = new Formula(clauses2, 3);
     CPPUNIT_ASSERT_THROW(solve(f), Conflict);
