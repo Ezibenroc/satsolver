@@ -8,14 +8,13 @@ Parser::Parser(std::istream &_stream) : stream(_stream) {
     this->parse();
 }
 Parser::~Parser() {
-	for(unsigned int i = 0 ; i < this->clauses.size() ; i++)
-		delete this->clauses[i];
 }
 
 void Parser::parse() {
     enum Parser::State state = WAITING_FOR_HEADER;
     while (state != Parser::END_OF_FILE)
         state = this->transition(state);
+    this->formula = new Formula(this->clauses, this->variables_count);
 }
 
 enum Parser::State Parser::transition(enum Parser::State state) {
@@ -101,7 +100,7 @@ std::vector<Clause*> Parser::get_clauses() {
     return this->clauses;
 }
 Formula* Parser::get_formula() {
-    return new Formula(this->clauses, this->variables_count);
+    return this->formula;
 }
 int Parser::get_variables_count() const {
     return this->variables_count;

@@ -51,6 +51,7 @@ class Parser {
         int variables_count, clauses_count;
         std::istream &stream;
         std::vector<int> literals;
+        Formula *formula;
 
         void parse();
         enum State transition(enum State);

@@ -29,6 +29,7 @@ void ParserTests::testBasic() {
     clauses_set.insert(clauses[2]->to_set());
     CPPUNIT_ASSERT(formula->to_set() == clauses_set);
     delete parser;
+    delete formula;
 }
 void ParserTests::testExtraWhitespaces() {
     std::istringstream stream("c 0 foo bar\np cnf 5 3\n3 0\n\n\n1 2      4 0\nc oof\n5 1 0\n");
@@ -40,6 +41,7 @@ void ParserTests::testExtraWhitespaces() {
     CPPUNIT_ASSERT(clauses[0]->to_set() == std::set<int>({3}));
     CPPUNIT_ASSERT(clauses[1]->to_set() == std::set<int>({1, 2, 4}));
     CPPUNIT_ASSERT(clauses[2]->to_set() == std::set<int>({1, 5}));
+    delete parser->get_formula();
     delete parser;
 }
 
