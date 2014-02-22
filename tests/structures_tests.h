@@ -10,6 +10,7 @@ class StructuresTests : public CppUnit::TestFixture {
 				void testFormula() ;
         void testUnitPropagation() ;
         void testIsolatedLiterals() ;
+        void testClean() ;
     public:
         static CppUnit::Test* suite();
 };

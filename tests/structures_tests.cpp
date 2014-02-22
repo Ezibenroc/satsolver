@@ -33,7 +33,12 @@ void StructuresTests::testClauseCreation() {
     CPPUNIT_ASSERT(!clause->contains_literal(4));
     CPPUNIT_ASSERT(!clause->contains_literal(5));
     satsolver::Clause *c2 = new Clause(*clause) ;
-    clause->remove(3) ; clause->remove(2) ;
+    CPPUNIT_ASSERT(c2->contains_clause(*clause)) ;
+    CPPUNIT_ASSERT(clause->contains_clause(*c2)) ;
+    clause->remove(3) ; 
+    CPPUNIT_ASSERT(c2->contains_clause(*clause)) ;
+    CPPUNIT_ASSERT(!clause->contains_clause(*c2)) ;
+    clause->remove(2) ;
     CPPUNIT_ASSERT(!c2->contains_literal(-5));
     CPPUNIT_ASSERT(!c2->contains_literal(-4));
     CPPUNIT_ASSERT(!c2->contains_literal(-3));
@@ -189,6 +194,29 @@ void StructuresTests::testIsolatedLiterals() {
   delete f;
 }
 
+void StructuresTests::testClean() {
+	std::vector <int> v = {1,2,-3} ;
+	Clause *c = new Clause(3,v) ;
+	std::vector <int> w = {-1,-2} ;
+	Clause *d = new Clause(3,w) ;
+	std::vector <int> x = {-1,-2,-3} ;
+	Clause *e = new Clause(3,x) ;
+	std::vector <int> y = {1} ;
+	Clause *b = new Clause(3,y) ;		
+	std::vector<Clause*> g ;
+	g.push_back(c) ;
+	g.push_back(d) ;
+	g.push_back(e) ;
+	g.push_back(b) ;
+	Formula *f = new Formula(g,3) ;
+  CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,-2},{-1,-2,-3},{1}}));
+	f->clean() ; 
+  CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,-2},{1}}));
+	f->clean() ; 
+  CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,-2},{1}}));
+  delete f ;
+}
+
 CppUnit::Test* StructuresTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("StructuresTests");
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("testClauseCreation",
@@ -203,5 +231,7 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testUnitPropagation));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("testIsolatedLiterals",
                 &StructuresTests::testIsolatedLiterals));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testClean",
+                &StructuresTests::testClean));
     return suite;
 }

@@ -39,6 +39,7 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
         return 1;
     }
 
+    std::cout << "s SATISFIABLE" << std::endl;
     solution_set = solution->to_set();
 		for (solution_set_iterator=solution_set->begin(); solution_set_iterator!=solution_set->end(); solution_set_iterator++) {
         std::cout << "v " << *solution_set_iterator << std::endl;

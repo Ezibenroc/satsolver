@@ -155,3 +155,16 @@ int Clause::monome() {
 	std::cout << "Error in clause::monome." << std::endl ;
 	exit(EXIT_FAILURE) ;
 }
+
+bool Clause::contains_clause(satsolver::Clause &c) {
+	if(this->get_size() < c.get_size()) {
+		return false ;
+	}
+	for(int i = 1 ; i <= this->nb_variables ; i++) {
+		if(!this->contains_literal(i) && c.contains_literal(i))
+			return false ;
+		if(!this->contains_literal(-i) && c.contains_literal(-i))
+			return false ;
+	}
+	return true ;
+}

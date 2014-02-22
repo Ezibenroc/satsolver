@@ -151,3 +151,27 @@ int Formula::choose_literal() const {
     std::cout << "Error in choose_literal : all clauses are empty, or there is no clauses." << std::endl ;
     return 0;
 }
+
+void Formula::clean() {
+	int n = 0 ;
+	std::vector<Clause*> old_clauses(this->clauses) ;
+	this->clauses.clear() ;
+	this->clauses.reserve(old_clauses.size()) ;
+	unsigned j ;
+	for(unsigned i = 0 ; i < old_clauses.size() ; i++) {
+		j = 0 ;
+		while(j < old_clauses.size() && (old_clauses[j] == NULL || j == i 
+														|| !old_clauses[i]->contains_clause(*old_clauses[j]))) {
+			j++ ;												
+		}
+		if(j < old_clauses.size()) { // la clause i contient la clause j
+			delete old_clauses[i] ;
+			old_clauses[i] = NULL ;
+			n ++ ;
+		}
+		else {	// la clause i ne contient aucune autre clauses
+			this->clauses.push_back(old_clauses[i]) ;
+		}
+	}
+//	std::cout << "Deleted " << n << " clauses during clean." << std::endl ;
+}

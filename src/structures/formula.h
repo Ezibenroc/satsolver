@@ -47,12 +47,26 @@ class Formula {
 			void set_false(int x) ;
 			
 
-
+			// Renvoie vrai ssi la formule ne contient pas de clauses
 		  bool is_empty() const;
+		  
+		  // Renvoie le nombre de variables
 		  int get_nb_variables() const;
+		  
+		  // Renvoie la taille de la formule ;
 		  int get_size() const ;
+		  
+		  // Renvoie vrai ssi la formule contient une clause vide
 		  bool contains_empty_clause() const;
+		  
+		  // Renvoie un littéral de la formule
+		  // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide
 		  int choose_literal() const; 
+		  
+		  // Supprime toute les clauses contenant d'autres clauses
+		  // Assez lourd (nombre de clauses au carré fois le nombre de variables)
+		  // À utiliser avec parcimonie
+		  void clean() ;
 };
 
 }

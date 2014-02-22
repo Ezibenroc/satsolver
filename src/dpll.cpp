@@ -28,6 +28,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     	}
     	formula->set_true(literal) ;
     	affectation->set_true(literal) ;
+    	formula->clean() ;
     	return process(formula,affectation) ;
     }
     
@@ -38,6 +39,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     		std::cout << "Isolated resolution with literal " << literal << std::endl ;
     	}
     	formula->set_true(literal) ;
+    	// Pas besoin d'appeler clean, il ne changerai pas la formule ici.
     	affectation->set_true(literal) ;
     	return process(formula,affectation) ;
     }
@@ -51,6 +53,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     	new_f = new Formula(formula) ;
     	new_f->set_true(literal) ;
     	affectation->set_true(literal) ; // pas la peine de copier l'affectation, on s'en sert seulement en écriture dans l'algo
+    	new_f->clean() ;
     	process(new_f,affectation) ;
     	delete new_f ; // suppression de new_f dans le cas où c'était satisfiable
     	return ;
@@ -61,6 +64,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     		std::cout << "Made a wrong bet with literal " << literal << std::endl ;
     	}
     	formula->set_false(literal) ;
+    	formula->clean() ;
     	affectation->set_false(literal) ;
     	return process(formula,affectation) ;
     }

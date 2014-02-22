@@ -52,6 +52,9 @@ class Clause {
        // Si la clause est un monome, renvoie le literal en question
        // Sinon renvoie 0
        int monome() ; 
+       
+       // Renvoie vrai ssi elle contient la clause donnée
+       bool contains_clause(satsolver::Clause &c) ;
 };
 
 }
