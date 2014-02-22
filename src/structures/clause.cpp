@@ -50,7 +50,9 @@ Clause::Clause(const Clause &c){
 }
 
 Clause& Clause::operator=(const Clause &that) {
-    std::cout << "Foo" << std::endl;
+    this->literals = that.literals;
+    this->nb_variables = that.nb_variables;
+    this->size = that.size;
     return *this;
 }
 

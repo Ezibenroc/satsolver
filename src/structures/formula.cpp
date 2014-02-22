@@ -22,7 +22,6 @@ Formula::~Formula() {
     this->clauses.clear() ;
 }
 Formula& Formula::operator=(const Formula &that) {
-    std::cout << "Bar" << std::endl;
     this->nb_variables = that.nb_variables;
     this->clauses = that.clauses;
     return *this;
