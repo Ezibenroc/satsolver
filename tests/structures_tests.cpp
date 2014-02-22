@@ -109,11 +109,11 @@ void StructuresTests::testFormula() {
 	Clause *e = new Clause(3,x) ;
 	std::vector <int> y = {1} ;
 	Clause *b = new Clause(3,y) ;		
-	std::vector<Clause*> g ;
-	g.push_back(c) ;
-	g.push_back(d) ;
-	g.push_back(e) ;
-	g.push_back(b) ;
+	std::vector<std::shared_ptr<Clause>> g ;
+	g.push_back(std::shared_ptr<Clause>(c));
+	g.push_back(std::shared_ptr<Clause>(d));
+	g.push_back(std::shared_ptr<Clause>(e));
+	g.push_back(std::shared_ptr<Clause>(b));
 	Formula *f = new Formula(g,3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
   Formula *f2 = new Formula(f) ;
@@ -136,11 +136,11 @@ void StructuresTests::testUnitPropagation() {
 	Clause *e = new Clause(3,x) ;
 	std::vector <int> y = {1} ;
 	Clause *b = new Clause(3,y) ;		
-	std::vector<Clause*> g ;
-	g.push_back(c) ;
-	g.push_back(d) ;
-	g.push_back(e) ;
-	g.push_back(b) ;
+	std::vector<std::shared_ptr<Clause>> g ;
+	g.push_back(std::shared_ptr<Clause>(c));
+	g.push_back(std::shared_ptr<Clause>(d));
+	g.push_back(std::shared_ptr<Clause>(e));
+	g.push_back(std::shared_ptr<Clause>(b));
 	Formula *f = new Formula(g,3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
 	monome = f->find_monome() ;
@@ -170,11 +170,11 @@ void StructuresTests::testIsolatedLiterals() {
 	Clause *e = new Clause(3,x) ;
 	std::vector <int> y = {1} ;
 	Clause *b = new Clause(3,y) ;		
-	std::vector<Clause*> g ;
-	g.push_back(c) ;
-	g.push_back(d) ;
-	g.push_back(e) ;
-	g.push_back(b) ;
+	std::vector<std::shared_ptr<Clause>> g ;
+	g.push_back(std::shared_ptr<Clause>(c));
+	g.push_back(std::shared_ptr<Clause>(d));
+	g.push_back(std::shared_ptr<Clause>(e));
+	g.push_back(std::shared_ptr<Clause>(b));
 	Formula *f = new Formula(g,3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
 	literal = f->find_isolated_literal() ;
@@ -203,11 +203,11 @@ void StructuresTests::testClean() {
 	Clause *e = new Clause(3,x) ;
 	std::vector <int> y = {1} ;
 	Clause *b = new Clause(3,y) ;		
-	std::vector<Clause*> g ;
-	g.push_back(c) ;
-	g.push_back(d) ;
-	g.push_back(e) ;
-	g.push_back(b) ;
+	std::vector<std::shared_ptr<Clause>> g ;
+	g.push_back(std::shared_ptr<Clause>(c));
+	g.push_back(std::shared_ptr<Clause>(d));
+	g.push_back(std::shared_ptr<Clause>(e));
+	g.push_back(std::shared_ptr<Clause>(b));
 	Formula *f = new Formula(g,3) ;
   CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,-2},{-1,-2,-3},{1}}));
 	f->clean() ; 
@@ -219,19 +219,19 @@ void StructuresTests::testClean() {
 
 CppUnit::Test* StructuresTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("StructuresTests");
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testClauseCreation",
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testClauseCreation",
                 &StructuresTests::testClauseCreation));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testBasicUsage",
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testBasicUsage",
                 &StructuresTests::testBasicUsage));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testAffectationCreationUsage",
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testAffectationCreationUsage",
                 &StructuresTests::testAffectationCreationUsage));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testFormula",
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testFormula",
                 &StructuresTests::testFormula));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testUnitPropagation",
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testUnitPropagation",
                 &StructuresTests::testUnitPropagation));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testIsolatedLiterals",
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testIsolatedLiterals",
                 &StructuresTests::testIsolatedLiterals));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("testClean",
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testClean",
                 &StructuresTests::testClean));
     return suite;
 }

@@ -25,25 +25,25 @@ void DpllTests::testBasicUsage() {
            *c3=new Clause(3, {1, -2, 3}), *c4=new Clause(3, {-1, -2, 3}),
            *c5=new Clause(3, {1, 2, -3}), *c6=new Clause(3, {-1, 2, -3}),
            *c7=new Clause(3, {1, -2, -3}), *c8=new Clause(3, {-1, -2, -3});
-    std::vector<Clause*> clauses;
-    std::vector<Clause*> clauses2 ;
+    std::vector<std::shared_ptr<Clause>> clauses;
+    std::vector<std::shared_ptr<Clause>> clauses2 ;
     Formula *f;
     Affectation *solution;
-    clauses.push_back(c1);
-    clauses.push_back(c2);
-    clauses.push_back(c3);
-    clauses.push_back(c4);
-    clauses.push_back(c5);
-    clauses.push_back(c6);
-    clauses.push_back(c8);
-    clauses2.push_back(new Clause(*c1));
-    clauses2.push_back(new Clause(*c2));
-    clauses2.push_back(new Clause(*c3));
-    clauses2.push_back(new Clause(*c4));
-    clauses2.push_back(new Clause(*c5));
-    clauses2.push_back(new Clause(*c6));
-    clauses2.push_back(c7) ;
-    clauses2.push_back(new Clause(*c8));   
+    clauses.push_back(std::shared_ptr<Clause>(c1));
+    clauses.push_back(std::shared_ptr<Clause>(c2));
+    clauses.push_back(std::shared_ptr<Clause>(c3));
+    clauses.push_back(std::shared_ptr<Clause>(c4));
+    clauses.push_back(std::shared_ptr<Clause>(c5));
+    clauses.push_back(std::shared_ptr<Clause>(c6));
+    clauses.push_back(std::shared_ptr<Clause>(c8));
+    clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c1)));
+    clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c2)));
+    clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c3)));
+    clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c4)));
+    clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c5)));
+    clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c6)));
+    clauses2.push_back(std::shared_ptr<Clause>(c7));
+    clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c8)));   
     f = new Formula(clauses, 3);
     solution = solve(f);
     CPPUNIT_ASSERT(solution->is_false(1));
@@ -58,7 +58,7 @@ void DpllTests::testBasicUsage() {
 
 CppUnit::Test* DpllTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("DpllTests");
-    suite->addTest(new CppUnit::TestCaller<DpllTests>("testBasicUsage",
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsage",
                 &DpllTests::testBasicUsage));
     return suite;
 }

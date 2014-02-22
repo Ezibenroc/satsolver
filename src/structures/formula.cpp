@@ -7,22 +7,25 @@
 using namespace satsolver;
 
 
-Formula::Formula(std::vector<Clause*> v, int nb_variables) : clauses(v), nb_variables(nb_variables) {
+Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : clauses(v), nb_variables(nb_variables) {
 }
 
 Formula::Formula(satsolver::Formula *f) {
     this->nb_variables = f->nb_variables;
     this->clauses.reserve(f->clauses.size()) ;
-		for(unsigned int i = 0 ; i < f->clauses.size() ; i++) {
-        this->clauses.push_back(new Clause(*(f->clauses[i])));
+    for(unsigned int i = 0 ; i < f->clauses.size() ; i++) {
+        this->clauses.push_back(std::shared_ptr<Clause>(new Clause(*f->clauses[i].get())));
     }
 }
 
 Formula::~Formula() {
-	for(unsigned int i = 0 ; i < this->clauses.size() ; i++) {
-        delete (this->clauses[i]);
-  }
 	this->clauses.clear() ;
+}
+Formula& Formula::operator=(const Formula &that) {
+    std::cout << "Bar" << std::endl;
+    this->nb_variables = that.nb_variables;
+    this->clauses = that.clauses;
+    return *this;
 }
 
 std::string Formula::to_string() const {
@@ -50,7 +53,7 @@ std::set<std::set<int> > Formula::to_set() {
 std::set<Clause*> Formula::to_clauses_set() {
     std::set<Clause*> set;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-        set.insert(this->clauses[i]) ;
+        set.insert(new Clause(*this->clauses[i].get())) ;
     }
     return set ;
 }
@@ -71,12 +74,11 @@ void Formula::set_true(int x) {
 */
 
 void Formula::set_true(int x) {
-	std::vector<Clause*> old_clauses(this->clauses) ;
+	std::vector<std::shared_ptr<Clause>> old_clauses(this->clauses) ;
 	this->clauses.clear() ;
 	this->clauses.reserve(old_clauses.size()) ;
-	for(unsigned j = 0 ; j < old_clauses.size() ; j++) {
+	for(unsigned j = 0 ; j < old_clauses.size() ; j++) { 
 		if(old_clauses[j]->contains_literal(x)) {
-			delete old_clauses[j] ;
 		}
 		else {
 			this->clauses.push_back(old_clauses[j]) ;
@@ -154,7 +156,7 @@ int Formula::choose_literal() const {
 
 void Formula::clean() {
 	int n = 0 ;
-	std::vector<Clause*> old_clauses(this->clauses) ;
+	std::vector<std::shared_ptr<Clause>> old_clauses(this->clauses) ;
 	this->clauses.clear() ;
 	this->clauses.reserve(old_clauses.size()) ;
 	unsigned j ;
@@ -165,7 +167,6 @@ void Formula::clean() {
 			j++ ;												
 		}
 		if(j < old_clauses.size()) { // la clause i contient la clause j
-			delete old_clauses[i] ;
 			old_clauses[i] = NULL ;
 			n ++ ;
 		}

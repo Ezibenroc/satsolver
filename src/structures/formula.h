@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "clause.h"
 
@@ -10,12 +11,13 @@ namespace satsolver {
 
 class Formula {
 		private :
-			std::vector<satsolver::Clause*> clauses ;
+			std::vector<std::shared_ptr<satsolver::Clause>> clauses ;
 			int nb_variables ;
 			
 			
 		public :
-			Formula(std::vector<satsolver::Clause*> v, int nb_variables) ;
+			Formula(std::vector<std::shared_ptr<satsolver::Clause>> v, int nb_variables) ;
+            Formula& operator=(const Formula &that);
 			Formula(satsolver::Formula *f) ;
 			~Formula() ;			
 

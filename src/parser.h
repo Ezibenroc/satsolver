@@ -47,7 +47,7 @@ class Parser {
 
     private:
 
-        std::vector<Clause*> clauses;
+        std::vector<std::shared_ptr<Clause>> clauses;
         int variables_count, clauses_count;
         std::istream &stream;
         std::vector<int> literals;
@@ -61,7 +61,7 @@ class Parser {
         Parser(std::istream &stream);
         ~Parser();
 
-        std::vector<Clause*> get_clauses();
+        std::vector<std::shared_ptr<Clause>> get_clauses();
         Formula* get_formula();
         int get_variables_count() const;
         int get_clauses_count() const;

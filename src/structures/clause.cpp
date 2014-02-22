@@ -49,19 +49,24 @@ Clause::Clause(const Clause &c){
     assert(this->size == c.size);
 }
 
+Clause& Clause::operator=(const Clause &that) {
+    std::cout << "Foo" << std::endl;
+    return *this;
+}
+
 Clause::~Clause() {
     free(this->literals);
 }
 
-int Clause::get_size() {
+int Clause::get_size() const {
 	return this->size ;
 }
 
-bool Clause::is_empty() {
+bool Clause::is_empty() const {
 	return this->size == 0 ;
 }
 
-bool Clause::contains_literal(int literal) {
+bool Clause::contains_literal(int literal) const {
     int sub ;
     assert(literal>=-nb_variables);
     assert(literal<=nb_variables);
@@ -100,7 +105,7 @@ void Clause::remove(int literal) {
     	throw Conflict() ;
 }
 
-bool Clause::is_tautology() {
+bool Clause::is_tautology() const {
 		for(int i = 1 ; i <= this->nb_variables ; i++) {
 			if(this->contains_literal(i) && this->contains_literal(-i))
 				return true ;
@@ -109,7 +114,7 @@ bool Clause::is_tautology() {
 }	
 
 
-std::string Clause::to_string() {
+std::string Clause::to_string() const {
 	std::ostringstream oss;
 	bool flag = false ;
 	for(int i = 1 ; i <= this->nb_variables ; i++) {
@@ -129,7 +134,7 @@ std::string Clause::to_string() {
 	return oss.str() ;
 }
 
-std::set<int> Clause::to_set() {
+std::set<int> Clause::to_set() const {
   std::set<int> set;
 	for(int i = 1 ; i <= this->nb_variables ; i++) {
 		if(this->contains_literal(-i))
@@ -141,7 +146,7 @@ std::set<int> Clause::to_set() {
 }
 
 
-int Clause::monome() {
+int Clause::monome() const {
 	if(this->size != 1)
 		return 0 ;
 	for(int i = 1 ; i <= this->nb_variables ; i++) {
@@ -156,7 +161,7 @@ int Clause::monome() {
 	exit(EXIT_FAILURE) ;
 }
 
-bool Clause::contains_clause(satsolver::Clause &c) {
+bool Clause::contains_clause(satsolver::Clause &c) const {
 	if(this->get_size() < c.get_size()) {
 		return false ;
 	}

@@ -13,7 +13,7 @@
 void ParserTests::testBasic() {
     std::istringstream stream("p cnf 5 3\n3 0\n1 2 4 0\n5 1 0\n");
     std::istringstream &stream2 = stream;
-    std::vector<satsolver::Clause*> clauses;
+    std::vector<std::shared_ptr<satsolver::Clause>> clauses;
     std::set<std::set<int>> clauses_set;
     satsolver::Formula *formula;
     satsolver::Parser *parser;
@@ -34,7 +34,7 @@ void ParserTests::testBasic() {
 void ParserTests::testExtraWhitespaces() {
     std::istringstream stream("c 0 foo bar\np cnf 5 3\n3 0\n\n\n1 2      4 0\nc oof\n5 1 0\n");
     std::istringstream &stream2 = stream;
-    std::vector<satsolver::Clause*> clauses;
+    std::vector<std::shared_ptr<satsolver::Clause>> clauses;
     satsolver::Parser *parser;
     CPPUNIT_ASSERT_NO_THROW(parser = new satsolver::Parser(stream2));
     clauses = parser->get_clauses();
@@ -48,9 +48,9 @@ void ParserTests::testExtraWhitespaces() {
 
 CppUnit::Test* ParserTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("ParserTests");
-    suite->addTest(new CppUnit::TestCaller<ParserTests>("testBasic",
+    suite->addTest(new CppUnit::TestCaller<ParserTests>("ParserTest_testBasic",
                 &ParserTests::testBasic));
-    suite->addTest(new CppUnit::TestCaller<ParserTests>("testExtraWhitespaces",
+    suite->addTest(new CppUnit::TestCaller<ParserTests>("ParserTest_testExtraWhitespaces",
                 &ParserTests::testExtraWhitespaces));
     return suite;
 }

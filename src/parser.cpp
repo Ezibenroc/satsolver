@@ -74,7 +74,7 @@ enum Parser::State Parser::transition(enum Parser::State state) {
             }
             else {
                 std::getline(this->stream, str); // Consume remaining characters
-                this->clauses.push_back(new Clause(this->variables_count, this->literals));
+                this->clauses.push_back(std::shared_ptr<Clause>(new Clause(this->variables_count, this->literals)));
                 this->literals.clear();
                 return WAITING_FOR_CLAUSE;
             }
@@ -96,7 +96,7 @@ enum Parser::State Parser::transition(enum Parser::State state) {
     return state;
 }
 
-std::vector<Clause*> Parser::get_clauses() {
+std::vector<std::shared_ptr<Clause>> Parser::get_clauses() {
     return this->clauses;
 }
 Formula* Parser::get_formula() {
