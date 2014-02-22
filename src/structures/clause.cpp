@@ -13,8 +13,8 @@ Clause::Clause(int nb_variables, bool *literals) {
     this->nb_variables = nb_variables ;
     this->size = 0 ;
     for(int i = 0 ; i < nb_variables*2 ; i++) {
-    	if(literals[i])
-    		this->size ++ ;
+        if(literals[i])
+            this->size ++ ;
     }
 }
 
@@ -42,7 +42,7 @@ Clause::Clause(const Clause &c){
     this->nb_variables = c.nb_variables ;
     this->size = 0;
     for(int i = 0 ; i < this->nb_variables*2 ; i++) {
-    	this->literals[i] = c.literals[i];
+        this->literals[i] = c.literals[i];
         if (c.literals[i])
             this->size++;
     }
@@ -59,11 +59,11 @@ Clause::~Clause() {
 }
 
 int Clause::get_size() const {
-	return this->size ;
+    return this->size ;
 }
 
 bool Clause::is_empty() const {
-	return this->size == 0 ;
+    return this->size == 0 ;
 }
 
 bool Clause::contains_literal(int literal) const {
@@ -102,44 +102,44 @@ void Clause::remove(int literal) {
         this->literals[this->nb_variables + literal - sub] = false;
     }
     if(this->size == 0)
-    	throw Conflict() ;
+        throw Conflict() ;
 }
 
 bool Clause::is_tautology() const {
-		for(int i = 1 ; i <= this->nb_variables ; i++) {
-			if(this->contains_literal(i) && this->contains_literal(-i))
-				return true ;
-		}
-		return false ;
-}	
+        for(int i = 1 ; i <= this->nb_variables ; i++) {
+            if(this->contains_literal(i) && this->contains_literal(-i))
+                return true ;
+        }
+        return false ;
+}    
 
 
 std::string Clause::to_string() const {
-	std::ostringstream oss;
-	bool flag = false ;
-	for(int i = 1 ; i <= this->nb_variables ; i++) {
-		if(this->contains_literal(-i)) {
-			if(flag)
-				oss << " " ;
-			flag = true ;
-			oss << -i ;
-		}
-		if(this->contains_literal(i)) {
-			if(flag)
-				oss << " " ;
-			flag = true ;
-			oss << i ;
-		}
-	}
-	return oss.str() ;
+    std::ostringstream oss;
+    bool flag = false ;
+    for(int i = 1 ; i <= this->nb_variables ; i++) {
+        if(this->contains_literal(-i)) {
+            if(flag)
+                oss << " " ;
+            flag = true ;
+            oss << -i ;
+        }
+        if(this->contains_literal(i)) {
+            if(flag)
+                oss << " " ;
+            flag = true ;
+            oss << i ;
+        }
+    }
+    return oss.str() ;
 }
 
 std::set<int> Clause::to_set() const {
   std::set<int> set;
-	for(int i = 1 ; i <= this->nb_variables ; i++) {
-		if(this->contains_literal(-i))
+    for(int i = 1 ; i <= this->nb_variables ; i++) {
+        if(this->contains_literal(-i))
             set.insert(-i);
-		if(this->contains_literal(i))
+        if(this->contains_literal(i))
             set.insert(i);
     }
     return set;
@@ -147,29 +147,29 @@ std::set<int> Clause::to_set() const {
 
 
 int Clause::monome() const {
-	if(this->size != 1)
-		return 0 ;
-	for(int i = 1 ; i <= this->nb_variables ; i++) {
-		if(this->contains_literal(i)) {
-			return i ;
-		}
-		if(this->contains_literal(-i)) {
-			return -i ;
-		}
-	}
-	std::cout << "Error in clause::monome." << std::endl ;
-	exit(EXIT_FAILURE) ;
+    if(this->size != 1)
+        return 0 ;
+    for(int i = 1 ; i <= this->nb_variables ; i++) {
+        if(this->contains_literal(i)) {
+            return i ;
+        }
+        if(this->contains_literal(-i)) {
+            return -i ;
+        }
+    }
+    std::cout << "Error in clause::monome." << std::endl ;
+    exit(EXIT_FAILURE) ;
 }
 
 bool Clause::contains_clause(satsolver::Clause &c) const {
-	if(this->get_size() < c.get_size()) {
-		return false ;
-	}
-	for(int i = 1 ; i <= this->nb_variables ; i++) {
-		if(!this->contains_literal(i) && c.contains_literal(i))
-			return false ;
-		if(!this->contains_literal(-i) && c.contains_literal(-i))
-			return false ;
-	}
-	return true ;
+    if(this->get_size() < c.get_size()) {
+        return false ;
+    }
+    for(int i = 1 ; i <= this->nb_variables ; i++) {
+        if(!this->contains_literal(i) && c.contains_literal(i))
+            return false ;
+        if(!this->contains_literal(-i) && c.contains_literal(-i))
+            return false ;
+    }
+    return true ;
 }

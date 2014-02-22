@@ -53,7 +53,7 @@ void DpllTests::testBasicUsage() {
     delete f ;
     f = new Formula(clauses2, 3);
     CPPUNIT_ASSERT_THROW(solve(f), Conflict);
-   	delete f ;
+    delete f ;
 }
 
 CppUnit::Test* DpllTests::suite() {

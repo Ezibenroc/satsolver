@@ -10,10 +10,10 @@ namespace satsolver {
 class Conflict: public std::exception {};
 
 class Clause {
-		private:
-        int size; 				// nombre de literaux dans la clause
-        bool *literals;		// clause 
-        int nb_variables;	// nombre de variables dans le problème	
+        private:
+        int size;                 // nombre de literaux dans la clause
+        bool *literals;        // clause 
+        int nb_variables;    // nombre de variables dans le problème    
 
     public:   
     
@@ -22,8 +22,8 @@ class Clause {
         Clause(const satsolver::Clause &c) ; // initialise une nouvelle clause, copie de la clause donnée
         Clause& operator=(const Clause &that);
         ~Clause();
-				
-				// Test si le litéral donné appartient à la clause
+                
+                // Test si le litéral donné appartient à la clause
         bool contains_literal(int literal) const;
         
         // Ajoute le litéral donné à la clause
