@@ -12,3 +12,8 @@ installée (libcppunit-dev sous Debian/Ubuntu).
 Ils sont compilés en même tempsque les autres exécutables, et sont lancés
 par l’exécutable `testrunner`.
 
+
+Tests en utilisant generator :
+Compiler : ocamlc unix.cma -o generator generator_random.ml
+Exécuter (en ayant le programme resol dans le répertoire courant) avec 23 tests et 12 variables :
+./generator -var 12 -test 23
