@@ -100,7 +100,7 @@ int Formula::find_monome() const {
     return 0 ;
 }
 
-/
+/*
 int Formula::unit_propagation() {
     int literal = find_monome() ;
     if(literal == 0)

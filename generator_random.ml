@@ -50,7 +50,7 @@ let main() =
   let x = gettimeofday() in
   for i = 1 to !ntest do
   	print_form !nvar "tmp" ;
-  	if (command "./resol tmp > result") = 2 then failwith "Fatal error occured.";
+  	if (command "./resol tmp | ./check_result.py tmp >> result") = 2 then failwith "Fatal error occured.";
   	if !verbose then print_endline("Test "^(string_of_int i)); 
   done ;
   print_endline("Average time : "^(round (string_of_float((gettimeofday()-.x)/.(float_of_int !ntest)))) 3) ;
