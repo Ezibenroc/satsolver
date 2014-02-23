@@ -1,19 +1,76 @@
-Compiler :
+Utilisation
+===========
+
+Compilation
+-----------
+
     $ mkdir build/
     $ cd build/
     $ cmake ..
     $ make
 
+Exécution
+---------
+
+La compilation engendre un exécutable `resol`, qui prend en paramètre un
+nom de fichier dans le format de FNC du DIMACS (celui utilisé par minisat,
+et détaillé dans l’énoncé du DM1), et affiche en sortie une solution,
+dans le format détaillé dans l’énoncé du DM1.
+
+Celui-ci peut également :
+* ne pas prendre de nom de fichier en paramètre ; l’entrée standard est
+  alors utilisée.
+* prendre l’option -verbose en paramètre, qui affiche des informations
+  pendant l’exécution de l’algorithme de DPLL.
+
 Tests
-=====
+-----
 
 Les tests unitaires ne sont compilés que si la bibliothèque CppUnit est
 installée (libcppunit-dev sous Debian/Ubuntu).
 Ils sont compilés en même tempsque les autres exécutables, et sont lancés
 par l’exécutable `testrunner`.
 
-
 Tests en utilisant generator :
 Compiler : ocamlc unix.cma -o generator generator_random.ml
 Exécuter (en ayant le programme resol dans le répertoire courant) avec 23 tests et 12 variables :
 ./generator -var 12 -test 23
+
+
+Implémentation
+==============
+
+Organisation du code
+--------------------
+
+Les structures de données sont chacunes implémentées dans une paire de
+fichiers situés dans src/structures/.
+La majorité des opérations effectuables sur ces structures sont
+implémentées directement en tant que méthodes de ces objets, ce qui
+permet de réduire la taille de l’implémentation de DPLL lui-même et
+de s’affranchir complètement de l’implémentation des structures
+de données.
+
+Dans le but d’éviter la duplication de code, chaque exécutable
+engendré (excepté testrunner) correspond à un des brefs fichiers
+de src/entry_points/, qui ne fait qu’utiliser le code écrit dans
+src/solver_main.cpp.
+
+Le format imposé étant très simple, il peut être analysé par un simple
+automate fini, implémenté dans src/parser.cpp.
+Parser::parse appelle Parser::transition (qui lit quelques caractères
+du fichier donné en entrée au parseur puis change l’état de l’automate
+en fonction de ce qui a été lu) jusqu’à ce que l’état de l’automate
+devienne END_OF_FILE (qui est donc l’état final).
+
+
+Répartition du travail
+======================
+
+Tom :
+* Implémentation des structures
+* Ajout des littéraux surveillés
+
+Valentin :
+* Implémentation du parseur
+* Implémentation de l’algorithme de DPLL (sans les littéraux surveillés)
