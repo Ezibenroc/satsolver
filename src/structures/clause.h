@@ -12,7 +12,7 @@ class Conflict: public std::exception {};
 class Clause {
         private:
         int size;                 // nombre de literaux dans la clause
-        bool *literals;        // clause
+        bool *literals;        // présence de chaque littéral dans la clause (1…n : -x_n, …, -x_1 et (n+1)…2n : x_1, …, x_n ; n=nb_variables)
         int nb_variables;    // nombre de variables dans le problème
 
     public:
@@ -23,7 +23,7 @@ class Clause {
         Clause& operator=(const Clause &that);
         ~Clause();
 
-                // Test si le litéral donné appartient à la clause
+        // Teste si le litéral donné appartient à la clause
         bool contains_literal(int literal) const;
 
         // Ajoute le litéral donné à la clause
@@ -33,7 +33,7 @@ class Clause {
         // Renvoie l'exception Conflict si la clause est vide après la suppression
         void remove(int literal) ;
 
-        // Test si la clause est une tautologie
+        // Teste si la clause est une tautologie
         bool is_tautology() const;
 
         // Renvoie le nombre de littéraux

@@ -3,6 +3,8 @@
 #include "parser_tests.h"
 #include "dpll_tests.h"
 
+bool VERBOSE = false;
+
 int main(void)
 {
     CppUnit::TextUi::TestRunner runner;

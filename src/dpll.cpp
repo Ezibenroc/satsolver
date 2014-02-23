@@ -8,10 +8,9 @@
 #include "structures/formula.h"
 #include "structures/clause.h"
 #include "dpll.h"
+#include "config.h"
 
 using namespace satsolver;
-
-bool verbose_dpll = false ;
 
 void satsolver::process(Formula *formula, Affectation *affectation) {
     int literal;
@@ -20,10 +19,10 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
         return ;
     }
 
-        // Unitary resolution
+    // Unitary resolution
     literal = formula->find_monome() ;
     if(literal) {
-        if(verbose_dpll) {
+        if(VERBOSE) {
             std::cout << "Unitary resolution with literal " << literal << std::endl ;
         }
         formula->set_true(literal) ;
@@ -35,7 +34,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     // Isolated literal
     literal = formula->find_isolated_literal() ;
     if(literal) {
-        if(verbose_dpll) {
+        if(VERBOSE) {
             std::cout << "Isolated resolution with literal " << literal << std::endl ;
         }
         formula->set_true(literal) ;
@@ -47,7 +46,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     // Make a bet
     literal = formula->choose_literal();
     try {
-        if(verbose_dpll) {
+        if(VERBOSE) {
             std::cout << "Make a bet with literal " << literal << std::endl ;
         }
         new_f = new Formula(formula) ;
@@ -59,7 +58,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     }
     catch (Conflict e) {
         delete new_f ; // suppression de new_f dans le cas où c'était insatisfiable
-        if(verbose_dpll) {
+        if(VERBOSE) {
             std::cout << "Made a wrong bet with literal " << literal << std::endl ;
         }
         formula->set_false(literal) ;
