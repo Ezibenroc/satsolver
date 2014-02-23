@@ -57,21 +57,6 @@ std::set<Clause*> Formula::to_clauses_set() {
     return set ;
 }
 
-/* Beaucoup de copies... Et une fuite mémoire astronomique.
-void Formula::set_true(int x) {
-    std::vector<Clause*> new_clauses;
-    Clause *new_clause;
-    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-        if (!this->clauses[i]->contains_literal(x)) {
-            new_clause = new Clause(*this->clauses[i]);
-                        new_clause->remove(-x);
-            new_clauses.push_back(new_clause);
-        }
-    }
-    this->clauses.swap(new_clauses);
-}
-*/
-
 void Formula::set_true(int x) {
     std::vector<std::shared_ptr<Clause>> old_clauses(this->clauses) ;
     this->clauses.clear() ;
@@ -99,15 +84,6 @@ int Formula::find_monome() const {
     }
     return 0 ;
 }
-
-/
-int Formula::unit_propagation() {
-    int literal = find_monome() ;
-    if(literal == 0)
-        return 0 ;
-    this->set_true(literal) ;
-    return literal ;
-}*/
 
 int Formula::find_isolated_literal() const {
     bool pos, neg ;
