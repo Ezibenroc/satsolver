@@ -49,7 +49,7 @@ enum Parser::State Parser::transition(enum Parser::State state) {
         case WAITING_FOR_CLAUSES_COUNT:
             this->stream >> this->clauses_count;
             return WAITING_FOR_CLAUSE;
-        
+
         case WAITING_FOR_CLAUSE:
             if (this->stream.eof())
                 return END_OF_FILE;
@@ -86,13 +86,13 @@ enum Parser::State Parser::transition(enum Parser::State state) {
         case IN_COMMENT_BEFORE_HEADER:
             std::getline(this->stream, str);
             return WAITING_FOR_HEADER;
-        
+
         case END_OF_FILE:
             assert(false);
 
     }
-                
-            
+
+
     return state;
 }
 

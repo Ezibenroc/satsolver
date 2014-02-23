@@ -31,7 +31,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
         formula->clean() ;
         return process(formula,affectation) ;
     }
-    
+
     // Isolated literal
     literal = formula->find_isolated_literal() ;
     if(literal) {
@@ -43,7 +43,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
         affectation->set_true(literal) ;
         return process(formula,affectation) ;
     }
-    
+
     // Make a bet
     literal = formula->choose_literal();
     try {

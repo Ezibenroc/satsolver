@@ -113,7 +113,7 @@ bool Clause::is_tautology() const {
                 return true ;
         }
         return false ;
-}    
+}
 
 
 std::string Clause::to_string() const {

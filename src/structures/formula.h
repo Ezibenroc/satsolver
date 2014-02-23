@@ -19,7 +19,7 @@ class Formula {
         Formula(std::vector<std::shared_ptr<satsolver::Clause>> v, int nb_variables) ;
         Formula& operator=(const Formula &that);
         Formula(satsolver::Formula *f) ;
-        ~Formula() ;			
+        ~Formula() ;
 
         // Renvoie le premier entier x tel qu'il existe une clause monome {x} (0 s'il n'existe pas)
         int find_monome() const;
@@ -27,7 +27,7 @@ class Formula {
         /* Propagation unitaire
         Trouve une clause monome, et affecte à vrai son littéral.
         Si succés, renvoie le literal affecté à vrai, sinon renvoie 0. */
-        //	int unit_propagation() ;			
+        //	int unit_propagation() ;
 
         // Renvoie le premier entier x tel que x soit présent dans au moins une clause, et -x absent de toute clauses
         // (0 s'il n'existe pas)
@@ -63,7 +63,7 @@ class Formula {
 
         // Renvoie un littéral de la formule
         // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide
-        int choose_literal() const; 
+        int choose_literal() const;
 
         // Supprime toute les clauses contenant d'autres clauses
         // Assez lourd (nombre de clauses au carré fois le nombre de variables)

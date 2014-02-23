@@ -76,7 +76,7 @@ void Formula::set_true(int x) {
     std::vector<std::shared_ptr<Clause>> old_clauses(this->clauses) ;
     this->clauses.clear() ;
     this->clauses.reserve(old_clauses.size()) ;
-    for(unsigned j = 0 ; j < old_clauses.size() ; j++) { 
+    for(unsigned j = 0 ; j < old_clauses.size() ; j++) {
         if (!old_clauses[j]->contains_literal(x)) {
             this->clauses.push_back(old_clauses[j]) ;
             this->clauses[this->clauses.size()-1]->remove(-x) ;
@@ -100,7 +100,7 @@ int Formula::find_monome() const {
     return 0 ;
 }
 
-/*
+/
 int Formula::unit_propagation() {
     int literal = find_monome() ;
     if(literal == 0)
@@ -124,7 +124,7 @@ int Formula::find_isolated_literal() const {
     }
     return 0 ;
 }
- 
+
 
 bool Formula::is_empty() const {
     return (this->clauses.size() == 0);
@@ -159,9 +159,9 @@ void Formula::clean() {
     unsigned j ;
     for(unsigned i = 0 ; i < old_clauses.size() ; i++) {
         j = 0 ;
-        while(j < old_clauses.size() && (old_clauses[j] == NULL || j == i 
+        while(j < old_clauses.size() && (old_clauses[j] == NULL || j == i
                                                         || !old_clauses[i]->contains_clause(*old_clauses[j]))) {
-            j++ ;                                                
+            j++ ;
         }
         if(j < old_clauses.size()) { // la clause i contient la clause j
             old_clauses[i] = NULL ;

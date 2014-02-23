@@ -20,16 +20,16 @@ class Parser {
             WAITING_FOR_CNF,
             WAITING_FOR_VARIABLES_COUNT,
             WAITING_FOR_CLAUSES_COUNT,
-            
+
             WAITING_FOR_CLAUSE,
             PARSING_CLAUSE,
-            
+
             IN_COMMENT,
             IN_COMMENT_BEFORE_HEADER,
 
             END_OF_FILE,
         };
-        
+
         class syntaxerror : public std::exception {
             private:
                 const char *msg;
@@ -43,7 +43,7 @@ class Parser {
                     return this->msg;
                 }
         };
-                
+
 
     private:
 
