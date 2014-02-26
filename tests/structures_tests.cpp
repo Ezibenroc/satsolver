@@ -148,6 +148,7 @@ void StructuresTests::testFormula() {
     
 		Formula *f2 = new Formula(f) ;
    	CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
+   	CPPUNIT_ASSERT(f2->isolated_literal() == 2) ;
    	f2->bet_true(-1) ;
     CPPUNIT_ASSERT(f2->get_aff()->is_true(-1) && f2->get_aff()->is_true(2) && f2->get_aff()->is_true(-3)) ;
     st = f2->get_mem() ;
@@ -168,6 +169,7 @@ void StructuresTests::testFormula() {
 		st.pop() ;
     CPPUNIT_ASSERT((st.top() == std::pair<int,bool>(-3,true))) ;
    	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1},{1}}));
+   	CPPUNIT_ASSERT(f->isolated_literal() == 0) ;
    	
    	CPPUNIT_ASSERT(f->back() == -2) ;
    	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));   

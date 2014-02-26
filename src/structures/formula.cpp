@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <cstring>
 
 using namespace satsolver;
 
@@ -140,7 +141,37 @@ int Formula::back() {
 }
 
 int Formula::isolated_literal() {
-
+	int *l ;
+	l = (int*) malloc((this->nb_variables+1)*sizeof(int)) ;
+	/* l[i] = 0 si i est inconnu et n'existe pas dans les clauses
+		 l[i] = 1 si i est inconnu et seulement positif
+		 l[i] = 2 si i est inconnu et seulement négatif
+		 l[i] = 3 si i est inconnu et positif et négatif
+	*/
+	memset(l,0,(this->nb_variables+1)*sizeof(int)) ;
+	for(auto c : this->to_set()) {
+		for(auto i : c) {
+			if(i>0) {
+				if(l[i] == 0 || l[i] == 1)
+					l[i] = 1 ;
+				else
+					l[i] = 3 ;
+			}
+			else {
+				if(l[-i] == 0 || l[-i] == 2)
+					l[-i] = 2 ;
+				else
+					l[-i] = 3 ;
+			}
+		}
+	}
+	for(int i = 1 ; i <= this->nb_variables ; i++) {
+		if(l[i] == 1)
+			return i ;
+		else if(l[i] == 2)
+			return -i ;
+	}
+	return 0 ;
 }
 
 

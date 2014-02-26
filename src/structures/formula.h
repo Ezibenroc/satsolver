@@ -54,7 +54,7 @@ class Formula {
 				int back() ;
 
 				// Renvoie un litéral isolé de la formule (0 si inexistant)
-				int Formula::isolated_literal()
+				int isolated_literal() ;
 
         // Renvoie vrai ssi la formule ne contient pas de clauses
         bool is_empty() const;
