@@ -24,10 +24,11 @@ void ParserTests::testBasic() {
     CPPUNIT_ASSERT(clauses[2]->to_set() == std::set<int>({1, 5}));
     CPPUNIT_ASSERT(clauses[0]->to_set() == std::set<int>({3}));
     formula = parser->get_formula();
-    clauses_set.insert(clauses[0]->to_set());
+    //clauses_set.insert(clauses[0]->to_set()); -> deleted by pretreatment in formula instanciation
     clauses_set.insert(clauses[1]->to_set());
     clauses_set.insert(clauses[2]->to_set());
     CPPUNIT_ASSERT(formula->to_set() == clauses_set);
+    CPPUNIT_ASSERT(*(formula->get_aff()->to_set()) == std::set<int>({3}));
     delete parser;
     delete formula;
 }
