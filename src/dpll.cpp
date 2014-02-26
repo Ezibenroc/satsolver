@@ -12,7 +12,7 @@
 
 using namespace satsolver;
 
-void satsolver::process(Formula *formula, Affectation *affectation) {
+void satsolver::process(Formula *formula, Affectation *affectation) {/*
     int literal;
     Formula *new_f ;
     if(formula->is_empty()) {
@@ -65,7 +65,7 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
         formula->clean() ;
         affectation->set_false(literal) ;
         process(formula,affectation) ;
-    }
+    }*/
 }
 
 

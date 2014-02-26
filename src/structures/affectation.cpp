@@ -15,24 +15,29 @@ Affectation::Affectation(int nb_var) {
         this->aff.push_back(0) ;
 }
 
+Affectation::Affectation(Affectation *a) {
+    this->aff = std::vector<int>(a->aff) ;
+    this->nb_aff = a->nb_aff ;
+}
+
 bool Affectation::is_true(int x) const {
     assert(abs(x) <= (int) this->aff.size() && x!=0) ;
     if(x>0)
-        return this->aff[x-1] == 1 ;
+        return this->aff[x-1] == TR ;
     else
         return this->is_false(-x);
 }
 bool Affectation::is_false(int x) const {
     assert(abs(x) <= (int) this->aff.size() && x!=0) ;
     if(x>0)
-        return this->aff[x-1] == -1 ;
+        return this->aff[x-1] == FA ;
     else
         return this->is_true(-x);
 }
 bool Affectation::is_unknown(int x) const {
     assert(abs(x) <= (int) this->aff.size() && x!=0) ;
     if (x>0)
-        return this->aff[x-1] == 0 ;
+        return this->aff[x-1] == UN ;
     else
         return this->is_unknown(-x);
 }
@@ -40,21 +45,21 @@ bool Affectation::is_unknown(int x) const {
 void Affectation::set_true(int x) {
     assert(abs(x) <= (int) this->aff.size() && x!=0) ;
     if(x>0)
-        this->aff[x-1] = 1 ;
+        this->aff[x-1] = TR ;
     else
         this->set_false(-x);
 }
 void Affectation::set_false(int x) {
     assert(abs(x) <= (int) this->aff.size() && x!=0) ;
     if(x>0)
-        this->aff[x-1] = -1 ;
+        this->aff[x-1] = FA ;
     else
         this->set_true(-x);
 }
 void Affectation::set_unknown(int x) {
     assert(abs(x) <= (int) this->aff.size() && x!=0) ;
     if(x>0)
-        this->aff[abs(x)-1] = 0 ;
+        this->aff[abs(x)-1] = UN ;
     else
         this->set_unknown(-x);
 }

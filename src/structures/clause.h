@@ -4,6 +4,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include "affectation.h"
 
 namespace satsolver {
 
@@ -11,13 +12,13 @@ class Conflict: public std::exception {};
 
 class Clause {
         private:
-        int size;                 // nombre de literaux dans la clause
-        bool *literals;        // présence de chaque littéral dans la clause (1…n : -x_n, …, -x_1 et (n+1)…2n : x_1, …, x_n ; n=nb_variables)
+        std::set<int> literals ;
         int nb_variables;    // nombre de variables dans le problème
+        std::pair<int,int> watched ;
+        Affectation *aff ; // pointeur vers l'affectation globale
 
     public:
 
-        Clause(int nb_variables, bool *literals);
         Clause(int nb_variables, std::vector<int> literals);
         Clause(const satsolver::Clause &c) ; // initialise une nouvelle clause, copie de la clause donnée
         Clause& operator=(const Clause &that);
@@ -50,12 +51,32 @@ class Clause {
 
        // Renvoie vrai si la clause est vide
        bool is_empty() const;
-       // Si la clause est un monome, renvoie le literal en question
-       // Sinon renvoie 0
-       int monome() const;
 
        // Renvoie vrai ssi elle contient la clause donnée
        bool contains_clause(satsolver::Clause &c) const;
+       
+       // Initialise les watched literals
+       void init_WL() ;
+       
+       // Renvoie le premier ou le second watched literal
+       int fst_WL() ;
+       int snd_WL() ;
+       
+       // Test si l'entier donné est un watched literal
+       bool is_WL(int x) ;
+       
+       // Définie l'affectation
+       void set_affectation(Affectation *a) ;
+       
+       // Annonce à la clause que x a été mis à vrai
+       // Retourne y si y devient le seul littéral non faux, 0 sinon
+       int set_true(int x) ;
+       int set_false(int x) ;
+       
+       bool is_true() ;
+       
+       // Si la clause est un monome {x}, renvoie x
+       int monome() ;
 };
 
 }

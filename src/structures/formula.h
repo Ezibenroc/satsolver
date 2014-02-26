@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <stack>
 
 #include "clause.h"
 
@@ -13,6 +14,13 @@ class Formula {
     private :
         std::vector<std::shared_ptr<satsolver::Clause>> clauses ;
         int nb_variables ;
+        Affectation *aff ;
+        std::stack<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
+        std::set<int> to_do ; // littéraux déduit pas encore affectés
+
+        // Affectation d'un litéral x
+        // Exception Conflict si un conflit est généré
+        void set_true(int x) ;
 
 
     public :
@@ -21,17 +29,6 @@ class Formula {
         Formula(satsolver::Formula *f) ;
         ~Formula() ;
 
-        // Renvoie le premier entier x tel qu'il existe une clause monome {x} (0 s'il n'existe pas)
-        int find_monome() const;
-
-        /* Propagation unitaire
-        Trouve une clause monome, et affecte à vrai son littéral.
-        Si succés, renvoie le literal affecté à vrai, sinon renvoie 0. */
-        //	int unit_propagation() ;
-
-        // Renvoie le premier entier x tel que x soit présent dans au moins une clause, et -x absent de toute clauses
-        // (0 s'il n'existe pas)
-        int find_isolated_literal() const;
 
         // Renvoie la représentation textuelle de la formule
         std::string to_string() const;
@@ -44,10 +41,20 @@ class Formula {
         std::set<std::set<int> > to_set() ;
         std::set<Clause*> to_clauses_set() ;
 
-        // Affectation d'un litéral x
-        void set_true(int x) ;
-        void set_false(int x) ;
+				// Déduction de l'affectation d'un littéral
+				void deduce_true(int x) ;
+				void deduce_false(int x) ;
+				
+				// Pari sur l'affectation d'un littéral
+				void bet_true(int x) ;
+				void bet_false(int x) ;
 
+				// Retourne en arrière jusqu'au dernier paris
+				// Renvoie le dernier littéral parié (0 si inexistant) 
+				int back() ;
+
+				// Renvoie un litéral isolé de la formule (0 si inexistant)
+				int Formula::isolated_literal()
 
         // Renvoie vrai ssi la formule ne contient pas de clauses
         bool is_empty() const;
@@ -66,10 +73,19 @@ class Formula {
         int choose_literal() const;
 
         // Supprime toute les clauses contenant d'autres clauses
+        // Affecte tous les monomes
         // Assez lourd (nombre de clauses au carré fois le nombre de variables)
-        // À utiliser avec parcimonie
+        // À utiliser seulement à l'initialisation
         void clean() ;
-};
+        
+        // Renvoie la pile d'affectations
+        // Ne pas utiliser en dehors des tests unitaires
+        std::stack<std::pair<int,bool>> get_mem() ;
+    		
+    		// Renvoie l'affectation
+    		// Ne pas utiliser en dehors des tests unitaires
+    		Affectation *get_aff() ;		    
+};	
 
 }
 

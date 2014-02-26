@@ -4,115 +4,71 @@
 #include <sstream>
 #include <iostream>
 
+#include <set>
 #include "clause.h"
 
 using namespace satsolver;
 
-Clause::Clause(int nb_variables, bool *literals) {
-    this->literals = literals;
-    this->nb_variables = nb_variables ;
-    this->size = 0 ;
-    for(int i = 0 ; i < nb_variables*2 ; i++) {
-        if(literals[i])
-            this->size ++ ;
-    }
-}
 
 Clause::Clause(int nb_var, std::vector<int> literals) {
-    int sub ;
-    this->literals = (bool*) malloc(sizeof(bool)*nb_var*2);
-    this->size = 0 ;
+    this->literals = std::set<int>() ;
     this->nb_variables = nb_var;
-    memset(this->literals, false, nb_var*2);
     for(std::vector<int>::iterator it = literals.begin(); it != literals.end(); ++it) {
-        assert(*it != 0);
-        if(*it > 0)
-            sub = 1 ;
-        else
-            sub = 0 ;
-        if (!this->literals[nb_var + *it - sub]) {
-            this->literals[nb_var + *it - sub] = true;
-            this->size ++ ;
-        }
+        assert(*it != 0 && abs(*it) <= nb_var);
+        this->literals.insert(*it) ;
     }
+    this->watched = std::pair<int,int>(0,0) ;
+    this->aff = NULL ;
 }
 
 Clause::Clause(const Clause &c){
-    this->literals = (bool*) malloc(sizeof(bool)*c.nb_variables*2);
+    this->literals = std::set<int>(c.literals) ;
     this->nb_variables = c.nb_variables ;
-    this->size = 0;
-    for(int i = 0 ; i < this->nb_variables*2 ; i++) {
-        this->literals[i] = c.literals[i];
-        if (c.literals[i])
-            this->size++;
-    }
-    assert(this->size == c.size);
+		this->watched = std::pair<int,int>(c.watched) ;
+    this->aff = c.aff ;
 }
 
 Clause& Clause::operator=(const Clause &that) {
     this->literals = that.literals;
     this->nb_variables = that.nb_variables;
-    this->size = that.size;
+		this->watched = that.watched ;
     return *this;
+    this->aff = that.aff ;
 }
 
 Clause::~Clause() {
-    free(this->literals);
+
 }
 
 int Clause::get_size() const {
-    return this->size ;
+    return (int) this->literals.size() ;
 }
 
 bool Clause::is_empty() const {
-    return this->size == 0 ;
+    return this->get_size() == 0 ;
 }
 
 bool Clause::contains_literal(int literal) const {
-    int sub ;
-    assert(literal>=-nb_variables);
-    assert(literal<=nb_variables);
-    if(literal > 0)
-        sub = 1;
-    else
-        sub = 0;
-    return this->literals[this->nb_variables + literal - sub];
+    assert(abs(literal)<=this->nb_variables && literal != 0);
+    return this->literals.find(literal) != this->literals.end() ;
 }
 
 void Clause::add(int literal) {
-    int sub;
-    if(!this->contains_literal(literal)) {
-        this->size ++;
-        if(literal > 0)
-            sub = 1;
-        else
-            sub = 0;
-        assert(!this->literals[this->nb_variables + literal - sub]);
-        this->literals[this->nb_variables + literal - sub] = true;
-    }
+    assert(abs(literal)<=this->nb_variables && literal != 0);
+    this->literals.insert(literal) ;
 }
 
 void Clause::remove(int literal) {
-    int sub ;
-    if(this->contains_literal(literal)) {
-        this->size -- ;
-        if(literal > 0)
-            sub = 1;
-        else
-            sub = 0;
-        assert(this->literals[this->nb_variables + literal - sub]);
-        this->literals[this->nb_variables + literal - sub] = false;
-    }
-    if(this->size == 0)
-        throw Conflict() ;
+    assert(abs(literal)<=this->nb_variables && literal != 0);
+    this->literals.erase(literal) ;
 }
 
 bool Clause::is_tautology() const {
-        for(int i = 1 ; i <= this->nb_variables ; i++) {
-            if(this->contains_literal(i) && this->contains_literal(-i))
-                return true ;
-        }
-        return false ;
+    for(int i = 1 ; i <= this->nb_variables ; i++) {
+        if(this->contains_literal(i) && this->contains_literal(-i))
+            return true ;
+    }
+    return false ;
 }
 
 
@@ -137,31 +93,15 @@ std::string Clause::to_string() const {
 }
 
 std::set<int> Clause::to_set() const {
-  std::set<int> set;
-    for(int i = 1 ; i <= this->nb_variables ; i++) {
-        if(this->contains_literal(-i))
-            set.insert(-i);
-        if(this->contains_literal(i))
-            set.insert(i);
+    std::set<int> s = std::set<int>() ;
+    for(auto l : this->literals) {
+    	if(!this->aff->is_false(l)) {
+    		s.insert(l) ;
+    	}
     }
-    return set;
+    return s ;
 }
 
-
-int Clause::monome() const {
-    if(this->size != 1)
-        return 0 ;
-    for(int i = 1 ; i <= this->nb_variables ; i++) {
-        if(this->contains_literal(i)) {
-            return i ;
-        }
-        if(this->contains_literal(-i)) {
-            return -i ;
-        }
-    }
-    std::cout << "Error in clause::monome." << std::endl ;
-    exit(EXIT_FAILURE) ;
-}
 
 bool Clause::contains_clause(satsolver::Clause &c) const {
     if(this->get_size() < c.get_size()) {
@@ -174,4 +114,69 @@ bool Clause::contains_clause(satsolver::Clause &c) const {
             return false ;
     }
     return true ;
+}
+
+void Clause::init_WL() {
+	assert(this->get_size() >= 2) ;
+	std::set<int>::iterator it = this->literals.begin() ;
+	this->watched.first = *it ;
+	++it ;
+	this->watched.second = *it ;
+}
+
+int Clause::fst_WL() {
+	return this->watched.first ;
+}
+int Clause::snd_WL() {
+	return this->watched.second ;
+}
+
+bool Clause::is_WL(int x) {
+	return this->watched.first == x || this->watched.second == x ;
+}
+
+void Clause::set_affectation(Affectation *a) {
+	this->aff = a ;
+}
+
+int Clause::set_true(int x) { 
+	if(this->contains_literal(x)) { // on installe x comme littéral surveillé
+		if(this->aff->is_unknown(this->fst_WL()))  // priorité aux littéraux vrais
+			this->watched.first = x ;
+		else
+			this->watched.second = x ;		
+	}
+	else if(this->is_WL(-x)) { // on surveille un littéral qui a été mis à faux
+		if(this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()))
+			return 0 ; // rien à faire, la clause est satisfaite
+		for(auto literal : this->literals) {
+			if(!this->aff->is_false(literal) && !this->is_WL(literal)) { // nouveau literal surveillé
+				if(this->fst_WL() == -x) 
+					this->watched.first = literal ;
+				else
+					this->watched.second = literal ;
+				return 0 ; // pas de propagation unitaire, on a trouvé un remplaçant
+			}
+		}
+		// On n'a pas trouvé de remplaçant, il ne reste donc qu'un literal non faux
+		if(this->fst_WL() != -x)
+			return this->fst_WL() ;
+		else
+			return this->snd_WL() ;	
+	}
+	return 0 ;
+}
+
+int Clause::set_false(int x) {
+	return this->set_true(-x) ;
+}
+
+bool Clause::is_true() {
+	return this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()) ;
+}
+
+int Clause::monome() {
+	if(this->literals.size() == 1)
+		return *(this->literals.begin()) ;
+	return 0 ;
 }

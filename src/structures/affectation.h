@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 
+#define TR 1
+#define FA -1
+#define UN 0
+
 namespace satsolver {
 
 class Affectation {
@@ -14,6 +18,7 @@ class Affectation {
 
     public :
         Affectation(int nb_variables) ; // nb_variables est le nombre de variables dans le problème
+        Affectation(Affectation *a) ;
 
         // Connaître l'état d'une variable
         bool is_true(int x) const;
