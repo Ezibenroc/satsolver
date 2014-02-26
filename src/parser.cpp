@@ -22,7 +22,8 @@ enum Parser::State Parser::transition(enum Parser::State state) {
     std::string str;
     int literal;
     switch (state) {
-        case WAITING_FOR_HEADER:
+
+        case WAITING_FOR_HEADER: // At the beginning of a line, header not seen yet
             this->stream >> prefix;
             switch (prefix) {
                 case 'c':
@@ -36,21 +37,21 @@ enum Parser::State Parser::transition(enum Parser::State state) {
             };
             break;
 
-        case WAITING_FOR_CNF:
+        case WAITING_FOR_CNF: // In the header line, “p” has been read
             this->stream >> str;
             if (str != "cnf")
                 throw Parser::syntaxerror("Expected 'cnf'.");
             return WAITING_FOR_VARIABLES_COUNT;
 
-        case WAITING_FOR_VARIABLES_COUNT:
+        case WAITING_FOR_VARIABLES_COUNT: // In the header line, “p cnf” has been read
             this->stream >> this->variables_count;
             return WAITING_FOR_CLAUSES_COUNT;
 
-        case WAITING_FOR_CLAUSES_COUNT:
+        case WAITING_FOR_CLAUSES_COUNT: // In the header line, “p cnf X” (where X is the variables count) has been read
             this->stream >> this->clauses_count;
             return WAITING_FOR_CLAUSE;
 
-        case WAITING_FOR_CLAUSE:
+        case WAITING_FOR_CLAUSE: // At the beginning of a line, header has already been seen.
             if (this->stream.eof())
                 return END_OF_FILE;
             this->stream >> str;
@@ -66,7 +67,7 @@ enum Parser::State Parser::transition(enum Parser::State state) {
             }
             return PARSING_CLAUSE;
 
-        case PARSING_CLAUSE:
+        case PARSING_CLAUSE: // In a clause. At least one literal has been read.
             this->stream >> literal;
             if (literal) {
                 this->literals.push_back(literal);
@@ -79,15 +80,16 @@ enum Parser::State Parser::transition(enum Parser::State state) {
                 return WAITING_FOR_CLAUSE;
             }
 
-        case IN_COMMENT:
+        case IN_COMMENT: // In a comment. Header has already been seen.
             std::getline(this->stream, str);
             return WAITING_FOR_CLAUSE;
 
-        case IN_COMMENT_BEFORE_HEADER:
+        case IN_COMMENT_BEFORE_HEADER: // In a command. Header has not been seen yet.
             std::getline(this->stream, str);
             return WAITING_FOR_HEADER;
 
         case END_OF_FILE:
+            // We have read the EOF character and set the state to END_OF_FILE, which is a terminal state and therefore this case should never be matched.
             assert(false);
 
     }
