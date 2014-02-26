@@ -18,6 +18,9 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
     if(formula->is_empty()) {
         return ;
     }
+    if(VERBOSE) {
+        std::cout << "Processing: " << formula->to_string() << std::endl;
+    }
 
     // Unitary resolution
     literal = formula->find_monome() ;
