@@ -139,30 +139,33 @@ void Clause::set_affectation(Affectation *a) {
 	this->aff = a ;
 }
 
-int Clause::set_true(int x) { 
-	if(this->contains_literal(x)) { // on installe x comme littéral surveillé
-		if(this->aff->is_unknown(this->fst_WL()))  // priorité aux littéraux vrais
-			this->watched.first = x ;
-		else
-			this->watched.second = x ;		
-	}
-	else if(this->is_WL(-x)) { // on surveille un littéral qui a été mis à faux
-		if(this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()))
-			return 0 ; // rien à faire, la clause est satisfaite
-		for(auto literal : this->literals) {
-			if(!this->aff->is_false(literal) && !this->is_WL(literal)) { // nouveau literal surveillé
-				if(this->fst_WL() == -x) 
-					this->watched.first = literal ;
-				else
-					this->watched.second = literal ;
-				return 0 ; // pas de propagation unitaire, on a trouvé un remplaçant
-			}
+int Clause::set_true(int x) {
+	if(!this->aff->is_true(this->fst_WL()) && !this->aff->is_true(this->snd_WL())) {
+		if(this->contains_literal(x)) { // on installe x comme littéral surveillé
+			if(this->aff->is_unknown(this->fst_WL()))  // priorité aux littéraux vrais
+				this->watched.first = x ;
+			else
+				this->watched.second = x ;		
 		}
-		// On n'a pas trouvé de remplaçant, il ne reste donc qu'un literal non faux
-		if(this->fst_WL() != -x)
-			return this->fst_WL() ;
-		else
-			return this->snd_WL() ;	
+		else if(this->is_WL(-x)) { // on surveille un littéral qui a été mis à faux
+			if(this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()))
+				return 0 ; // rien à faire, la clause est satisfaite
+			for(auto literal : this->literals) {
+				if(!this->aff->is_false(literal) && !this->is_WL(literal)) { // nouveau literal surveillé
+					if(this->fst_WL() == -x) 
+						this->watched.first = literal ;
+					else
+						this->watched.second = literal ;
+					return 0 ; // pas de propagation unitaire, on a trouvé un remplaçant
+				}
+			}
+			// On n'a pas trouvé de remplaçant, il ne reste donc qu'un literal non faux
+			if(this->fst_WL() != -x)
+				return this->fst_WL() ;
+			else
+				return this->snd_WL() ;	
+		}
+		return 0 ;
 	}
 	return 0 ;
 }

@@ -93,14 +93,14 @@ void Formula::set_true(int x) {
 }
 */
 
-void Formula::set_true(int x) {
+bool Formula::set_true(int x) {
 	int literal ;
 	this->aff->set_true(x) ;
 	for(auto c : this->clauses) {
 		literal = c->set_true(x) ;
 		if(literal){// on a engendré un monome
 			if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
-				throw Conflict() ;
+				return false ;
 			}
 			this->to_do.insert(literal) ;
 		} 
@@ -108,24 +108,25 @@ void Formula::set_true(int x) {
 	if(!this->to_do.empty()) { // on doit affecter ces littéraux
 		literal = *this->to_do.begin() ;	
 		this->to_do.erase(literal) ;
-		deduce_true(literal) ;
+		return deduce_true(literal) ;
 	}
+	return true ;
 }
 
-void Formula::deduce_true(int x) {
+bool Formula::deduce_true(int x) {
 	this->mem.push(std::pair<int,bool>(x,true)) ;
-	this->set_true(x) ;	
+	return this->set_true(x) ;	
 }
-void Formula::deduce_false(int x) {
-	deduce_true(-x) ;
+bool Formula::deduce_false(int x) {
+	return deduce_true(-x) ;
 }
 
-void Formula::bet_true(int x) {
+bool Formula::bet_true(int x) {
 	this->mem.push(std::pair<int,bool>(x,false)) ;
-	this->set_true(x) ;
+	return this->set_true(x) ;
 }
-void Formula::bet_false(int x) {
-	bet_true(-x) ;
+bool Formula::bet_false(int x) {
+	return bet_true(-x) ;
 }
 
 int Formula::back() {

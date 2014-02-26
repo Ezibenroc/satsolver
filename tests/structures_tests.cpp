@@ -132,7 +132,7 @@ void StructuresTests::testSetTrueClause() {
     aff->set_true(1) ;
     CPPUNIT_ASSERT(c->set_true(2) == 0) ;
     aff->set_true(2) ;
-    CPPUNIT_ASSERT((c->fst_WL()==1 && c->snd_WL()==2)||(c->fst_WL()==2 && c->snd_WL()==1));
+    CPPUNIT_ASSERT(c->fst_WL()==1 || c->snd_WL()==1 || c->fst_WL()==2 || c->snd_WL()==2);
     delete aff ;
     delete c ;
 }
@@ -159,7 +159,7 @@ void StructuresTests::testFormula() {
 		Formula *f2 = new Formula(f) ;
    	CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
    	CPPUNIT_ASSERT(f2->isolated_literal() == 2) ;
-   	f2->bet_true(-1) ;
+   	CPPUNIT_ASSERT(f2->bet_true(-1)) ;
     CPPUNIT_ASSERT(f2->get_aff()->is_true(-1) && f2->get_aff()->is_true(2) && f2->get_aff()->is_true(-3)) ;
     CPPUNIT_ASSERT(f2->get_aff()->get_nb_unknown() == 0) ;
     st = f2->get_mem() ;
@@ -172,7 +172,7 @@ void StructuresTests::testFormula() {
    	CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({}));
 		delete f2 ;
 		
-		CPPUNIT_ASSERT_THROW(f->bet_false(2),Conflict) ;
+		CPPUNIT_ASSERT(!f->bet_false(2)) ;
     CPPUNIT_ASSERT(f->get_aff()->is_unknown(1) && f->get_aff()->is_false(2) && f->get_aff()->is_true(-3)) ;
     CPPUNIT_ASSERT(f->get_aff()->get_nb_unknown() == 1) ;
     st = f->get_mem() ;
@@ -190,98 +190,7 @@ void StructuresTests::testFormula() {
     delete f ;
 
 }
-/*
-void StructuresTests::testUnitPropagation() {
-    int monome ;
-    std::vector <int> v = {1,2,-3} ;
-    Clause *c = new Clause(3,v) ;
-    std::vector <int> w = {-1,2} ;
-    Clause *d = new Clause(3,w) ;
-    std::vector <int> x = {-1,-2,-3} ;
-    Clause *e = new Clause(3,x) ;
-    std::vector <int> y = {1} ;
-    Clause *b = new Clause(3,y) ;        
-    std::vector<std::shared_ptr<Clause>> g ;
-    g.push_back(std::shared_ptr<Clause>(c));
-    g.push_back(std::shared_ptr<Clause>(d));
-    g.push_back(std::shared_ptr<Clause>(e));
-    g.push_back(std::shared_ptr<Clause>(b));
-    Formula *f = new Formula(g,3) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
-    monome = f->find_monome() ;
-    CPPUNIT_ASSERT(monome) ;
-    f->set_true(monome) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{2},{-2,-3}}));
-    monome = f->find_monome() ;
-    CPPUNIT_ASSERT(monome) ;
-    f->set_true(monome) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-3}}));
-    monome = f->find_monome() ;
-    CPPUNIT_ASSERT(monome) ;
-    f->set_true(monome) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({}));
-    monome = f->find_monome() ;
-    CPPUNIT_ASSERT(!monome) ;
-    delete f;
-}
 
-void StructuresTests::testIsolatedLiterals() {
-    int literal ;
-    std::vector <int> v = {1,2,-3} ;
-    Clause *c = new Clause(3,v) ;
-    std::vector <int> w = {-1,2} ;
-    Clause *d = new Clause(3,w) ;
-    std::vector <int> x = {-1,-2,-3} ;
-    Clause *e = new Clause(3,x) ;
-    std::vector <int> y = {1} ;
-    Clause *b = new Clause(3,y) ;        
-    std::vector<std::shared_ptr<Clause>> g ;
-    g.push_back(std::shared_ptr<Clause>(c));
-    g.push_back(std::shared_ptr<Clause>(d));
-    g.push_back(std::shared_ptr<Clause>(e));
-    g.push_back(std::shared_ptr<Clause>(b));
-    Formula *f = new Formula(g,3) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,2},{-1,-2,-3},{1}}));
-    literal = f->find_isolated_literal() ;
-    CPPUNIT_ASSERT(literal) ;
-    f->set_true(literal) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1}}));
-    literal = f->find_isolated_literal() ;
-    CPPUNIT_ASSERT(literal) ;
-    f->set_true(literal) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1}}));
-    literal = f->find_isolated_literal() ;
-    CPPUNIT_ASSERT(literal) ;
-    f->set_true(literal) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({}));
-    literal = f->find_isolated_literal() ;
-    CPPUNIT_ASSERT(!literal) ;
-    delete f;
-}
-
-void StructuresTests::testClean() {
-    std::vector <int> v = {1,2,-3} ;
-    Clause *c = new Clause(3,v) ;
-    std::vector <int> w = {-1,-2} ;
-    Clause *d = new Clause(3,w) ;
-    std::vector <int> x = {-1,-2,-3} ;
-    Clause *e = new Clause(3,x) ;
-    std::vector <int> y = {1} ;
-    Clause *b = new Clause(3,y) ;        
-    std::vector<std::shared_ptr<Clause>> g ;
-    g.push_back(std::shared_ptr<Clause>(c));
-    g.push_back(std::shared_ptr<Clause>(d));
-    g.push_back(std::shared_ptr<Clause>(e));
-    g.push_back(std::shared_ptr<Clause>(b));
-    Formula *f = new Formula(g,3) ;
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{-1,-2},{-1,-2,-3},{1}}));
-    f->clean() ; 
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,-2},{1}}));
-    f->clean() ; 
-    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,-2},{1}}));
-    delete f ;
-}
-*/
 CppUnit::Test* StructuresTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("StructuresTests");
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testClauseCreation",
@@ -294,11 +203,5 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testSetTrueClause));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testFormula",
                 &StructuresTests::testFormula));
-/*    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testUnitPropagation",
-                &StructuresTests::testUnitPropagation));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testIsolatedLiterals",
-                &StructuresTests::testIsolatedLiterals));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testClean",
-                &StructuresTests::testClean));*/
     return suite;
 }

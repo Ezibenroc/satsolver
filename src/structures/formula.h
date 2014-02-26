@@ -19,8 +19,8 @@ class Formula {
         std::set<int> to_do ; // littéraux déduit pas encore affectés
 
         // Affectation d'un litéral x
-        // Exception Conflict si un conflit est généré
-        void set_true(int x) ;
+        // Renvoie faux si un conflit est généré (vrai sinon)
+        bool set_true(int x) ;
 
 
     public :
@@ -42,12 +42,14 @@ class Formula {
         std::set<Clause*> to_clauses_set() ;
 
 				// Déduction de l'affectation d'un littéral
-				void deduce_true(int x) ;
-				void deduce_false(int x) ;
+				// Renvoie faux ssi conflit
+				bool deduce_true(int x) ;
+				bool deduce_false(int x) ;
 				
 				// Pari sur l'affectation d'un littéral
-				void bet_true(int x) ;
-				void bet_false(int x) ;
+				// Renvoie faux ssi conflit
+				bool bet_true(int x) ;
+				bool bet_false(int x) ;
 
 				// Retourne en arrière jusqu'au dernier paris
 				// Renvoie le dernier littéral parié (0 si inexistant) 
