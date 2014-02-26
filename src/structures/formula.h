@@ -83,7 +83,7 @@ class Formula {
         std::stack<std::pair<int,bool>> get_mem() ;
     		
     		// Renvoie l'affectation
-    		// Ne pas utiliser en dehors des tests unitaires
+    		// Ne pas utiliser en dehors des tests unitaires, ou de la fin de DPLL
     		Affectation *get_aff() ;		    
 };	
 

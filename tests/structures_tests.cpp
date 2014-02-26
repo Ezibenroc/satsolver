@@ -81,6 +81,7 @@ void StructuresTests::testBasicUsage() {
 
 void StructuresTests::testAffectationCreationUsage(){
     satsolver::Affectation aff(3) ;
+    CPPUNIT_ASSERT(aff.get_nb_unknown() == 3) ;
     CPPUNIT_ASSERT(aff.is_unknown(1));
     CPPUNIT_ASSERT(aff.is_unknown(2));
     CPPUNIT_ASSERT(aff.is_unknown(3));
@@ -91,7 +92,9 @@ void StructuresTests::testAffectationCreationUsage(){
     CPPUNIT_ASSERT(!aff.is_false(2));
     CPPUNIT_ASSERT(!aff.is_false(3));
     aff.set_true(2) ;
+    CPPUNIT_ASSERT(aff.get_nb_unknown() == 2) ;
     aff.set_false(3);
+    CPPUNIT_ASSERT(aff.get_nb_unknown() == 1) ;
     CPPUNIT_ASSERT(aff.is_unknown(1));
     CPPUNIT_ASSERT(!aff.is_unknown(2));
     CPPUNIT_ASSERT(!aff.is_unknown(3));
@@ -101,6 +104,12 @@ void StructuresTests::testAffectationCreationUsage(){
     CPPUNIT_ASSERT(!aff.is_false(1));
     CPPUNIT_ASSERT(!aff.is_false(2));
     CPPUNIT_ASSERT(aff.is_false(3));
+    aff.set_false(3);
+    CPPUNIT_ASSERT(aff.get_nb_unknown() == 1) ;
+    aff.set_true(3);
+    CPPUNIT_ASSERT(aff.get_nb_unknown() == 1) ;
+    aff.set_unknown(3);
+    CPPUNIT_ASSERT(aff.get_nb_unknown() == 2) ;
 }
 
 void StructuresTests::testSetTrueClause() {
@@ -145,12 +154,14 @@ void StructuresTests::testFormula() {
    	std::stack<std::pair<int,bool>> st = f->get_mem() ;
     CPPUNIT_ASSERT(st.size() == 1 && (st.top() == std::pair<int,bool>(-3,true))) ;
     CPPUNIT_ASSERT(f->get_aff()->is_true(-3)) ;    
+    CPPUNIT_ASSERT(f->get_aff()->get_nb_unknown() == 2) ;
     
 		Formula *f2 = new Formula(f) ;
    	CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
    	CPPUNIT_ASSERT(f2->isolated_literal() == 2) ;
    	f2->bet_true(-1) ;
     CPPUNIT_ASSERT(f2->get_aff()->is_true(-1) && f2->get_aff()->is_true(2) && f2->get_aff()->is_true(-3)) ;
+    CPPUNIT_ASSERT(f2->get_aff()->get_nb_unknown() == 0) ;
     st = f2->get_mem() ;
     CPPUNIT_ASSERT(st.size() == 3) ;
     CPPUNIT_ASSERT((st.top() == std::pair<int,bool>(2,true))) ;
@@ -163,6 +174,7 @@ void StructuresTests::testFormula() {
 		
 		CPPUNIT_ASSERT_THROW(f->bet_false(2),Conflict) ;
     CPPUNIT_ASSERT(f->get_aff()->is_unknown(1) && f->get_aff()->is_false(2) && f->get_aff()->is_true(-3)) ;
+    CPPUNIT_ASSERT(f->get_aff()->get_nb_unknown() == 1) ;
     st = f->get_mem() ;
     CPPUNIT_ASSERT(st.size() == 2) ;
     CPPUNIT_ASSERT((st.top() == std::pair<int,bool>(-2,false))) ;
@@ -173,6 +185,7 @@ void StructuresTests::testFormula() {
    	
    	CPPUNIT_ASSERT(f->back() == -2) ;
    	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));   
+    CPPUNIT_ASSERT(f->get_aff()->get_nb_unknown() == 2) ;
    	CPPUNIT_ASSERT(f->back() == 0) ;
     delete f ;
 

@@ -192,9 +192,10 @@ bool Formula::contains_empty_clause() const {
     return false;
 }
 int Formula::choose_literal() const {
-    for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
-        if (this->clauses[i]->get_size() != 0)
-            return *(this->clauses[i]->to_set().begin());
+    for(int i = 1 ; i <= this->nb_variables ; i ++) {
+        if (this->aff->is_unknown(i)) {
+        	return i ;
+        }
     }
     std::cout << "Error in choose_literal : all clauses are empty, or there is no clauses." << std::endl ;
     return 0;
