@@ -76,6 +76,7 @@ void StructuresTests::testBasicUsage() {
     CPPUNIT_ASSERT(a->to_set() == std::set<int>({1,-2,2,-3,3,4}));
     delete a;
     delete c;
+    delete aff;
 }
 
 
@@ -204,8 +205,9 @@ void StructuresTests::testFormula() {
     CPPUNIT_ASSERT(f->back() == -2) ;
     CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
     CPPUNIT_ASSERT(f->get_aff()->get_nb_unknown() == 2) ;
-    CPPUNIT_ASSERT(f->back() == 0) ;
-    delete f ;*/
+    CPPUNIT_ASSERT(f->back() == 0) ;*/
+    delete f ;
+    delete f2;
 
 }
 
