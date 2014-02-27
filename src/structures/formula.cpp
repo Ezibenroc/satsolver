@@ -9,7 +9,6 @@
 
 using namespace satsolver;
 
-bool verbose = false ;
 int depth_stack = 0 ; // used only for verbosity mode
 
 void print_space() {
@@ -25,12 +24,13 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : cla
 		c->set_affectation(this->aff) ;
 	}
 	this->clean() ;
-  if (WITH_WL)
-      for(auto c : this->clauses) {
-      		if(c->get_size() == 0)
-      			throw Conflict() ;
-          c->init_WL() ;
-			}
+    if (WITH_WL) {
+        for(auto c : this->clauses) {
+            if(c->get_size() == 0)
+                throw Conflict() ;
+            c->init_WL() ;
+        }
+    }
 }
 
 Formula::Formula(satsolver::Formula *f) {
@@ -115,7 +115,7 @@ bool Formula::set_true(int x) {
 			if(literal){// on a engendré un monome
 				if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
 					this->to_do.clear();
-					if(verbose) {print_space() ; std::cout << "Generated a conflict : " << literal << std::endl ;}
+					if(VERBOSE) {print_space() ; std::cout << "Generated a conflict : " << literal << std::endl ;}
 					return false ;
 				}
 				this->to_do.insert(literal) ;
@@ -132,7 +132,7 @@ bool Formula::set_true(int x) {
 }
 
 bool Formula::deduce_true(int x) {
-	if(verbose) {
+	if(VERBOSE) {
 		print_space() ;
 		std::cout << "Deduce " << x << std::endl ;
 	}
@@ -147,7 +147,7 @@ bool Formula::deduce_false(int x) {
 }
 
 bool Formula::bet_true(int x) {
-	if(verbose) {
+	if(VERBOSE) {
 		print_space() ;
 		std::cout << "Bet " << x << std::endl ;
 	}
@@ -164,23 +164,23 @@ bool Formula::bet_false(int x) {
 
 int Formula::back() {
 	depth_stack -- ;
-	if(verbose) {
+	if(VERBOSE) {
 		print_space() ;
 		std::cout << "Backtrack : " ;
 	}
 	std::pair<int,bool> p ;
 	while(!this->mem.empty()) {
 		p = this->mem.top() ;
-		if(verbose) std::cout << p.first << " " ;
+		if(VERBOSE) std::cout << p.first << " " ;
 		this->aff->set_unknown(p.first) ;
 		this->mem.pop() ;
 		if(!p.second) {// on est arrivé au paris
-			if(verbose)
+			if(VERBOSE)
 				std::cout << std::endl ;
 			return p.first ;
 		}
 	}
-	if(verbose) std::cout << std::endl ;
+	if(VERBOSE) std::cout << std::endl ;
 	return 0 ;
 }
 
