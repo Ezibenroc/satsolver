@@ -75,7 +75,10 @@ class Clause {
 
        bool is_true() ;
 
-       // Si la clause est un monome {x}, renvoie x
+       // Si la clause est un monome {x}, renvoie x (appelé seulement dans clean)
+       int monome_begin() ;
+       
+       // Si tous les litteraux sont faux, sauf un qui est indéterminé, renvoie ce littéral
        int monome() ;
 
        // Determines whether all literals in the clause are set to false.
