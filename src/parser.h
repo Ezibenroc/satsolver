@@ -27,7 +27,7 @@ class Parser {
             IN_COMMENT,
             IN_COMMENT_BEFORE_HEADER,
 
-            END_OF_FILE,
+            END_OF_FILE
         };
 
         class syntaxerror : public std::exception {
