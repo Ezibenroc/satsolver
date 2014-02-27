@@ -29,9 +29,9 @@ Affectation* satsolver::solve(Formula *formula) {
                 if(tmp == 0)
                     throw Conflict() ;
                 if (WITH_WL) 
-                    contains_false_clause = !formula->deduce_false(literal);
+                    contains_false_clause = !formula->deduce_false(tmp);
                 else {
-                    formula->deduce_false(literal);
+                    formula->deduce_false(tmp);
                     contains_false_clause = formula->contains_false_clause();
                 }
     		}
