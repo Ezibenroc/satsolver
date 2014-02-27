@@ -14,17 +14,20 @@ add_library(Clause src/structures/clause.cpp)
 add_library(Formula src/structures/formula.cpp)
 
 add_library(Parser src/parser.cpp)
-target_link_libraries(Parser Affectation Clause Formula)
+target_link_libraries(Parser Clause Formula)
 add_library(DPLL src/dpll.cpp)
 target_link_libraries(DPLL Affectation Clause Formula)
 
 add_library(solver_main src/solver_main.cpp)
-target_link_libraries(solver_main Affectation Clause Formula)
+target_link_libraries(solver_main Affectation Formula)
 target_link_libraries(solver_main Parser)
 target_link_libraries(solver_main DPLL)
 
 add_executable(resol src/entry_points/resol.cpp)
 target_link_libraries(resol solver_main)
+
+add_executable(resol-wl src/entry_points/resol-wl.cpp)
+target_link_libraries(resol-wl solver_main)
 
 find_package(CppUnit)
 if (CPPUNIT_FOUND)

@@ -7,7 +7,6 @@
 #include "solver_main.h"
 #include "structures/affectation.h"
 #include "structures/formula.h"
-#include "structures/clause.h"
 #include "parser.h"
 #include "dpll.h"
 #include "config.h"
@@ -26,7 +25,6 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
     satsolver::Affectation *solution;
     std::set<int> *solution_set;
     std::set<int>::iterator solution_set_iterator;
-    assert(!with_watched_literals); // Not implemented yet
     int i;
     bool using_stdin = true;
     std::istream *input = &std::cin;
