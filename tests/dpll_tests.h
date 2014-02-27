@@ -4,7 +4,8 @@
 #include <cppunit/TestFixture.h>
 class DpllTests : public CppUnit::TestFixture {
     private:
-        void testBasicUsage();
+        void testBasicUsageWithoutWL();
+        void testBasicUsageWithWL();
     public:
         static CppUnit::Test* suite();
 };

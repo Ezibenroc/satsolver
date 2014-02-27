@@ -11,7 +11,7 @@
 namespace satsolver {
 
 class Formula {
-    private :
+    protected :
         std::vector<std::shared_ptr<satsolver::Clause>> clauses ;
         int nb_variables ;
         
@@ -56,7 +56,6 @@ class Formula {
         bool contains_empty_clause() const;
 
         // Renvoie un littéral de la formule
-        // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide
         virtual int choose_literal() const;
 
         // Supprime toute les clauses contenant d'autres clauses

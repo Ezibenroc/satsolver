@@ -8,8 +8,9 @@ namespace satsolver {
 
 
     void process(Formula *formula, Affectation *affectation);
-
     Affectation* solve(Formula *formula);
+
+    Affectation* solve_wl(Formula *formula);
 
 
 }

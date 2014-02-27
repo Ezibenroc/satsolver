@@ -25,7 +25,6 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
     satsolver::Affectation *solution;
     std::set<int> *solution_set;
     std::set<int>::iterator solution_set_iterator;
-    assert(!with_watched_literals); // Not implemented yet
     int i;
     bool using_stdin = true;
     std::istream *input = &std::cin;
@@ -54,7 +53,10 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
     parser = new satsolver::Parser(*input);
     formula = parser->get_formula();
     try {
-        solution = satsolver::solve(formula);
+        if (with_watched_literals)
+            solution = satsolver::solve(formula);
+        else
+            solution = satsolver::solve(formula);
     }
     catch (satsolver::Conflict e) {
         std::cout << "s UNSATISFIABLE" << std::endl;

@@ -7,13 +7,6 @@
 
 using namespace satsolver;
 
-bool verbose = false ;
-int depth_stack = 0 ; // used only for verbosity mode
-
-void print_space() {
-	for(int i = 0 ; i < depth_stack ; i++)
-		std::cout << "\t" ;
-}
 
 Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : clauses(v), nb_variables(nb_variables) {
 }
