@@ -36,7 +36,7 @@ void StructuresTests::testClauseCreation() {
     satsolver::Clause *c2 = new Clause(*clause) ;
     CPPUNIT_ASSERT(c2->contains_clause(*clause)) ;
     CPPUNIT_ASSERT(clause->contains_clause(*c2)) ;
-    clause->remove(3) ; 
+    clause->remove(3) ;
     CPPUNIT_ASSERT(c2->contains_clause(*clause)) ;
     CPPUNIT_ASSERT(!clause->contains_clause(*c2)) ;
     clause->remove(2) ;
@@ -118,7 +118,7 @@ void StructuresTests::testAffectationCreationUsage(){
 void StructuresTests::testSetTrueClause() {
     WITH_WL = true;
     std::vector <int> v = {1,2,-3,4,} ;
-    Clause *c = new Clause(4,v) ;	
+    Clause *c = new Clause(4,v) ;
     satsolver::Affectation *aff = new satsolver::Affectation(4) ;
     c->set_affectation(aff) ;
     c->init_WL() ;
@@ -140,9 +140,9 @@ void StructuresTests::testSetTrueClause() {
     CPPUNIT_ASSERT(c->is_WL(1) && c->is_WL(2));
     delete aff ;
     delete c ;
-    
+
     v = {1,2,3} ;
-   	c = new Clause(3,v) ;	
+    c = new Clause(3,v) ;
     aff = new satsolver::Affectation(3) ;
     c->set_affectation(aff) ;
     c->init_WL() ;
@@ -166,18 +166,18 @@ void StructuresTests::testFormula() {
     v = {1,2,3} ;
     g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
     Formula *f = new Formula(g,3) ;
-   	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
-   	std::stack<std::pair<int,bool>> st = f->get_mem() ;
+    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
+    std::stack<std::pair<int,bool>> st = f->get_mem() ;
     CPPUNIT_ASSERT(st.size() == 1 && (st.top() == std::pair<int,bool>(-3,true))) ;
-    CPPUNIT_ASSERT(f->get_aff()->is_true(-3)) ;    
+    CPPUNIT_ASSERT(f->get_aff()->is_true(-3)) ;
     CPPUNIT_ASSERT(f->get_aff()->get_nb_unknown() == 2) ;
-    
-		Formula *f2 = new Formula(f) ;
-   	CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
-   	CPPUNIT_ASSERT(f2->isolated_literal() == 2) ;
-   	CPPUNIT_ASSERT(f2->bet_true(-1)) ;
-		
-   	CPPUNIT_ASSERT(f2->monome() == 2) ;
+
+    Formula *f2 = new Formula(f) ;
+    CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
+    CPPUNIT_ASSERT(f2->isolated_literal() == 2) ;
+    CPPUNIT_ASSERT(f2->bet_true(-1)) ;
+
+    CPPUNIT_ASSERT(f2->monome() == 2) ;
 /*    CPPUNIT_ASSERT(f2->get_aff()->is_true(-1) && f2->get_aff()->is_true(2) && f2->get_aff()->is_true(-3)) ;
     CPPUNIT_ASSERT(f2->get_aff()->get_nb_unknown() == 0) ;
     st = f2->get_mem() ;
@@ -185,26 +185,26 @@ void StructuresTests::testFormula() {
     CPPUNIT_ASSERT((st.top() == std::pair<int,bool>(2,true))) ;
     st.pop() ;
     CPPUNIT_ASSERT((st.top() == std::pair<int,bool>(-1,false))) ;
-		st.pop() ;
+    st.pop() ;
     CPPUNIT_ASSERT((st.top() == std::pair<int,bool>(-3,true))) ;
-   	CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({}));
-		delete f2 ;
-		
-		CPPUNIT_ASSERT(!f->bet_false(2)) ;
+    CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({}));
+    delete f2 ;
+
+    CPPUNIT_ASSERT(!f->bet_false(2)) ;
     CPPUNIT_ASSERT(f->get_aff()->is_unknown(1) && f->get_aff()->is_false(2) && f->get_aff()->is_true(-3)) ;
     CPPUNIT_ASSERT(f->get_aff()->get_nb_unknown() == 1) ;
     st = f->get_mem() ;
     CPPUNIT_ASSERT(st.size() == 2) ;
     CPPUNIT_ASSERT((st.top() == std::pair<int,bool>(-2,false))) ;
-		st.pop() ;
+    st.pop() ;
     CPPUNIT_ASSERT((st.top() == std::pair<int,bool>(-3,true))) ;
-   	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1},{1}}));
-   	CPPUNIT_ASSERT(f->isolated_literal() == 0) ;
-   	
-   	CPPUNIT_ASSERT(f->back() == -2) ;
-   	CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));   
+    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1},{1}}));
+    CPPUNIT_ASSERT(f->isolated_literal() == 0) ;
+
+    CPPUNIT_ASSERT(f->back() == -2) ;
+    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
     CPPUNIT_ASSERT(f->get_aff()->get_nb_unknown() == 2) ;
-   	CPPUNIT_ASSERT(f->back() == 0) ;
+    CPPUNIT_ASSERT(f->back() == 0) ;
     delete f ;*/
 
 }

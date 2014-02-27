@@ -55,7 +55,7 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
     }
     parser = new satsolver::Parser(*input);
     try {
-    		formula = parser->get_formula();
+        formula = parser->get_formula();
         solution = satsolver::solve(formula);
     }
     catch (satsolver::Conflict e) {
@@ -65,9 +65,9 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
 
     std::cout << "s SATISFIABLE" << std::endl;
     solution_set = solution->to_set();
-		for (solution_set_iterator=solution_set->begin(); solution_set_iterator!=solution_set->end(); solution_set_iterator++) {
+    for (solution_set_iterator=solution_set->begin(); solution_set_iterator!=solution_set->end(); solution_set_iterator++) {
         std::cout << "v " << *solution_set_iterator << std::endl;
-		}
+    }
 
     if (!using_stdin)
         delete input;

@@ -54,31 +54,28 @@ class Clause {
 
        // Renvoie vrai ssi elle contient la clause donnée
        bool contains_clause(satsolver::Clause &c) const;
-       
+
        // Initialise les watched literals
        void init_WL() ;
-       
+
        // Renvoie le premier ou le second watched literal
        int fst_WL() ;
        int snd_WL() ;
-       
+
        // Test si l'entier donné est un watched literal
        bool is_WL(int x) ;
-       
+
        // Définie l'affectation
        void set_affectation(Affectation *a) ;
-       
+
        // Annonce à la clause que x a été mis à vrai
        // Retourne y si y devient le seul littéral non faux, 0 sinon
        int set_true(int x) ;
        int set_false(int x) ;
-       
+
        bool is_true() ;
-       
-       // Si la clause est un monome {x}, renvoie x (appelé seulement dans clean)
-       int monome_begin() ;
-       
-       // Si tous les litteraux sont faux, sauf un qui est indéterminé, renvoie ce littéral
+
+       // Si la clause est un monome {x}, renvoie x
        int monome() ;
 
        // Determines whether all literals in the clause are set to false.

@@ -16,10 +16,10 @@ class Formula {
         std::vector<std::shared_ptr<satsolver::Clause>> clauses ;
         int nb_variables ;
         std::stack<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
-        std::set<int> to_do ; // littéraux déduit pas encore affectés
+        std::set<int> to_do ; // littéraux déduits pas encore affectés (d’autres opérations sont « en cours »)
 
         // Affectation d'un litéral x
-        // Si WITH_WL, renvoie faux si un conflit est généré (vrai sinon)
+        // Si WITH_WL, renvoie faux ssi un conflit est généré
         bool set_true(int x) ;
 
 
@@ -32,7 +32,7 @@ class Formula {
 
         // Renvoie la représentation textuelle de la formule
         std::string to_string() ;
-				std::string to_string2() ;
+                std::string to_string2() ;
 
         // Renvoie un ensemble d'ensembles d'entiers, selon l'affectation
         // Chaque ensemble de cet ensemble représente une clause
@@ -42,25 +42,25 @@ class Formula {
         std::set<std::set<int> > to_set() ;
         std::set<Clause*> to_clauses_set() ;
 
-				// Déduction de l'affectation d'un littéral
-				// Si WITH_WL, renvoie faux ssi conflit
-				bool deduce_true(int x) ;
-				bool deduce_false(int x) ;
-				
-				// Pari sur l'affectation d'un littéral
-				// Si WITH_WL, renvoie faux ssi conflit
-				bool bet_true(int x) ;
-				bool bet_false(int x) ;
+        // Déduction de l'affectation d'un littéral
+        // Si WITH_WL, renvoie faux ssi conflit
+        bool deduce_true(int x) ;
+        bool deduce_false(int x) ;
 
-				// Retourne en arrière jusqu'au dernier paris
-				// Renvoie le dernier littéral parié (0 si inexistant) 
-				int back() ;
+        // Pari sur l'affectation d'un littéral
+        // Si WITH_WL, renvoie faux ssi conflit
+        bool bet_true(int x) ;
+        bool bet_false(int x) ;
 
-				// Renvoie un monome de la formule (0 si inexistant)
-				int monome() ;
+        // Retourne en arrière jusqu'au dernier paris
+        // Renvoie le dernier littéral parié (0 si inexistant)
+        int back() ;
 
-				// Renvoie un litéral isolé de la formule (0 si inexistant)
-				int isolated_literal() ;
+        // Renvoie un monome de la formule (0 si inexistant)
+        int monome() ;
+
+        // Renvoie un litéral isolé de la formule (0 si inexistant)
+        int isolated_literal() ;
 
         // Renvoie vrai ssi la formule ne contient pas de clauses
         bool is_empty() const;
@@ -86,15 +86,15 @@ class Formula {
         // Assez lourd (nombre de clauses au carré fois le nombre de variables)
         // À utiliser seulement à l'initialisation
         void clean() ;
-        
+
         // Renvoie la pile d'affectations
         // Ne pas utiliser en dehors des tests unitaires
         std::stack<std::pair<int,bool>> get_mem() ;
-    		
-    		// Renvoie l'affectation
-    		// Ne pas utiliser en dehors des tests unitaires, ou de la fin de DPLL
-    		Affectation *get_aff() ;		    
-};	
+
+        // Renvoie l'affectation
+        // Ne pas utiliser en dehors des tests unitaires, ou de la fin de DPLL
+        Affectation *get_aff() ;
+};
 
 }
 

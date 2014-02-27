@@ -27,7 +27,7 @@ Clause::Clause(const Clause &c){
     this->literals = std::set<int>(c.literals) ;
     this->nb_variables = c.nb_variables ;
     if (WITH_WL)
-		this->watched = std::pair<int,int>(c.watched) ;
+        this->watched = std::pair<int,int>(c.watched) ;
     this->aff = c.aff ;
 }
 
@@ -35,7 +35,7 @@ Clause& Clause::operator=(const Clause &that) {
     this->literals = that.literals;
     this->nb_variables = that.nb_variables;
     if (WITH_WL)
-		this->watched = that.watched ;
+        this->watched = that.watched ;
     return *this;
     this->aff = that.aff ;
 }
@@ -102,9 +102,9 @@ std::string Clause::to_string()  {
 std::set<int> Clause::to_set() const {
     std::set<int> s = std::set<int>() ;
     for(auto l : this->literals) {
-    	if(!this->aff->is_false(l)) {
-    		s.insert(l) ;
-    	}
+        if(!this->aff->is_false(l)) {
+            s.insert(l) ;
+        }
     }
     return s ;
 }
@@ -125,98 +125,98 @@ bool Clause::contains_clause(satsolver::Clause &c) const {
 
 void Clause::init_WL() {
     assert(WITH_WL);
-	assert(this->get_size() >= 2) ;
-	std::set<int>::iterator it = this->literals.begin() ;
-	this->watched.first = *it ;
-	++it ;
-	this->watched.second = *it ;
+    assert(this->get_size() >= 2) ;
+    std::set<int>::iterator it = this->literals.begin() ;
+    this->watched.first = *it ;
+    ++it ;
+    this->watched.second = *it ;
 }
 
 int Clause::fst_WL() {
     assert(WITH_WL);
-	return this->watched.first ;
+    return this->watched.first ;
 }
 int Clause::snd_WL() {
     assert(WITH_WL);
-	return this->watched.second ;
+    return this->watched.second ;
 }
 
 bool Clause::is_WL(int x) {
     assert(WITH_WL);
-	return this->watched.first == x || this->watched.second == x ;
+    return this->watched.first == x || this->watched.second == x ;
 }
 
 void Clause::set_affectation(Affectation *a) {
-	this->aff = a ;
+    this->aff = a ;
 }
 
 int Clause::set_true(int x) {
     if (!WITH_WL)
         return 0;
 
-	if(this->contains_literal(x) && !this->is_WL(x)) { // on installe x comme littéral surveillé
-		if(this->aff->is_unknown(this->fst_WL()))  // priorité aux littéraux vrais
-			this->watched.first = x ;
-		else
-			this->watched.second = x ;	
-		return 0 ;	
-	}
-	else if(this->contains_literal(x)) { // rien
-		return 0 ;
-	}
-	else if(this->is_WL(-x)) { // on surveille un littéral qui a été mis à faux
-		if(this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()))
-			return 0 ; // rien à faire, la clause est satisfaite
-		for(auto literal : this->literals) {
-			if(!this->aff->is_false(literal) && !this->is_WL(literal)) { // nouveau literal surveillé
-				if(this->fst_WL() == -x) 
-					this->watched.first = literal ;
-				else
-					this->watched.second = literal ;
-				return 0 ; // pas de propagation unitaire, on a trouvé un remplaçant
-			}
-		}
-		// On n'a pas trouvé de remplaçant, il ne reste donc qu'un literal non faux
-		if(this->fst_WL() != -x)
-			return this->fst_WL() ;
-		else
-			return this->snd_WL() ;	
-	}
-	return 0 ;
+    if(this->contains_literal(x) && !this->is_WL(x)) { // on installe x comme littéral surveillé
+        if(this->aff->is_unknown(this->fst_WL()))  // priorité aux littéraux vrais
+            this->watched.first = x ;
+        else
+            this->watched.second = x ;
+        return 0 ;
+    }
+    else if(this->contains_literal(x)) { // rien
+        return 0 ;
+    }
+    else if(this->is_WL(-x)) { // on surveille un littéral qui a été mis à faux
+        if(this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()))
+            return 0 ; // rien à faire, la clause est satisfaite
+        for(auto literal : this->literals) {
+            if(!this->aff->is_false(literal) && !this->is_WL(literal)) { // nouveau literal surveillé
+                if(this->fst_WL() == -x)
+                    this->watched.first = literal ;
+                else
+                    this->watched.second = literal ;
+                return 0 ; // pas de propagation unitaire, on a trouvé un remplaçant
+            }
+        }
+        // On n'a pas trouvé de remplaçant, il ne reste donc qu'un literal non faux
+        if(this->fst_WL() != -x)
+            return this->fst_WL() ;
+        else
+            return this->snd_WL() ;
+    }
+    return 0 ;
 }
 
 int Clause::set_false(int x) {
-	return this->set_true(-x) ;
+    return this->set_true(-x) ;
 }
 
 bool Clause::is_true() {
-	for(auto l : this->literals) {
-		if(this->aff->is_true(l))
-			return true ;
-	}
-	return false ;
+    for(auto l : this->literals) {
+        if(this->aff->is_true(l))
+            return true ;
+    }
+    return false ;
 }
 
 int Clause::monome_begin() {
-	if(this->literals.size() == 1)
-		return *(this->literals.begin()) ;
-	return 0 ;
+    if(this->literals.size() == 1)
+        return *(this->literals.begin()) ;
+    return 0 ;
 }
 
 int Clause::monome() {
-	assert(!WITH_WL) ;
-	int literal = 0, count = 0;
-	for(auto l : literals) {
-		if(this->aff->is_true(l))
-			return 0 ;
-		else if(this->aff->is_unknown(l)) {
-			if(count > 0)
-				return 0 ;
-			literal = l ;
-			count ++ ;
-		}
-	}
-	return literal ;
+    assert(!WITH_WL) ;
+    int literal = 0, count = 0;
+    for(auto l : literals) {
+        if(this->aff->is_true(l))
+            return 0 ;
+        else if(this->aff->is_unknown(l)) {
+            if(count > 0)
+                return 0 ;
+            literal = l ;
+            count ++ ;
+        }
+    }
+    return literal ;
 }
 
 bool Clause::is_evaluated_to_false() const {

@@ -35,7 +35,7 @@ class Affectation {
 
         std::set<int>* to_set() const;
         
-				int get_nb_unknown() ;
+        int get_nb_unknown() ;
 };
 
 }
