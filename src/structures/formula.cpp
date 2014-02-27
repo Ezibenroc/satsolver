@@ -5,6 +5,8 @@
 #include <iostream>
 #include <cstring>
 
+#include "config.h"
+
 using namespace satsolver;
 
 bool verbose = false ;
@@ -23,9 +25,9 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : cla
 		c->set_affectation(this->aff) ;
 	}
 	this->clean() ;
-	for(auto c : this->clauses) {
-		c->init_WL() ;
-	}
+    if (WITH_WL)
+        for(auto c : this->clauses)
+            c->init_WL() ;
 }
 
 Formula::Formula(satsolver::Formula *f) {
@@ -125,7 +127,7 @@ bool Formula::set_true(int x) {
 	std::cout << "------------------------" << std::endl ;*/
 	for(auto c : this->clauses) {
 		literal = c->set_true(x) ;
-		if(literal){// on a engendré un monome
+		if(WITH_WL && literal){// on a engendré un monome
 			if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
 				this->to_do.clear();
 				if(verbose) std::cout << "Generated a conflict : " << literal << std::endl ;
@@ -240,9 +242,9 @@ int Formula::get_size() const {
 int Formula::get_nb_variables() const {
     return this->nb_variables;
 }
-bool Formula::contains_empty_clause() const {
+bool Formula::contains_false_clause() const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
-        if (this->clauses[i]->get_size() == 0)
+        if (this->clauses[i]->is_evaluated_to_false())
             return true;
     }
     return false;

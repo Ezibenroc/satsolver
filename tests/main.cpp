@@ -4,6 +4,7 @@
 #include "dpll_tests.h"
 
 bool VERBOSE = false;
+bool WITH_WL = false;
 
 int main(void)
 {

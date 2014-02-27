@@ -77,6 +77,9 @@ class Clause {
        
        // Si la clause est un monome {x}, renvoie x
        int monome() ;
+
+       // Determines whether all literals in the clause are set to false.
+       bool is_evaluated_to_false() const;
 };
 
 }

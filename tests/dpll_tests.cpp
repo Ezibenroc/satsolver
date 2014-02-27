@@ -16,11 +16,12 @@
 #include "structures/affectation.h"
 #include "dpll.h"
 #include "dpll_tests.h"
+#include "config.h"
 
 using namespace satsolver;
 
 
-void DpllTests::testBasicUsage() {
+void testBasicUsage() {
     Clause *c1=new Clause(3, {1, 2, 3}), *c2=new Clause(3, {-1, 2, 3}),
            *c3=new Clause(3, {1, -2, 3}), *c4=new Clause(3, {-1, -2, 3}),
            *c5=new Clause(3, {1, 2, -3}), *c6=new Clause(3, {-1, 2, -3}),
@@ -54,11 +55,21 @@ void DpllTests::testBasicUsage() {
     CPPUNIT_ASSERT_THROW(solve(f), Conflict);
     delete f ;
 }
+void DpllTests::testBasicUsageWithWL() {
+    WITH_WL = true;
+    testBasicUsage();
+    WITH_WL = false;
+}
+void DpllTests::testBasicUsageWithoutWL() {
+    testBasicUsage();
+}
 
 CppUnit::Test* DpllTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("DpllTests");
-    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsage",
-                &DpllTests::testBasicUsage));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithoutWL",
+                &DpllTests::testBasicUsageWithoutWL));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithWL",
+                &DpllTests::testBasicUsageWithWL));
     return suite;
 }
 

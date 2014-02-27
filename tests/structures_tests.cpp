@@ -15,6 +15,7 @@
 #include "structures/formula.h"
 #include "structures/affectation.h"
 #include "structures_tests.h"
+#include "config.h"
 
 using namespace satsolver;
 
@@ -115,6 +116,7 @@ void StructuresTests::testAffectationCreationUsage(){
 }
 
 void StructuresTests::testSetTrueClause() {
+    WITH_WL = true;
     std::vector <int> v = {1,2,-3,4,} ;
     Clause *c = new Clause(4,v) ;	
     satsolver::Affectation *aff = new satsolver::Affectation(4) ;
@@ -148,6 +150,7 @@ void StructuresTests::testSetTrueClause() {
     CPPUNIT_ASSERT(!c->is_WL(1)) ;
     delete c ;
     delete aff ;
+    WITH_WL = false;
 }
 
 void StructuresTests::testFormula() {

@@ -14,16 +14,16 @@ class Formula {
     private :
         std::vector<std::shared_ptr<satsolver::Clause>> clauses ;
         int nb_variables ;
-        Affectation *aff ;
         std::stack<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
         std::set<int> to_do ; // littéraux déduit pas encore affectés
 
         // Affectation d'un litéral x
-        // Renvoie faux si un conflit est généré (vrai sinon)
+        // Si WITH_WL, renvoie faux si un conflit est généré (vrai sinon)
         bool set_true(int x) ;
 
 
     public :
+        Affectation *aff ;
         Formula(std::vector<std::shared_ptr<satsolver::Clause>> v, int nb_variables) ;
         Formula& operator=(const Formula &that);
         Formula(satsolver::Formula *f) ;
@@ -43,12 +43,12 @@ class Formula {
         std::set<Clause*> to_clauses_set() ;
 
 				// Déduction de l'affectation d'un littéral
-				// Renvoie faux ssi conflit
+				// Si WITH_WL, renvoie faux ssi conflit
 				bool deduce_true(int x) ;
 				bool deduce_false(int x) ;
 				
 				// Pari sur l'affectation d'un littéral
-				// Renvoie faux ssi conflit
+				// Si WITH_WL, renvoie faux ssi conflit
 				bool bet_true(int x) ;
 				bool bet_false(int x) ;
 
@@ -70,6 +70,9 @@ class Formula {
 
         // Renvoie vrai ssi la formule contient une clause vide
         bool contains_empty_clause() const;
+
+        // Determines whether one of the clauses is evaluated to false.
+        bool contains_false_clause() const;
 
         // Renvoie un littéral de la formule
         // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide

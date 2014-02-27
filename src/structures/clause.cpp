@@ -6,6 +6,7 @@
 
 #include <set>
 #include "clause.h"
+#include "config.h"
 
 using namespace satsolver;
 
@@ -17,13 +18,15 @@ Clause::Clause(int nb_var, std::vector<int> literals) {
         assert(*it != 0 && abs(*it) <= nb_var);
         this->literals.insert(*it) ;
     }
-    this->watched = std::pair<int,int>(0,0) ;
+    if (WITH_WL)
+        this->watched = std::pair<int,int>(0,0) ;
     this->aff = NULL ;
 }
 
 Clause::Clause(const Clause &c){
     this->literals = std::set<int>(c.literals) ;
     this->nb_variables = c.nb_variables ;
+    if (WITH_WL)
 		this->watched = std::pair<int,int>(c.watched) ;
     this->aff = c.aff ;
 }
@@ -31,6 +34,7 @@ Clause::Clause(const Clause &c){
 Clause& Clause::operator=(const Clause &that) {
     this->literals = that.literals;
     this->nb_variables = that.nb_variables;
+    if (WITH_WL)
 		this->watched = that.watched ;
     return *this;
     this->aff = that.aff ;
@@ -120,6 +124,7 @@ bool Clause::contains_clause(satsolver::Clause &c) const {
 }
 
 void Clause::init_WL() {
+    assert(WITH_WL);
 	assert(this->get_size() >= 2) ;
 	std::set<int>::iterator it = this->literals.begin() ;
 	this->watched.first = *it ;
@@ -128,13 +133,16 @@ void Clause::init_WL() {
 }
 
 int Clause::fst_WL() {
+    assert(WITH_WL);
 	return this->watched.first ;
 }
 int Clause::snd_WL() {
+    assert(WITH_WL);
 	return this->watched.second ;
 }
 
 bool Clause::is_WL(int x) {
+    assert(WITH_WL);
 	return this->watched.first == x || this->watched.second == x ;
 }
 
@@ -143,6 +151,8 @@ void Clause::set_affectation(Affectation *a) {
 }
 
 int Clause::set_true(int x) {
+    if (!WITH_WL)
+        return 0;
 
 	/*if(!(this->contains_literal(x) || this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()) || (!this->aff->is_false(this->fst_WL()) && !this->aff->is_false(this->snd_WL())))) {
 		std::cout << "#####################" << std::endl ;
@@ -199,4 +209,11 @@ int Clause::monome() {
 	if(this->literals.size() == 1)
 		return *(this->literals.begin()) ;
 	return 0 ;
+}
+
+bool Clause::is_evaluated_to_false() const {
+    for (auto literal : this->literals)
+        if (!this->aff->is_false(literal))
+            return false;
+    return true;
 }

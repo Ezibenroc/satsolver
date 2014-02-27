@@ -13,6 +13,7 @@
 #include "config.h"
 
 bool VERBOSE = false;
+bool WITH_WL;
 
 void bad_command_options(char *executable) {
     std::cout << "Syntax: " << executable << "[-verbose] [<filename>]\n\n";
@@ -29,6 +30,7 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
     int i;
     bool using_stdin = true;
     std::istream *input = &std::cin;
+    WITH_WL = with_watched_literals;
     for (i=1; i<argc && argv[i][0]=='-'; i++) {
         if (!strcmp(argv[i], "-verbose")) {
             VERBOSE = true;
