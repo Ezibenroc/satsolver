@@ -2,6 +2,7 @@
 #define STRUCTURES_CLAUSE_H
 
 #include <set>
+#include <unordered_set>
 #include <string>
 #include <vector>
 #include "affectation.h"
@@ -12,7 +13,7 @@ class Conflict: public std::exception {};
 
 class Clause {
         private:
-        std::set<int> literals ;
+        std::unordered_set<int> literals ;
         int nb_variables;    // nombre de variables dans le problème
         std::pair<int,int> watched ;
         Affectation *aff ; // pointeur vers l'affectation globale
