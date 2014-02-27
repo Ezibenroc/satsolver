@@ -154,14 +154,6 @@ int Clause::set_true(int x) {
     if (!WITH_WL)
         return 0;
 
-	/*if(!(this->contains_literal(x) || this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()) || (!this->aff->is_false(this->fst_WL()) && !this->aff->is_false(this->snd_WL())))) {
-		std::cout << "#####################" << std::endl ;
-		std::cout << "#\t" << this->to_string() << std::endl ;
-		std::cout << "#\t" << this->aff->to_string() << std::endl ;
-		std::cout << "#####################" << std::endl ;
-		exit(EXIT_FAILURE) ;
-	}*/
-
 	if(this->contains_literal(x) && !this->is_WL(x)) { // on installe x comme littéral surveillé
 		if(this->aff->is_unknown(this->fst_WL()))  // priorité aux littéraux vrais
 			this->watched.first = x ;
@@ -205,10 +197,26 @@ bool Clause::is_true() {
 	return false ;
 }
 
-int Clause::monome() {
+int Clause::monome_begin() {
 	if(this->literals.size() == 1)
 		return *(this->literals.begin()) ;
 	return 0 ;
+}
+
+int Clause::monome() {
+	assert(!WITH_WL) ;
+	int literal = 0, count = 0;
+	for(auto l : literals) {
+		if(this->aff->is_true(l))
+			return 0 ;
+		else if(this->aff->is_unknown(l)) {
+			if(count > 0)
+				return 0 ;
+			literal = l ;
+			count ++ ;
+		}
+	}
+	return literal ;
 }
 
 bool Clause::is_evaluated_to_false() const {

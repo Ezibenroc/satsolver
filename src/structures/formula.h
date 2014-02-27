@@ -56,6 +56,9 @@ class Formula {
 				// Renvoie le dernier littéral parié (0 si inexistant) 
 				int back() ;
 
+				// Renvoie un monome de la formule (0 si inexistant)
+				int monome() ;
+
 				// Renvoie un litéral isolé de la formule (0 si inexistant)
 				int isolated_literal() ;
 

@@ -103,38 +103,21 @@ std::set<Clause*> Formula::to_clauses_set() {
     return set ;
 }
 
-/* Beaucoup de copies... Et une fuite mémoire astronomique.
-void Formula::set_true(int x) {
-    std::vector<Clause*> new_clauses;
-    Clause *new_clause;
-    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-        if (!this->clauses[i]->contains_literal(x)) {
-            new_clause = new Clause(*this->clauses[i]);
-                        new_clause->remove(-x);
-            new_clauses.push_back(new_clause);
-        }
-    }
-    this->clauses.swap(new_clauses);
-}
-*/
 
 bool Formula::set_true(int x) {
 	int literal ;
-/*	std::cout << "------------------------" << std::endl ;
-	std::cout << "Stack size : " << this->mem.size() << std::endl ;
-	std::cout << this->aff->to_string() << std::endl ;
-	std::cout << this->to_string2() << std::endl ;
-	std::cout << "------------------------" << std::endl ;*/
-	for(auto c : this->clauses) {
-		literal = c->set_true(x) ;
-		if(WITH_WL && literal){// on a engendré un monome
-			if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
-				this->to_do.clear();
-				if(verbose) std::cout << "Generated a conflict : " << literal << std::endl ;
-				return false ;
-			}
-			this->to_do.insert(literal) ;
-		} 
+	if(WITH_WL) {
+		for(auto c : this->clauses) {
+			literal = c->set_true(x) ;
+			if(literal){// on a engendré un monome
+				if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
+					this->to_do.clear();
+					if(verbose) {print_space() ; std::cout << "Generated a conflict : " << literal << std::endl ;}
+					return false ;
+				}
+				this->to_do.insert(literal) ;
+			} 
+		}
 	}
 	this->aff->set_true(x) ;
 	if(!this->to_do.empty()) { // on doit affecter ces littéraux
@@ -195,6 +178,16 @@ int Formula::back() {
 		}
 	}
 	if(verbose) std::cout << std::endl ;
+	return 0 ;
+}
+
+int Formula::monome() {
+	int literal ;
+	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+		literal = this->clauses[i]->monome() ;
+		if(literal)
+			return literal ;
+	}
 	return 0 ;
 }
 
@@ -274,7 +267,7 @@ void Formula::clean() {
 		int literal ;
 		do {
 			for(auto c : this->clauses) {
-				literal = c->monome();
+				literal = c->monome_begin();
 				if(literals_to_delete.find(literal) != literals_to_delete.end())
 					literal = 0 ;
 				if(literal)
@@ -320,5 +313,5 @@ std::stack<std::pair<int,bool>> Formula::get_mem() {
 }
 
 Affectation *Formula::get_aff() {
-	return new Affectation(this->aff) ;
+	return (this->aff) ;
 }		

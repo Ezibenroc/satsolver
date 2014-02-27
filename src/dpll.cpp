@@ -16,8 +16,19 @@ Affectation* satsolver::solve(Formula *formula) {
     int literal, tmp ;
     bool contains_false_clause;
     while(formula->get_aff()->get_nb_unknown() != 0) { // tant qu'il reste des inconnus, on continue
-    	literal = formula->isolated_literal() ;
-    	if(literal) {
+    	if(!WITH_WL && (literal = formula->monome())) {
+    		std::cout << "Found monome " << literal << std::endl ;
+      	formula->deduce_true(literal);
+        contains_false_clause = formula->contains_false_clause();
+    		while(contains_false_clause) {
+                tmp = formula->back() ;
+                if(tmp == 0)
+                    throw Conflict() ;
+                formula->deduce_false(tmp);
+                contains_false_clause = formula->contains_false_clause();
+    		}  		
+    	}
+    	else if((literal = formula->isolated_literal())) {
             if (WITH_WL) 
                 contains_false_clause = !formula->deduce_true(literal);
             else {

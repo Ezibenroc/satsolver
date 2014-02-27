@@ -176,6 +176,8 @@ void StructuresTests::testFormula() {
    	CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
    	CPPUNIT_ASSERT(f2->isolated_literal() == 2) ;
    	CPPUNIT_ASSERT(f2->bet_true(-1)) ;
+		
+   	CPPUNIT_ASSERT(f2->monome() == 2) ;
 /*    CPPUNIT_ASSERT(f2->get_aff()->is_true(-1) && f2->get_aff()->is_true(2) && f2->get_aff()->is_true(-3)) ;
     CPPUNIT_ASSERT(f2->get_aff()->get_nb_unknown() == 0) ;
     st = f2->get_mem() ;

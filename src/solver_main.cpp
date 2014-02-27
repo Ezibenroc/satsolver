@@ -71,9 +71,9 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
 
     if (!using_stdin)
         delete input;
-    delete parser;
+/*    delete parser;
     delete solution ;
     delete formula ;
-    delete solution_set ;
+    delete solution_set ;*/
     return 0;
 }
