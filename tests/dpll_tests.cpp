@@ -21,7 +21,7 @@
 using namespace satsolver;
 
 
-void testBasicUsage() {
+void DpllTests::testBasicUsage() {
     Clause *c1=new Clause(3, {1, 2, 3}), *c2=new Clause(3, {-1, 2, 3}),
            *c3=new Clause(3, {1, -2, 3}), *c4=new Clause(3, {-1, -2, 3}),
            *c5=new Clause(3, {1, 2, -3}), *c6=new Clause(3, {-1, 2, -3}),
@@ -57,19 +57,34 @@ void testBasicUsage() {
 }
 void DpllTests::testBasicUsageWithWL() {
     WITH_WL = true;
-    testBasicUsage();
+    DpllTests::testBasicUsage();
     WITH_WL = false;
 }
-void DpllTests::testBasicUsageWithoutWL() {
-    testBasicUsage();
+
+void DpllTests::testSmallConflict() {
+    Clause *c1 = new Clause(1, {1}), *c2 = new Clause(1, {-1});
+    std::vector<std::shared_ptr<Clause>> clauses;
+    clauses.push_back(std::shared_ptr<Clause>(c1));
+    clauses.push_back(std::shared_ptr<Clause>(c2));
+    Formula *f = new Formula(clauses, 3);
+    CPPUNIT_ASSERT_THROW(solve(f), Conflict);
+}
+void DpllTests::testSmallConflictWithWL() {
+    WITH_WL = true;
+    DpllTests::testSmallConflict();
+    WITH_WL = false;
 }
 
 CppUnit::Test* DpllTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("DpllTests");
     suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithoutWL",
-                &DpllTests::testBasicUsageWithoutWL));
+                &DpllTests::testBasicUsage));
     suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithWL",
                 &DpllTests::testBasicUsageWithWL));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithoutWL",
+                &DpllTests::testSmallConflict));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithWL",
+                &DpllTests::testSmallConflictWithWL));
     return suite;
 }
 
