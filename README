@@ -9,13 +9,16 @@ Compilation
     $ cmake ..
     $ make
 
+Remarque : pour accélérer l’exécution, on peut ajouter « -O3 » à la liste
+des options données à g++ (ligne 5 du fichier CMakeLists.txt).
+
 Exécution
 ---------
 
-La compilation engendre un exécutable `resol`, qui prend en paramètre un
-nom de fichier dans le format de FNC du DIMACS (celui utilisé par minisat,
-et détaillé dans l’énoncé du DM1), et affiche en sortie une solution,
-dans le format détaillé dans l’énoncé du DM1.
+La compilation engendre deux exécutables `resol` et `resol-wl`, qui prennent
+en paramètre un nom de fichier dans le format de FNC du DIMACS (celui
+utilisé par minisat, et détaillé dans l’énoncé du DM1), et affiche en sortie
+une solution, dans le format détaillé dans l’énoncé du DM1.
 
 Celui-ci peut également :
 * ne pas prendre de nom de fichier en paramètre ; l’entrée standard est
@@ -26,7 +29,7 @@ Celui-ci peut également :
 Tests
 -----
 
-Les tests unitaires ne sont compilés que si la bibliothèque CppUnit est
+Les tests unitaires ne sont compilés *que* si la bibliothèque CppUnit est
 installée (libcppunit-dev sous Debian/Ubuntu).
 Ils sont compilés en même tempsque les autres exécutables, et sont lancés
 par l’exécutable `testrunner`.
@@ -69,7 +72,7 @@ Répartition du travail
 
 Tom :
 * Implémentation des structures
-* Ajout des littéraux surveillés
+* Ajout des littéraux surveillés à l’algorithme de DPLL
 
 Valentin :
 * Implémentation du parseur
