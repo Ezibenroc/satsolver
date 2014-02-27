@@ -67,6 +67,27 @@ en fonction de ce qui a été lu) jusqu’à ce que l’état de l’automate
 devienne END_OF_FILE (qui est donc l’état final).
 
 
+Structures de données et choix d’implémentation
+-----------------------------------------------
+
+* Clauses :
+    * Ensemble de littéraux (unordered_set, basés sur une table de
+      hachage, afin d'avoir un accès en temps constant en moyenne).
+    * Pointeur vers l'affectation courante de la formule afin de
+      pouvoir tester si un littéral est à vrai/faux/indéterminé.
+* Affectations :
+    * Tableau d'entier, la i-ème case représentant l'état du littéral i.
+* Formules :
+    * Tableau de clauses.
+    * Pointeur sur l'affectation courante.
+    * Une pile de couples (entier,booléen). L'entier au sommet est le
+      dernier littéral affecté à vrai. Si le booléen associé est true,
+      alors c'était une déduction, sinon c'était un pari.
+    * Un ensemble de littéraux, qui est l'ensemble des contraintes
+      engendrées lors d'une affectation (tous les littéraux de cet ensemble
+      doivent être affectés à vrai, et si x et -x sont présents alors
+      il y a un conflit).
+
 Répartition du travail
 ======================
 
@@ -77,3 +98,14 @@ Tom :
 Valentin :
 * Implémentation du parseur
 * Implémentation de l’algorithme de DPLL (sans les littéraux surveillés)
+
+
+Comparaison des performance avec et sans les littéraux surveillés
+=================================================================
+
+Le gain des littéraux surveillés est négligeable (voire même légèrement
+négatif) sur des instances de 3-SAT (voir les fichiers examples/ex{1,5}-*.cnf)
+
+En revanche, un gain de temps conséquent peut être observé sur de
+plus grandes instances, par exemple examples/ex6-unsat.cnf (31s au lieu de
+42s)

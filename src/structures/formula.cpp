@@ -174,7 +174,7 @@ int Formula::back() {
         if(VERBOSE) std::cout << p.first << " " ;
         this->aff->set_unknown(p.first) ;
         this->mem.pop() ;
-        if(!p.second) {// on est arrivé au paris
+        if(!p.second) {// on est arrivé au pari
             if(VERBOSE)
                 std::cout << std::endl ;
             return p.first ;

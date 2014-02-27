@@ -52,7 +52,7 @@ class Formula {
         bool bet_true(int x) ;
         bool bet_false(int x) ;
 
-        // Retourne en arrière jusqu'au dernier paris
+        // Retourne en arrière jusqu'au dernier pari
         // Renvoie le dernier littéral parié (0 si inexistant)
         int back() ;
 
