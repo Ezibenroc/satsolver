@@ -29,6 +29,8 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
             std::cout << "Unitary resolution with literal " << literal << std::endl ;
         }
         formula->set_true(literal) ;
+        if (formula->contains_empty_clause())
+            throw Conflict();
         affectation->set_true(literal) ;
         formula->clean() ;
         return process(formula,affectation) ;
@@ -41,6 +43,8 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
             std::cout << "Isolated resolution with literal " << literal << std::endl ;
         }
         formula->set_true(literal) ;
+        if (formula->contains_empty_clause())
+            throw Conflict();
         // Pas besoin d'appeler clean, il ne changerai pas la formule ici.
         affectation->set_true(literal) ;
         return process(formula,affectation) ;
@@ -54,6 +58,8 @@ void satsolver::process(Formula *formula, Affectation *affectation) {
         }
         new_f = new Formula(formula) ;
         new_f->set_true(literal) ;
+        if (new_f->contains_empty_clause())
+            throw Conflict();
         affectation->set_true(literal) ; // pas la peine de copier l'affectation, on s'en sert seulement en écriture dans l'algo
         new_f->clean() ;
         process(new_f,affectation) ;

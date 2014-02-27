@@ -3,9 +3,17 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <cstring>
 
 using namespace satsolver;
 
+bool verbose = false ;
+int depth_stack = 0 ; // used only for verbosity mode
+
+void print_space() {
+	for(int i = 0 ; i < depth_stack ; i++)
+		std::cout << "\t" ;
+}
 
 Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : clauses(v), nb_variables(nb_variables) {
 }
@@ -29,19 +37,35 @@ Formula& Formula::operator=(const Formula &that) {
 
 std::string Formula::to_string() const {
     std::ostringstream oss;
-    if(this->clauses.size() == 0)
-        return "EMPTY FORMULA" ;
-    oss << "{";
-    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-        if (i)
-            oss << ", ";
-        oss << this->clauses[i]->to_string();
+    bool b  ;
+    std::set<std::set<int>> s = this->to_set() ;
+    if(s.empty())
+    	return "EMPTY FORMULA" ;
+    for(auto c : s) {
+    	oss << "{" ;
+    	b = false ;
+    	for(auto i : c) {
+    		if(b)
+    			oss << "," ;
+    		oss << i ;
+    		b = true ;
+    	}
+    	oss << "}" ;
     }
-    oss << "}";
     return oss.str() ;
 }
 
-std::set<std::set<int> > Formula::to_set() {
+std::string Formula::to_string2() const {
+    std::ostringstream oss;
+    oss << "######\n" ;
+    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+    	oss << "# " << this->clauses[i]->to_string() << "\n";
+    } 
+    oss << "######\n" ;
+    return oss.str() ;
+}
+
+std::set<std::set<int> > Formula::to_set() const {
     std::set<std::set<int> > set;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
         set.insert(this->clauses[i]->to_set()) ;
@@ -49,7 +73,7 @@ std::set<std::set<int> > Formula::to_set() {
     return set ;
 }
 
-std::set<Clause*> Formula::to_clauses_set() {
+std::set<Clause*> Formula::to_clauses_set() const {
     std::set<Clause*> set;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
         set.insert(new Clause(*this->clauses[i].get())) ;
@@ -71,7 +95,6 @@ void Formula::set_true(int x) {
     this->clauses.swap(new_clauses);
 }
 */
-
 void Formula::set_true(int x) {
     std::vector<std::shared_ptr<Clause>> old_clauses(this->clauses) ;
     this->clauses.clear() ;
@@ -83,31 +106,19 @@ void Formula::set_true(int x) {
         }
     }
 }
-
-
 void Formula::set_false(int x) {
-    this->set_true(-x) ;
+    this->set_true(-x);
 }
-
 
 int Formula::find_monome() const {
     int literal ;
-    for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
-        literal = this->clauses[i]->monome() ;
+    for(auto c : this->clauses) {
+        literal = c->monome() ;
         if(literal)
             return literal ;
     }
     return 0 ;
 }
-
-/*
-int Formula::unit_propagation() {
-    int literal = find_monome() ;
-    if(literal == 0)
-        return 0 ;
-    this->set_true(literal) ;
-    return literal ;
-}*/
 
 int Formula::find_isolated_literal() const {
     bool pos, neg ;
@@ -124,7 +135,6 @@ int Formula::find_isolated_literal() const {
     }
     return 0 ;
 }
-
 
 bool Formula::is_empty() const {
     return (this->clauses.size() == 0);
