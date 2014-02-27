@@ -12,6 +12,7 @@ namespace satsolver {
 
 class Formula {
     private :
+        Affectation *aff ;
         std::vector<std::shared_ptr<satsolver::Clause>> clauses ;
         int nb_variables ;
         std::stack<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
@@ -23,7 +24,6 @@ class Formula {
 
 
     public :
-        Affectation *aff ;
         Formula(std::vector<std::shared_ptr<satsolver::Clause>> v, int nb_variables) ;
         Formula& operator=(const Formula &that);
         Formula(satsolver::Formula *f) ;
