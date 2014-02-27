@@ -15,7 +15,7 @@ bool VERBOSE = false;
 bool WITH_WL;
 
 void bad_command_options(char *executable) {
-    std::cout << "Syntax: " << executable << "[-verbose] [<filename>]\n\n";
+    std::cout << "Syntax: " << executable << " [-verbose] [<filename>]\n\n";
     std::cout << "If filename is not given, stdin is used instead." << std::endl;
 }
 
@@ -69,9 +69,8 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
 
     if (!using_stdin)
         delete input;
-/*    delete parser;
-    delete solution ;
-    delete formula ;
-    delete solution_set ;*/
+    delete parser;
+    delete solution_set ;
+    delete formula;
     return 0;
 }

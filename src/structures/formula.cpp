@@ -220,11 +220,16 @@ int Formula::isolated_literal() {
         }
     }
     for(int i = 1 ; i <= this->nb_variables ; i++) {
-        if(l[i] == 1)
+        if(l[i] == 1) {
+            free(l);
             return i ;
-        else if(l[i] == 2)
+        }
+        else if(l[i] == 2) {
+            free(l);
             return -i ;
+        }
     }
+    free(l);
     return 0 ;
 }
 
