@@ -25,9 +25,12 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : cla
 		c->set_affectation(this->aff) ;
 	}
 	this->clean() ;
-    if (WITH_WL)
-        for(auto c : this->clauses)
-            c->init_WL() ;
+  if (WITH_WL)
+      for(auto c : this->clauses) {
+      		if(c->get_size() == 0)
+      			throw Conflict() ;
+          c->init_WL() ;
+			}
 }
 
 Formula::Formula(satsolver::Formula *f) {

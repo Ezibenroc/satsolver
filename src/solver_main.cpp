@@ -54,8 +54,8 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
         return 1;
     }
     parser = new satsolver::Parser(*input);
-    formula = parser->get_formula();
     try {
+    		formula = parser->get_formula();
         solution = satsolver::solve(formula);
     }
     catch (satsolver::Conflict e) {

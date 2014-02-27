@@ -62,12 +62,17 @@ void DpllTests::testBasicUsageWithWL() {
 }
 
 void DpllTests::testSmallConflict() {
+		Formula *f ;
     Clause *c1 = new Clause(1, {1}), *c2 = new Clause(1, {-1});
     std::vector<std::shared_ptr<Clause>> clauses;
     clauses.push_back(std::shared_ptr<Clause>(c1));
     clauses.push_back(std::shared_ptr<Clause>(c2));
-    Formula *f = new Formula(clauses, 3);
-    CPPUNIT_ASSERT_THROW(solve(f), Conflict);
+    if(WITH_WL)
+    	CPPUNIT_ASSERT_THROW(f = new Formula(clauses, 3),Conflict) ;
+    else {
+			f = new Formula(clauses, 3);
+	    CPPUNIT_ASSERT_THROW(solve(f), Conflict);
+	   }
 }
 void DpllTests::testSmallConflictWithWL() {
     WITH_WL = true;
@@ -83,8 +88,8 @@ CppUnit::Test* DpllTests::suite() {
                 &DpllTests::testBasicUsageWithWL));
     suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithoutWL",
                 &DpllTests::testSmallConflict));
-//    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithWL",
-//                &DpllTests::testSmallConflictWithWL));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithWL",
+                &DpllTests::testSmallConflictWithWL));
     return suite;
 }
 
