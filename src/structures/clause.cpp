@@ -72,23 +72,26 @@ bool Clause::is_tautology() const {
 }
 
 
-std::string Clause::to_string() const {
+std::string Clause::to_string()  {
     std::ostringstream oss;
     bool flag = false ;
+    oss << "{" ;
     for(int i = 1 ; i <= this->nb_variables ; i++) {
         if(this->contains_literal(-i)) {
             if(flag)
-                oss << " " ;
+                oss << "," ;
             flag = true ;
             oss << -i ;
         }
         if(this->contains_literal(i)) {
             if(flag)
-                oss << " " ;
+                oss << "," ;
             flag = true ;
             oss << i ;
         }
     }
+    oss << "}" ;
+    oss << " WL : " << this->fst_WL() << " & " << this->snd_WL()  ;
     return oss.str() ;
 }
 
@@ -140,32 +143,42 @@ void Clause::set_affectation(Affectation *a) {
 }
 
 int Clause::set_true(int x) {
-	if(!this->aff->is_true(this->fst_WL()) && !this->aff->is_true(this->snd_WL())) {
-		if(this->contains_literal(x)) { // on installe x comme littéral surveillé
-			if(this->aff->is_unknown(this->fst_WL()))  // priorité aux littéraux vrais
-				this->watched.first = x ;
-			else
-				this->watched.second = x ;		
-		}
-		else if(this->is_WL(-x)) { // on surveille un littéral qui a été mis à faux
-			if(this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()))
-				return 0 ; // rien à faire, la clause est satisfaite
-			for(auto literal : this->literals) {
-				if(!this->aff->is_false(literal) && !this->is_WL(literal)) { // nouveau literal surveillé
-					if(this->fst_WL() == -x) 
-						this->watched.first = literal ;
-					else
-						this->watched.second = literal ;
-					return 0 ; // pas de propagation unitaire, on a trouvé un remplaçant
-				}
-			}
-			// On n'a pas trouvé de remplaçant, il ne reste donc qu'un literal non faux
-			if(this->fst_WL() != -x)
-				return this->fst_WL() ;
-			else
-				return this->snd_WL() ;	
-		}
+
+	/*if(!(this->contains_literal(x) || this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()) || (!this->aff->is_false(this->fst_WL()) && !this->aff->is_false(this->snd_WL())))) {
+		std::cout << "#####################" << std::endl ;
+		std::cout << "#\t" << this->to_string() << std::endl ;
+		std::cout << "#\t" << this->aff->to_string() << std::endl ;
+		std::cout << "#####################" << std::endl ;
+		exit(EXIT_FAILURE) ;
+	}*/
+
+	if(this->contains_literal(x) && !this->is_WL(x)) { // on installe x comme littéral surveillé
+		if(this->aff->is_unknown(this->fst_WL()))  // priorité aux littéraux vrais
+			this->watched.first = x ;
+		else
+			this->watched.second = x ;	
+		return 0 ;	
+	}
+	else if(this->contains_literal(x)) { // rien
 		return 0 ;
+	}
+	else if(this->is_WL(-x)) { // on surveille un littéral qui a été mis à faux
+		if(this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()))
+			return 0 ; // rien à faire, la clause est satisfaite
+		for(auto literal : this->literals) {
+			if(!this->aff->is_false(literal) && !this->is_WL(literal)) { // nouveau literal surveillé
+				if(this->fst_WL() == -x) 
+					this->watched.first = literal ;
+				else
+					this->watched.second = literal ;
+				return 0 ; // pas de propagation unitaire, on a trouvé un remplaçant
+			}
+		}
+		// On n'a pas trouvé de remplaçant, il ne reste donc qu'un literal non faux
+		if(this->fst_WL() != -x)
+			return this->fst_WL() ;
+		else
+			return this->snd_WL() ;	
 	}
 	return 0 ;
 }
@@ -175,7 +188,11 @@ int Clause::set_false(int x) {
 }
 
 bool Clause::is_true() {
-	return this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()) ;
+	for(auto l : this->literals) {
+		if(this->aff->is_true(l))
+			return true ;
+	}
+	return false ;
 }
 
 int Clause::monome() {

@@ -22,7 +22,7 @@ Affectation* satsolver::solve(Formula *formula) {
     				tmp = formula->back() ;
     				if(tmp == 0)
     					throw Conflict() ;
-    			}while(formula->deduce_false(tmp)) ;
+    			}while(!formula->deduce_false(tmp)) ;
     		}
     	}
     	else {
@@ -32,7 +32,7 @@ Affectation* satsolver::solve(Formula *formula) {
     				tmp = formula->back() ;
     				if(tmp == 0)
     					throw Conflict() ;
-    			}while(formula->deduce_false(tmp)) ;
+    			}while(!formula->deduce_false(tmp)) ;
 				}
 			}
 		}  	

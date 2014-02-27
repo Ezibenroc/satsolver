@@ -7,6 +7,13 @@
 
 using namespace satsolver;
 
+bool verbose = false ;
+int depth_stack = 0 ; // used only for verbosity mode
+
+void print_space() {
+	for(int i = 0 ; i < depth_stack ; i++)
+		std::cout << "\t" ;
+}
 
 Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : clauses(v), nb_variables(nb_variables) {
 	this->aff = new Affectation(nb_variables) ;
@@ -47,17 +54,33 @@ Formula& Formula::operator=(const Formula &that) {
     return *this;
 }
 
-std::string Formula::to_string() const {
+std::string Formula::to_string() {
     std::ostringstream oss;
-    if(this->clauses.size() == 0)
-        return "EMPTY FORMULA" ;
-    oss << "{";
-    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-        if (i)
-            oss << ", ";
-        oss << this->clauses[i]->to_string();
+    bool b  ;
+    std::set<std::set<int>> s = this->to_set() ;
+    if(s.empty())
+    	return "EMPTY FORMULA" ;
+    for(auto c : s) {
+    	oss << "{" ;
+    	b = false ;
+    	for(auto i : c) {
+    		if(b)
+    			oss << "," ;
+    		oss << i ;
+    		b = true ;
+    	}
+    	oss << "}" ;
     }
-    oss << "}";
+    return oss.str() ;
+}
+
+std::string Formula::to_string2() {
+    std::ostringstream oss;
+    oss << "######\n" ;
+    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+    	oss << "# " << this->clauses[i]->to_string() << "\n";
+    } 
+    oss << "######\n" ;
     return oss.str() ;
 }
 
@@ -95,16 +118,23 @@ void Formula::set_true(int x) {
 
 bool Formula::set_true(int x) {
 	int literal ;
-	this->aff->set_true(x) ;
+/*	std::cout << "------------------------" << std::endl ;
+	std::cout << "Stack size : " << this->mem.size() << std::endl ;
+	std::cout << this->aff->to_string() << std::endl ;
+	std::cout << this->to_string2() << std::endl ;
+	std::cout << "------------------------" << std::endl ;*/
 	for(auto c : this->clauses) {
 		literal = c->set_true(x) ;
 		if(literal){// on a engendré un monome
 			if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
+				this->to_do.clear();
+				if(verbose) std::cout << "Generated a conflict : " << literal << std::endl ;
 				return false ;
 			}
 			this->to_do.insert(literal) ;
 		} 
 	}
+	this->aff->set_true(x) ;
 	if(!this->to_do.empty()) { // on doit affecter ces littéraux
 		literal = *this->to_do.begin() ;	
 		this->to_do.erase(literal) ;
@@ -114,30 +144,55 @@ bool Formula::set_true(int x) {
 }
 
 bool Formula::deduce_true(int x) {
-	this->mem.push(std::pair<int,bool>(x,true)) ;
-	return this->set_true(x) ;	
+	if(verbose) {
+		print_space() ;
+		std::cout << "Deduce " << x << std::endl ;
+	}
+	if(this->aff->is_unknown(x)) {
+		this->mem.push(std::pair<int,bool>(x,true)) ;
+		return this->set_true(x) ;	
+	}
+	else return this->aff->is_true(x) ;	
 }
 bool Formula::deduce_false(int x) {
 	return deduce_true(-x) ;
 }
 
 bool Formula::bet_true(int x) {
-	this->mem.push(std::pair<int,bool>(x,false)) ;
-	return this->set_true(x) ;
+	if(verbose) {
+		print_space() ;
+		std::cout << "Bet " << x << std::endl ;
+	}
+	depth_stack ++ ;
+	if(this->aff->is_unknown(x)) {
+		this->mem.push(std::pair<int,bool>(x,false)) ;
+		return this->set_true(x) ;
+	}
+	else return this->aff->is_true(x) ;
 }
 bool Formula::bet_false(int x) {
 	return bet_true(-x) ;
 }
 
 int Formula::back() {
+	depth_stack -- ;
+	if(verbose) {
+		print_space() ;
+		std::cout << "Backtrack : " ;
+	}
 	std::pair<int,bool> p ;
 	while(!this->mem.empty()) {
 		p = this->mem.top() ;
+		if(verbose) std::cout << p.first << " " ;
 		this->aff->set_unknown(p.first) ;
 		this->mem.pop() ;
-		if(!p.second) // on est arrivé au paris
+		if(!p.second) {// on est arrivé au paris
+			if(verbose)
+				std::cout << std::endl ;
 			return p.first ;
+		}
 	}
+	if(verbose) std::cout << std::endl ;
 	return 0 ;
 }
 
@@ -232,7 +287,6 @@ void Formula::clean() {
 				}
 			}
 		} while(literal != 0) ;
-		
 		// Suppression des clauses contenant d'autres clauses ou des littéraux vrais
     int n = 0 ;
     std::vector<std::shared_ptr<Clause>> old_clauses(this->clauses) ;
@@ -264,5 +318,5 @@ std::stack<std::pair<int,bool>> Formula::get_mem() {
 }
 
 Affectation *Formula::get_aff() {
-	return this->aff ;
+	return new Affectation(this->aff) ;
 }		

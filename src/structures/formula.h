@@ -31,7 +31,8 @@ class Formula {
 
 
         // Renvoie la représentation textuelle de la formule
-        std::string to_string() const;
+        std::string to_string() ;
+				std::string to_string2() ;
 
         // Renvoie un ensemble d'ensembles d'entiers, selon l'affectation
         // Chaque ensemble de cet ensemble représente une clause
