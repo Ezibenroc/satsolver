@@ -1,23 +1,20 @@
 #include <cassert>
 
-#include "parser.h"
+#include "parsers/sat.h"
 
 using namespace satsolver;
 
-Parser::Parser(std::istream &_stream) : stream(_stream) {
-    this->parse();
-}
-Parser::~Parser() {
+SatParser::~SatParser() {
 }
 
-void Parser::parse() {
-    enum Parser::State state = WAITING_FOR_HEADER;
-    while (state != Parser::END_OF_FILE)
+void SatParser::parse() {
+    enum SatParser::State state = WAITING_FOR_HEADER;
+    while (state != SatParser::END_OF_FILE)
         state = this->transition(state);
     this->formula = new Formula(this->clauses, this->variables_count);
 }
 
-enum Parser::State Parser::transition(enum Parser::State state) {
+enum SatParser::State SatParser::transition(enum SatParser::State state) {
     char prefix;
     std::string str;
     int literal;
@@ -33,14 +30,14 @@ enum Parser::State Parser::transition(enum Parser::State state) {
                 case ' ':
                     return WAITING_FOR_HEADER;
                 default:
-                    throw Parser::syntaxerror("Expected header.");
+                    throw SatParser::syntaxerror("Expected header.");
             };
             break;
 
         case WAITING_FOR_CNF: // In the header line, “p” has been read
             this->stream >> str;
             if (str != "cnf")
-                throw Parser::syntaxerror("Expected 'cnf'.");
+                throw SatParser::syntaxerror("Expected 'cnf'.");
             return WAITING_FOR_VARIABLES_COUNT;
 
         case WAITING_FOR_VARIABLES_COUNT: // In the header line, “p cnf” has been read
@@ -63,7 +60,7 @@ enum Parser::State Parser::transition(enum Parser::State state) {
                 this->literals.push_back(std::stoi(str));
             }
             catch (std::exception &e) {
-                throw Parser::syntaxerror(std::string() + "Expected integer, got '" + str + "'.");
+                throw SatParser::syntaxerror(std::string() + "Expected integer, got '" + str + "'.");
             }
             return PARSING_CLAUSE;
 
@@ -98,15 +95,15 @@ enum Parser::State Parser::transition(enum Parser::State state) {
     return state;
 }
 
-std::vector<std::shared_ptr<Clause>> Parser::get_clauses() {
+std::vector<std::shared_ptr<Clause>> SatParser::get_clauses() {
     return this->clauses;
 }
-Formula* Parser::get_formula() {
+Formula* SatParser::get_formula() {
     return this->formula;
 }
-int Parser::get_variables_count() const {
+int SatParser::get_variables_count() const {
     return this->variables_count;
 }
-int Parser::get_clauses_count() const {
+int SatParser::get_clauses_count() const {
     return this->clauses_count;
 }

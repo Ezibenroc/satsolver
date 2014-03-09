@@ -3,7 +3,7 @@
 
 #include <cppunit/TestFixture.h>
 
-class ParserTests : public CppUnit::TestFixture {
+class SatParserTests : public CppUnit::TestFixture {
     private:
         void testBasic();
         void testExtraWhitespaces();

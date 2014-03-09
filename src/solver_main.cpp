@@ -7,7 +7,7 @@
 #include "solver_main.h"
 #include "structures/affectation.h"
 #include "structures/formula.h"
-#include "parser.h"
+#include "parsers/sat.h"
 #include "dpll.h"
 #include "config.h"
 
@@ -20,7 +20,7 @@ void bad_command_options(char *executable) {
 }
 
 int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
-    satsolver::Parser *parser;
+    satsolver::SatParser *parser;
     satsolver::Formula *formula;
     satsolver::Affectation *solution;
     std::set<int> *solution_set;
@@ -51,9 +51,10 @@ int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
         bad_command_options(argv[0]);
         return 1;
     }
-    parser = new satsolver::Parser(*input);
+    parser = new satsolver::SatParser(*input);
+    parser->parse();
+    formula = parser->get_formula();
     try {
-        formula = parser->get_formula();
         solution = satsolver::solve(formula);
     }
     catch (satsolver::Conflict e) {
