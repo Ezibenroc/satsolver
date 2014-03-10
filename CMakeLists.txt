@@ -12,24 +12,29 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 add_library(Affectation src/structures/affectation.cpp)
 add_library(Clause src/structures/clause.cpp)
 add_library(Formula src/structures/formula.cpp)
+add_library(ExtendedFormula src/structures/extended_formula.cpp)
+add_library(Graph src/structures/graph.cpp)
 
 add_library(AbstractParser src/parsers/abstract.cpp)
 add_library(SatParser src/parsers/sat.cpp)
 target_link_libraries(SatParser AbstractParser Clause Formula)
 
-add_library(DPLL src/dpll.cpp)
+add_library(GraphParser src/parsers/graph.cpp)
+target_link_libraries(GraphParser AbstractParser Graph)
+
+add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Affectation Clause Formula)
 
-add_library(solver_main src/solver_main.cpp)
-target_link_libraries(solver_main Affectation Formula)
-target_link_libraries(solver_main SatParser)
-target_link_libraries(solver_main DPLL)
+add_library(ResolCommon src/entry_points/resol_common.cpp)
+target_link_libraries(ResolCommon Affectation Formula)
+target_link_libraries(ResolCommon SatParser)
+target_link_libraries(ResolCommon DPLL)
 
 add_executable(resol src/entry_points/resol.cpp)
-target_link_libraries(resol solver_main)
+target_link_libraries(resol ResolCommon)
 
 add_executable(resol-wl src/entry_points/resol-wl.cpp)
-target_link_libraries(resol-wl solver_main)
+target_link_libraries(resol-wl ResolCommon)
 
 find_package(CppUnit)
 if (CPPUNIT_FOUND)

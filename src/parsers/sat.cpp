@@ -26,7 +26,7 @@ enum SatParser::State SatParser::transition(enum SatParser::State state) {
                 case 'c':
                     return IN_COMMENT_BEFORE_HEADER;
                 case 'p':
-                    return WAITING_FOR_CNF;
+                    return WAITING_FOR_FORMAT;
                 case ' ':
                     return WAITING_FOR_HEADER;
                 default:
@@ -34,7 +34,7 @@ enum SatParser::State SatParser::transition(enum SatParser::State state) {
             };
             break;
 
-        case WAITING_FOR_CNF: // In the header line, “p” has been read
+        case WAITING_FOR_FORMAT: // In the header line, “p” has been read
             this->stream >> str;
             if (str != "cnf")
                 throw SatParser::syntaxerror("Expected 'cnf'.");
@@ -92,7 +92,7 @@ enum SatParser::State SatParser::transition(enum SatParser::State state) {
     }
 
 
-    return state;
+    assert(false);
 }
 
 std::vector<std::shared_ptr<Clause>> SatParser::get_clauses() {

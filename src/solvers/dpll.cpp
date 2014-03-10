@@ -7,7 +7,7 @@
 #include "structures/affectation.h"
 #include "structures/formula.h"
 #include "structures/clause.h"
-#include "dpll.h"
+#include "solvers/dpll.h"
 #include "config.h"
 
 using namespace satsolver;

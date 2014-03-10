@@ -14,7 +14,7 @@
 #include "structures/clause.h"
 #include "structures/formula.h"
 #include "structures/affectation.h"
-#include "dpll.h"
+#include "solvers/dpll.h"
 #include "dpll_tests.h"
 #include "config.h"
 

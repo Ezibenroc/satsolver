@@ -4,11 +4,11 @@
 #include <iostream>
 #include <fstream>
 
-#include "solver_main.h"
+#include "entry_points/resol_common.h"
 #include "structures/affectation.h"
 #include "structures/formula.h"
 #include "parsers/sat.h"
-#include "dpll.h"
+#include "solvers/dpll.h"
 #include "config.h"
 
 bool VERBOSE = false;
@@ -19,7 +19,7 @@ void bad_command_options(char *executable) {
     std::cout << "If filename is not given, stdin is used instead." << std::endl;
 }
 
-int satsolver::solver_main(int argc, char *argv[], bool with_watched_literals) {
+int satsolver::resol_main(int argc, char *argv[], bool with_watched_literals) {
     satsolver::SatParser *parser;
     satsolver::Formula *formula;
     satsolver::Affectation *solution;

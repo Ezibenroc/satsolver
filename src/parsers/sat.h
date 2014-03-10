@@ -18,7 +18,7 @@ class SatParser : public AbstractParser {
     public:
         enum State {
             WAITING_FOR_HEADER,
-            WAITING_FOR_CNF,
+            WAITING_FOR_FORMAT,
             WAITING_FOR_VARIABLES_COUNT,
             WAITING_FOR_CLAUSES_COUNT,
 

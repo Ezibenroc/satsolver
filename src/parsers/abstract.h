@@ -7,8 +7,6 @@
 #include <string>
 #include <exception>
 
-namespace satsolver {
-
 class AbstractParser {
     public:
         AbstractParser(std::istream &stream);
@@ -33,7 +31,5 @@ class AbstractParser {
 
         virtual void parse() = 0;
 };
-
-}
 
 #endif
