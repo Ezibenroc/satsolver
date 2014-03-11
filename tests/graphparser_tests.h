@@ -1,9 +1,9 @@
-#ifndef SATPARSER_TESTS_H
-#define SATPARSER_TESTS_H
+#ifndef GRAPHPARSER_TESTS_H
+#define GRAPHPARSER_TESTS_H
 
 #include <cppunit/TestFixture.h>
 
-class SatParserTests : public CppUnit::TestFixture {
+class GraphParserTests : public CppUnit::TestFixture {
     private:
         void testBasic();
         void testExtraWhitespaces();
@@ -12,4 +12,5 @@ class SatParserTests : public CppUnit::TestFixture {
 };
 
 #endif
+
 
