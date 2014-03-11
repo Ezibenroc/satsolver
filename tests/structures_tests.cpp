@@ -14,8 +14,12 @@
 #include "structures/clause.h"
 #include "structures/formula.h"
 #include "structures/affectation.h"
+#include "structures/extended_formula.h"
 #include "structures_tests.h"
 #include "config.h"
+
+#define EF ExtendedFormula
+#define SPEF std::shared_ptr<EF>
 
 using namespace satsolver;
 
@@ -211,6 +215,23 @@ void StructuresTests::testFormula() {
 
 }
 
+void StructuresTests::testExtendedFormula() {
+    SPEF extended_formula =
+            SPEF(new EF(EF::XOR,
+                SPEF(new EF(EF::AND,
+                    SPEF(new EF(EF::LITERAL, "foo")),
+                    SPEF(new EF(EF::LITERAL, "bar"))
+                )),
+                SPEF(new EF(EF::AND,
+                    SPEF(new EF(EF::LITERAL, "foo")),
+                    SPEF(new EF(EF::NOT,
+                        SPEF(new EF(EF::LITERAL, "bar"))
+                    ))
+                ))
+            ));
+    std::shared_ptr<Formula> formula = extended_formula->reduce_to_formula(NULL);
+}
+
 CppUnit::Test* StructuresTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("StructuresTests");
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testClauseCreation",
@@ -223,5 +244,7 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testSetTrueClause));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testFormula",
                 &StructuresTests::testFormula));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtenedFormula",
+                &StructuresTests::testExtendedFormula));
     return suite;
 }

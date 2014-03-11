@@ -39,7 +39,7 @@ target_link_libraries(resol-wl ResolCommon)
 find_package(CppUnit)
 if (CPPUNIT_FOUND)
     add_library(StructuresTests tests/structures_tests.cpp)
-    target_link_libraries(StructuresTests Affectation Clause Formula Graph)
+    target_link_libraries(StructuresTests Affectation Clause Formula ExtendedFormula)
     target_link_libraries(StructuresTests cppunit)
 
     add_library(DpllTests tests/dpll_tests.cpp)

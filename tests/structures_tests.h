@@ -8,7 +8,8 @@ class StructuresTests : public CppUnit::TestFixture {
         void testBasicUsage();
         void testAffectationCreationUsage();
         void testSetTrueClause() ;
-				void testFormula() ;
+        void testFormula() ;
+        void testExtendedFormula();
     public:
         static CppUnit::Test* suite();
 };
