@@ -15,6 +15,7 @@
 #include "structures/formula.h"
 #include "structures/affectation.h"
 #include "structures/extended_formula.h"
+#include "solvers/dpll.h"
 #include "structures_tests.h"
 #include "config.h"
 
@@ -216,6 +217,7 @@ void StructuresTests::testFormula() {
 }
 
 void StructuresTests::testExtendedFormula() {
+    std::shared_ptr<std::map<std::string, int>> variable_to_literal;
     SPEF extended_formula =
             SPEF(new EF(EF::XOR,
                 SPEF(new EF(EF::AND,
@@ -229,7 +231,12 @@ void StructuresTests::testExtendedFormula() {
                     ))
                 ))
             ));
-    std::shared_ptr<Formula> formula = extended_formula->reduce_to_formula(NULL);
+    std::shared_ptr<Formula> formula = extended_formula->reduce_to_formula(&variable_to_literal);
+    CPPUNIT_ASSERT(variable_to_literal);
+    CPPUNIT_ASSERT(variable_to_literal->size() >= 2);
+    CPPUNIT_ASSERT(variable_to_literal->find("foo") != variable_to_literal->end());
+    Affectation *sat_solution = satsolver::solve(&*formula);
+    CPPUNIT_ASSERT(sat_solution->is_true(variable_to_literal->at("foo")));
 }
 
 CppUnit::Test* StructuresTests::suite() {

@@ -116,6 +116,24 @@ std::vector<std::vector<std::string>*>* EF::reduce() {
                 };
             result->push_back(clause); // -A v B v C
             break;
+        case NOT:
+            clause = new std::vector<std::string>{
+                    std::string("-") + f1->make_literal(),
+                    std::string("-") + this->make_literal(),
+                    ""
+                };
+            result->push_back(clause); // A v -B v C
+            clause = new std::vector<std::string>{
+                    f1->make_literal(),
+                    this->make_literal(),
+                    ""
+                };
+            result->push_back(clause); // -A v B v C
+            break;
+        case LITERAL:
+            clause = new std::vector<std::string>{this->literal, "", ""};
+            result->push_back(clause);
+            break;
     }
     return result;
 }
@@ -133,7 +151,8 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
     for (auto raw_clause : *raw_clauses) {
         for (i=0; i<3; i++) {
             string_literal = raw_clause->at(i);
-            std::remove(string_literal.begin(), string_literal.end(), '-');
+            if (string_literal[0] == '-')
+                string_literal.erase(string_literal.begin(), string_literal.begin()+1);
             if (string_literal != "" && name_to_variable->find(string_literal) == name_to_variable->end())
                 name_to_variable->insert(std::make_pair(string_literal, ++nb_variables));
         }
@@ -144,8 +163,7 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
         for (i=0; i<3; i++) {
             string_literal = raw_clause->at(i);
             if (string_literal[0] == '-') {
-                std::remove(string_literal.begin(), string_literal.end(), '-');
-
+                string_literal.erase(string_literal.begin(), string_literal.begin()+1);
                 int_literals->push_back(- name_to_variable->at(string_literal));
             }
             else if (string_literal[0]) {
