@@ -362,6 +362,7 @@ int Formula::choose_literal_moms() const {
 			max_occurence = count[i] ;
 			max_literal = i ;
 		}
-	} 
+	}
+	free(count) ;
 	return max_literal-this->nb_variables ;
 }
