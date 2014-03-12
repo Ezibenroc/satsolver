@@ -3,14 +3,19 @@
 #include "satparser_tests.h"
 #include "graphparser_tests.h"
 #include "dpll_tests.h"
+#include "heuristics_tests.h"
+#include <time.h>
+#include <stdlib.h>
 
 bool VERBOSE = false;
 bool WITH_WL = false;
 
 int main(void)
 {
+		srand((int)time(NULL)) ;
     CppUnit::TextUi::TestRunner runner;
     runner.addTest(StructuresTests::suite());
+    runner.addTest(HeuristicsTests::suite());
     runner.addTest(DpllTests::suite());
     runner.addTest(SatParserTests::suite());
     runner.addTest(GraphParserTests::suite());

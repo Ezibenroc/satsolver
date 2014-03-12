@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstring>
+#include <stdlib.h>
 
 #include "config.h"
 
@@ -321,4 +322,17 @@ std::stack<std::pair<int,bool>> Formula::get_mem() {
 
 Affectation *Formula::get_aff() {
     return (this->aff) ;
+}
+
+std::vector<int> Formula::to_vector (void) const {
+	std::vector<int> v = std::vector<int>() ;
+	for(unsigned i = 0 ; i < clauses.size() ; i++) {
+		clauses[i]->add_literals_to_vector(v) ;
+	}
+	return v ;
+}
+
+int Formula::choose_literal_random() const {
+	std::vector<int> v = this->to_vector() ;
+	return v[rand()%v.size()] ;
 }

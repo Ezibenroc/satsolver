@@ -42,7 +42,7 @@ class SatParser : public AbstractParser {
 
 
     public:
-        using AbstractParser::AbstractParser;
+        SatParser(std::istream &stream);
         virtual ~SatParser();
         virtual void parse();
 

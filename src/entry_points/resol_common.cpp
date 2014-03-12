@@ -3,6 +3,8 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
+#include <time.h>
 
 #include "entry_points/resol_common.h"
 #include "structures/affectation.h"
@@ -20,6 +22,7 @@ void bad_command_options(char *executable) {
 }
 
 int satsolver::resol_main(int argc, char *argv[], bool with_watched_literals) {
+		srand(time(NULL)) ;
     satsolver::SatParser *parser;
     satsolver::Formula *formula;
     satsolver::Affectation *solution;

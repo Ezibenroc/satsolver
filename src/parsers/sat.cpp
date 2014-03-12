@@ -4,6 +4,8 @@
 
 using namespace satsolver;
 
+SatParser::SatParser(std::istream &stream) : AbstractParser::AbstractParser(stream){}
+
 SatParser::~SatParser() {
 }
 

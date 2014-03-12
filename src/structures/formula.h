@@ -94,6 +94,13 @@ class Formula {
         // Renvoie l'affectation
         // Ne pas utiliser en dehors des tests unitaires, ou de la fin de DPLL
         Affectation *get_aff() ;
+        
+        // Renvoie un vecteur de littéraux inconnus
+        std::vector<int> to_vector (void) const ;
+        
+        // Choisis un littéral aléatoirement dans la formule
+        // Pré-condition : le générateur pseudo-aléatoire a été initialisé correctement
+        int choose_literal_random() const ;
 };
 
 }

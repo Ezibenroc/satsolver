@@ -84,6 +84,9 @@ class Clause {
 
        // Determines whether all literals in the clause are set to false.
        bool is_evaluated_to_false() const;
+       
+       // Si la clause ne contient pas de littéral vrai, alors ajoute tous ses littéraux indéterminés au vecteur
+       void add_literals_to_vector(std::vector<int> &v) const ;
 };
 
 }

@@ -226,3 +226,14 @@ bool Clause::is_evaluated_to_false() const {
             return false;
     return true;
 }
+
+void Clause::add_literals_to_vector(std::vector<int> &v) const {
+	for(auto l : this->literals) {
+		if(this->aff->is_true(l)) // clause satisfaite, on sort
+			return ;
+	}
+	for(auto l : this->literals) { // clause insatisfaite, on ajoute tous les littéraux non faux
+		if(this->aff->is_unknown(l))
+			v.push_back(l) ;
+	}
+}
