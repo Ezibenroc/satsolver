@@ -336,3 +336,32 @@ int Formula::choose_literal_random() const {
 	std::vector<int> v = this->to_vector() ;
 	return v[rand()%v.size()] ;
 }
+
+int Formula::choose_literal_moms() const {
+	unsigned min_clause_size = 999999999 ;
+	std::vector<int> v = std::vector<int>() ;
+	int *count = (int*) malloc((2*this->nb_variables+1)*sizeof(int)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
+	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+		v.clear() ;
+		this->clauses[i]->add_literals_to_vector(v) ;
+		if(v.size() < min_clause_size) { // trouvé une clause plus petite, on remet tout à zéro
+			min_clause_size = (unsigned) v.size() ;
+			memset(count,0,(2*this->nb_variables+1)*sizeof(int)) ;
+		}
+		if(v.size() == min_clause_size) { // on incrémente le compteur de tous les littéraux de v
+			for(unsigned j = 0 ; j < v.size() ; j++) {
+				count[v[j]+this->nb_variables] ++ ;
+			}
+		}
+	}
+	// Recherche du minimum dans count
+	int max_occurence, max_literal ;
+	max_occurence = 0 ;  max_literal = 0 ;
+	for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) { 
+		if(count[i] > max_occurence) {
+			max_occurence = count[i] ;
+			max_literal = i ;
+		}
+	} 
+	return max_literal-this->nb_variables ;
+}

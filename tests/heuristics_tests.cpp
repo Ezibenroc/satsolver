@@ -61,10 +61,33 @@ void HeuristicsTests::testRandom() {
     }
 }
 
+void HeuristicsTests::testMoms() {
+    std::vector<std::shared_ptr<Clause>> g ;
+    std::vector <int> v = {1,2,-3} ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
+    v = {1,2,3,4} ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
+    v = {-1,-2,-3} ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
+    v = {-1,2,3,4} ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
+    Formula *f = new Formula(g,4) ;
+    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{1,2,3,4},{-1,-2,-3},{-1,2,3,4}}));
+    CPPUNIT_ASSERT(f->choose_literal_moms() == -3) ;
+    v = { 1,-4 } ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
+    v = { 2,-4 } ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
+    f = new Formula(g,4) ;
+    CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{1,2,3,4},{-1,-2,-3},{-1,2,3,4},{1,-4},{2,-4}}));
+    CPPUNIT_ASSERT(f->choose_literal_moms() == -4) ;
+}
 
 CppUnit::Test* HeuristicsTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("HeuristicsTests");
     suite->addTest(new CppUnit::TestCaller<HeuristicsTests>("StructuresTests_testRandom",
                 &HeuristicsTests::testRandom));
+    suite->addTest(new CppUnit::TestCaller<HeuristicsTests>("StructuresTests_testMoms",
+                &HeuristicsTests::testMoms));
     return suite;
 }

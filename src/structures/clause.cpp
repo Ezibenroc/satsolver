@@ -96,7 +96,7 @@ std::string Clause::to_string()  {
         }
     }
     oss << "}" ;
-    oss << " WL : " << this->fst_WL() << " & " << this->snd_WL()  ;
+    if(WITH_WL) oss << " WL : " << this->fst_WL() << " & " << this->snd_WL()  ;
     return oss.str() ;
 }
 

@@ -5,6 +5,7 @@
 class HeuristicsTests : public CppUnit::TestFixture {
     private:
         void testRandom();
+        void testMoms() ;
 
     public:
         static CppUnit::Test* suite();

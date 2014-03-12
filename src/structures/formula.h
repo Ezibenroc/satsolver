@@ -101,6 +101,9 @@ class Formula {
         // Choisis un littéral aléatoirement dans la formule
         // Pré-condition : le générateur pseudo-aléatoire a été initialisé correctement
         int choose_literal_random() const ;
+        
+        // Choisis un littéral avec l'heuristique MOMS
+        int choose_literal_moms() const ;
 };
 
 }
