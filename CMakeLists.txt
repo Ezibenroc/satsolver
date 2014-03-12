@@ -29,16 +29,10 @@ target_link_libraries(DPLL Affectation Clause Formula)
 add_library(GraphColorSolver src/solvers/graphcolor.cpp)
 target_link_libraries(GraphColorSolver Graph ExtendedFormula Formula)
 
-add_library(ResolCommon src/entry_points/resol_common.cpp)
-target_link_libraries(ResolCommon Affectation Formula)
-target_link_libraries(ResolCommon SatParser)
-target_link_libraries(ResolCommon DPLL)
-
 add_executable(resol src/entry_points/resol.cpp)
-target_link_libraries(resol ResolCommon)
-
-add_executable(resol-wl src/entry_points/resol-wl.cpp)
-target_link_libraries(resol-wl ResolCommon)
+target_link_libraries(resol Affectation Formula)
+target_link_libraries(resol SatParser)
+target_link_libraries(resol DPLL)
 
 add_executable(colorie src/entry_points/colorie.cpp)
 target_link_libraries(colorie GraphParser GraphColorSolver DPLL)
