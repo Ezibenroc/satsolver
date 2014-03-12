@@ -10,6 +10,8 @@ class StructuresTests : public CppUnit::TestFixture {
         void testSetTrueClause() ;
         void testFormula() ;
         void testExtendedFormula();
+        void testExtendedFormulaComparison();
+        void testExtendedFormulaSimplification();
     public:
         static CppUnit::Test* suite();
 };

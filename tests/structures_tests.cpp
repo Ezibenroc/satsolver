@@ -239,6 +239,22 @@ void StructuresTests::testExtendedFormula() {
     CPPUNIT_ASSERT(sat_solution->is_true(variable_to_literal->at("foo")));
 }
 
+void StructuresTests::testExtendedFormulaSimplification() {
+    SPEF formula;
+    formula = SPEF(new EF(EF::NOT, SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "foo"))))));
+    CPPUNIT_ASSERT(*formula->simplify() == EF(EF::LITERAL, "foo"));
+    formula = SPEF(new EF(EF::AND, SPEF(new EF(EF::LITERAL, "foo")), SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "foo"))))));
+    CPPUNIT_ASSERT(*formula->simplify() == EF(EF::FALSE));
+}
+
+void StructuresTests::testExtendedFormulaComparison() {
+    CPPUNIT_ASSERT(EF(EF::LITERAL, "foo") == EF(EF::LITERAL, "foo"));
+    CPPUNIT_ASSERT(EF(EF::LITERAL, "foo") != EF(EF::LITERAL, "bar"));
+
+    CPPUNIT_ASSERT(EF(EF::NOT, SPEF(new EF(EF::LITERAL, "foo"))) == EF(EF::NOT, SPEF(new EF(EF::LITERAL, "foo"))));
+    CPPUNIT_ASSERT(EF(EF::NOT, SPEF(new EF(EF::LITERAL, "foo"))) != EF(EF::NOT, SPEF(new EF(EF::LITERAL, "bar"))));
+}
+
 CppUnit::Test* StructuresTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("StructuresTests");
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testClauseCreation",
@@ -253,5 +269,9 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testFormula));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtenedFormula",
                 &StructuresTests::testExtendedFormula));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtendedFormulaComparison",
+                &StructuresTests::testExtendedFormulaComparison));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtendedFormulaSimplification",
+                &StructuresTests::testExtendedFormulaSimplification));
     return suite;
 }

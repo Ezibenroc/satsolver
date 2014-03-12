@@ -26,6 +26,9 @@ target_link_libraries(GraphParser AbstractParser Graph)
 add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Affectation Clause Formula)
 
+add_library(GraphColorSolver src/solvers/graphcolor.cpp)
+target_link_libraries(GraphColorSolver Graph ExtendedFormula Formula)
+
 add_library(ResolCommon src/entry_points/resol_common.cpp)
 target_link_libraries(ResolCommon Affectation Formula)
 target_link_libraries(ResolCommon SatParser)
@@ -36,6 +39,9 @@ target_link_libraries(resol ResolCommon)
 
 add_executable(resol-wl src/entry_points/resol-wl.cpp)
 target_link_libraries(resol-wl ResolCommon)
+
+add_executable(colorie src/entry_points/colorie.cpp)
+target_link_libraries(colorie GraphParser GraphColorSolver DPLL)
 
 find_package(CppUnit)
 if (CPPUNIT_FOUND)
@@ -59,8 +65,12 @@ if (CPPUNIT_FOUND)
     target_link_libraries(GraphParserTests GraphParser)
     target_link_libraries(GraphParserTests cppunit)
 
+    add_library(GraphSolverTests tests/graphsolver_tests.cpp)
+    target_link_libraries(GraphSolverTests GraphColorSolver)
+    target_link_libraries(GraphSolverTests cppunit)
+
     add_executable(testrunner tests/main.cpp)
-    target_link_libraries(testrunner StructuresTests HeuristicsTests DpllTests SatParserTests GraphParserTests)
+    target_link_libraries(testrunner StructuresTests HeuristicsTests DpllTests SatParserTests GraphParserTests GraphSolverTests)
     target_link_libraries(testrunner cppunit)
 else (CPPUNIT_FOUND)
     message("+---------------------------------------------+")

@@ -2,6 +2,7 @@
 #include "structures_tests.h"
 #include "satparser_tests.h"
 #include "graphparser_tests.h"
+#include "graphsolver_tests.h"
 #include "dpll_tests.h"
 #include "heuristics_tests.h"
 #include <time.h>
@@ -19,6 +20,7 @@ int main(void)
     runner.addTest(DpllTests::suite());
     runner.addTest(SatParserTests::suite());
     runner.addTest(GraphParserTests::suite());
+    runner.addTest(GraphSolverTests::suite());
     runner.run();
     return 0;
 }
