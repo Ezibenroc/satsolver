@@ -41,10 +41,11 @@ Formula::Formula(satsolver::Formula *f) {
         this->clauses.push_back(std::shared_ptr<Clause>(new Clause(*f->clauses[i].get())));
     }
     this->aff = new Affectation(f->aff) ;
-    for(auto c : this->clauses)
+    for(auto c : this->clauses) {
         c->set_affectation(aff) ;
-        this->mem = std::stack<std::pair<int,bool>>(f->mem) ;
-        this->to_do = std::set<int>(f->to_do) ;
+    }
+    this->mem = std::stack<std::pair<int,bool>>(f->mem) ;
+    this->to_do = std::set<int>(f->to_do) ;
 }
 
 Formula::~Formula() {
