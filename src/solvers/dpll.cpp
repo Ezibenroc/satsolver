@@ -47,7 +47,7 @@ Affectation* satsolver::solve(Formula *formula) {
             }
         }
         else {
-            literal = formula->choose_literal(0) ;
+            literal = formula->choose_literal(RANDOM) ;
             if (WITH_WL)
                 contains_false_clause = !formula->bet_true(literal);
             else {

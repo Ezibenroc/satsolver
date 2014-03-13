@@ -67,14 +67,7 @@ void DpllTests::testSmallConflict() {
     std::vector<std::shared_ptr<Clause>> clauses;
     clauses.push_back(std::shared_ptr<Clause>(c1));
     clauses.push_back(std::shared_ptr<Clause>(c2));
-    if(WITH_WL) {
-        CPPUNIT_ASSERT_THROW(f = new Formula(clauses, 3),Conflict) ;
-    }
-    else {
-        f = new Formula(clauses, 3);
-        CPPUNIT_ASSERT_THROW(solve(f), Conflict);
-        delete f;
-    }
+    CPPUNIT_ASSERT_THROW(f = new Formula(clauses, 3),Conflict) ;
 }
 void DpllTests::testSmallConflictWithWL() {
     WITH_WL = true;

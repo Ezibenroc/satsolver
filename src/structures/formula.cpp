@@ -27,13 +27,11 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : cla
         c->set_affectation(this->aff) ;
     }
     this->clean() ;
-    if (WITH_WL) {
-        for(auto c : this->clauses) {
-            if(c->get_size() == 0)
-                throw Conflict() ;
-            c->init_WL() ;
-        }
-    }
+      for(auto c : this->clauses) {
+          if(c->get_size() == 0)
+              throw Conflict() ;
+          if(WITH_WL) c->init_WL() ;
+      }
 }
 
 Formula::Formula(satsolver::Formula *f) {
@@ -348,7 +346,7 @@ int Formula::choose_literal_moms() const {
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
 		v.clear() ;
 		this->clauses[i]->add_literals_to_vector(v) ;
-		if(v.size() < min_clause_size) { // trouvé une clause plus petite, on remet tout à zéro
+		if(v.size() < min_clause_size && v.size() > 0) { // trouvé une clause plus petite, on remet tout à zéro
 			min_clause_size = (unsigned) v.size() ;
 			memset(count,0,(2*this->nb_variables+1)*sizeof(int)) ;
 		}
