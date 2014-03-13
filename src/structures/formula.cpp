@@ -5,8 +5,10 @@
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
+#include <math.h>
 
 #include "config.h"
+
 
 using namespace satsolver;
 
@@ -251,7 +253,7 @@ bool Formula::contains_false_clause() const {
     }
     return false;
 }
-int Formula::choose_literal() const {
+int Formula::choose_literal_dumb() const {
     for(int i = 1 ; i <= this->nb_variables ; i ++) {
         if (this->aff->is_unknown(i)) {
             return i ;
@@ -334,6 +336,7 @@ std::vector<int> Formula::to_vector (void) const {
 
 int Formula::choose_literal_random() const {
 	std::vector<int> v = this->to_vector() ;
+	assert(v.size() > 0) ;
 	return v[rand()%v.size()] ;
 }
 
@@ -354,7 +357,7 @@ int Formula::choose_literal_moms() const {
 			}
 		}
 	}
-	// Recherche du minimum dans count
+	// Recherche du maximum dans count
 	int max_occurence, max_literal ;
 	max_occurence = 0 ;  max_literal = 0 ;
 	for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) { 
@@ -365,4 +368,40 @@ int Formula::choose_literal_moms() const {
 	}
 	free(count) ;
 	return max_literal-this->nb_variables ;
+}
+
+int Formula::choose_literal_dlis() const {
+	std::vector<int> v = std::vector<int>() ;
+	float *count = (float*) malloc((2*this->nb_variables+1)*sizeof(float)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
+	float point ;
+	memset(count,0,(2*this->nb_variables+1)*sizeof(float)) ;
+	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+		v.clear() ;
+		this->clauses[i]->add_literals_to_vector(v) ;
+		point = (float) pow(2,-(float)v.size()) ;
+		for(unsigned j = 0 ; j < v.size() ; j ++)
+			count[v[j]+this->nb_variables] += point ;
+	}
+	// Recherche du maximum dans count
+	float max_occurence ;
+	int max_literal ;
+	max_occurence = 0 ;  max_literal = 0 ;
+	for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) {
+		if(count[i] > max_occurence) {
+			max_occurence = count[i] ;
+			max_literal = i ;
+		}
+	}
+	free(count) ;
+	return max_literal-this->nb_variables ;
+}
+
+int Formula::choose_literal(int choice) {
+	switch(choice) {
+		case DUMB : return this->choose_literal_dumb() ;
+		case RANDOM : return this->choose_literal_random() ;
+		case MOMS : return this->choose_literal_moms() ;
+		case DLIS : return this->choose_literal_dlis() ;
+		default : assert(false) ; return 0 ;
+	}
 }
