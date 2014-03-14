@@ -83,6 +83,9 @@ class Formula {
 
         // Determines whether one of the clauses is evaluated to false.
         bool contains_false_clause() const;
+        
+        // Determines whether all the clauses are evaluated to true.
+        bool only_true_clauses() const;
 
         // Supprime toute les clauses contenant d'autres clauses
         // Affecte tous les monomes
