@@ -10,6 +10,7 @@
 
 bool VERBOSE = false;
 bool WITH_WL = false;
+int HEURISTIC = DUMB ;
 
 void bad_command_options(char *executable) {
     std::cout << "Syntax: " << executable << " [-verbose] [<filename>]\n\n";
