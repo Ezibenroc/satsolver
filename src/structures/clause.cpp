@@ -227,6 +227,13 @@ bool Clause::is_evaluated_to_false() const {
     return true;
 }
 
+bool Clause::is_evaluated_to_true() const {
+    for (auto literal : this->literals)
+        if (this->aff->is_true(literal))
+            return true;
+    return false;
+}
+
 void Clause::add_literals_to_vector(std::vector<int> &v) const {
 	for(auto l : this->literals) {
 		if(this->aff->is_true(l)) // clause satisfaite, on sort

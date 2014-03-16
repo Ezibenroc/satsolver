@@ -5,8 +5,10 @@
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
+#include <math.h>
 
 #include "config.h"
+
 
 using namespace satsolver;
 
@@ -25,13 +27,11 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : cla
         c->set_affectation(this->aff) ;
     }
     this->clean() ;
-    if (WITH_WL) {
-        for(auto c : this->clauses) {
-            if(c->get_size() == 0)
-                throw Conflict() ;
-            c->init_WL() ;
-        }
-    }
+      for(auto c : this->clauses) {
+          if(c->get_size() == 0)
+              throw Conflict() ;
+          if(WITH_WL) c->init_WL() ;
+      }
 }
 
 Formula::Formula(satsolver::Formula *f) {
@@ -252,7 +252,15 @@ bool Formula::contains_false_clause() const {
     }
     return false;
 }
-int Formula::choose_literal() const {
+bool Formula::only_true_clauses() const {
+    for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
+        if (!this->clauses[i]->is_evaluated_to_true())
+            return false;
+    }
+    return true;
+}
+
+int Formula::choose_literal_dumb() const {
     for(int i = 1 ; i <= this->nb_variables ; i ++) {
         if (this->aff->is_unknown(i)) {
             return i ;
@@ -335,17 +343,20 @@ std::vector<int> Formula::to_vector (void) const {
 
 int Formula::choose_literal_random() const {
 	std::vector<int> v = this->to_vector() ;
+	assert(v.size() > 0) ;
 	return v[rand()%v.size()] ;
 }
 
 int Formula::choose_literal_moms() const {
+	bool there_is_literals = false ;
 	unsigned min_clause_size = 999999999 ;
 	std::vector<int> v = std::vector<int>() ;
 	int *count = (int*) malloc((2*this->nb_variables+1)*sizeof(int)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
 		v.clear() ;
 		this->clauses[i]->add_literals_to_vector(v) ;
-		if(v.size() < min_clause_size) { // trouvé une clause plus petite, on remet tout à zéro
+		there_is_literals = there_is_literals || v.size() > 0 ;
+		if(v.size() < min_clause_size && v.size() > 0) { // trouvé une clause plus petite, on remet tout à zéro
 			min_clause_size = (unsigned) v.size() ;
 			memset(count,0,(2*this->nb_variables+1)*sizeof(int)) ;
 		}
@@ -355,7 +366,7 @@ int Formula::choose_literal_moms() const {
 			}
 		}
 	}
-	// Recherche du minimum dans count
+	// Recherche du maximum dans count
 	int max_occurence, max_literal ;
 	max_occurence = 0 ;  max_literal = 0 ;
 	for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) { 
@@ -365,5 +376,45 @@ int Formula::choose_literal_moms() const {
 		}
 	}
 	free(count) ;
+	assert(there_is_literals) ;
 	return max_literal-this->nb_variables ;
+}
+
+int Formula::choose_literal_dlis() const {
+	bool there_is_literals = false ;
+	std::vector<int> v = std::vector<int>() ;
+	float *count = (float*) malloc((2*this->nb_variables+1)*sizeof(float)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
+	float point ;
+	memset(count,0,(2*this->nb_variables+1)*sizeof(float)) ;
+	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+		v.clear() ;
+		this->clauses[i]->add_literals_to_vector(v) ;
+		there_is_literals = there_is_literals || v.size() > 0 ;
+		point = (float) pow(2,-(float)v.size()) ;
+		for(unsigned j = 0 ; j < v.size() ; j ++)
+			count[v[j]+this->nb_variables] += point ;
+	}
+	// Recherche du maximum dans count
+	float max_occurence ;
+	int max_literal ;
+	max_occurence = 0 ;  max_literal = 0 ;
+	for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) {
+		if(count[i] > max_occurence) {
+			max_occurence = count[i] ;
+			max_literal = i ;
+		}
+	}
+	free(count) ;
+	assert(there_is_literals) ;
+	return max_literal-this->nb_variables ;
+}
+
+int Formula::choose_literal(int choice) {
+	switch(choice) {
+		case DUMB : return this->choose_literal_dumb() ;
+		case RANDOM : return this->choose_literal_random() ;
+		case MOMS : return this->choose_literal_moms() ;
+		case DLIS : return this->choose_literal_dlis() ;
+		default : assert(false) ; return 0 ;
+	}
 }

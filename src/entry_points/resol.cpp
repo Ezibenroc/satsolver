@@ -14,9 +14,10 @@
 
 bool VERBOSE = false;
 bool WITH_WL = false;
+int HEURISTIC = DUMB ;
 
 void bad_command_options(char *executable) {
-    std::cout << "Syntax: " << executable << " [-verbose] [-WL] [<filename>]\n\n";
+    std::cout << "Syntax: " << executable << " [-verbose] [-WL] [-rand | -moms | -dlis] [<filename>]\n\n";
     std::cout << "If filename is not given, stdin is used instead." << std::endl;
 }
 
@@ -35,6 +36,12 @@ int main(int argc, char *argv[]) {
             VERBOSE = true;
         else if (!strcmp(argv[i], "-WL"))
             WITH_WL = true;
+        else if (!strcmp(argv[i], "-rand") && HEURISTIC == DUMB)
+            HEURISTIC = RANDOM ;
+        else if (!strcmp(argv[i], "-moms") && HEURISTIC == DUMB)
+            HEURISTIC = MOMS ;
+        else if (!strcmp(argv[i], "-dlis") && HEURISTIC == DUMB)
+            HEURISTIC = DLIS ;
         else {
             bad_command_options(argv[0]);
             return 1;

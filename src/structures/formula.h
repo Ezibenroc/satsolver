@@ -8,6 +8,13 @@
 
 #include "clause.h"
 
+
+// Heuristiques :
+#define DUMB 0
+#define RANDOM 1
+#define MOMS 2
+#define DLIS 3 
+
 namespace satsolver {
 
 class Formula {
@@ -76,10 +83,9 @@ class Formula {
 
         // Determines whether one of the clauses is evaluated to false.
         bool contains_false_clause() const;
-
-        // Renvoie un littéral de la formule
-        // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide
-        int choose_literal() const;
+        
+        // Determines whether all the clauses are evaluated to true.
+        bool only_true_clauses() const;
 
         // Supprime toute les clauses contenant d'autres clauses
         // Affecte tous les monomes
@@ -97,6 +103,10 @@ class Formula {
         
         // Renvoie un vecteur de littéraux inconnus
         std::vector<int> to_vector (void) const ;
+
+        // Renvoie un littéral de la formule
+        // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide
+        int choose_literal_dumb() const;
         
         // Choisis un littéral aléatoirement dans la formule
         // Pré-condition : le générateur pseudo-aléatoire a été initialisé correctement
@@ -104,6 +114,12 @@ class Formula {
         
         // Choisis un littéral avec l'heuristique MOMS
         int choose_literal_moms() const ;
+     
+        // Choisis un littéral avec l'heuristique DLIS (variante)
+        int choose_literal_dlis() const ;
+        
+        // Choisis un littéral selon l'heuristique spécifiée
+        int choose_literal(int choice) ;
 };
 
 }

@@ -5,11 +5,13 @@
 #include "graphsolver_tests.h"
 #include "dpll_tests.h"
 #include "heuristics_tests.h"
+#include "structures/formula.h"
 #include <time.h>
 #include <stdlib.h>
 
 bool VERBOSE = false;
 bool WITH_WL = false;
+int HEURISTIC = DUMB ;
 
 int main(void)
 {
@@ -20,7 +22,7 @@ int main(void)
     runner.addTest(DpllTests::suite());
     runner.addTest(SatParserTests::suite());
     runner.addTest(GraphParserTests::suite());
-    runner.addTest(GraphSolverTests::suite());
+ //   runner.addTest(GraphSolverTests::suite());
     runner.run();
     return 0;
 }

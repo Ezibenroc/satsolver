@@ -8,6 +8,9 @@ class DpllTests : public CppUnit::TestFixture {
         void testBasicUsageWithWL();
         void testSmallConflict();
         void testSmallConflictWithWL();
+        void testRAND() ;
+        void testMOMS() ;
+        void testDLIS() ;
     public:
         static CppUnit::Test* suite();
 };

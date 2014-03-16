@@ -17,7 +17,7 @@ Affectation* satsolver::solve(Formula *formula) {
     bool contains_false_clause;
     if (formula->to_set().size() <= 1)
         throw Conflict();
-    while(formula->get_aff()->get_nb_unknown() != 0) { // tant qu'il reste des inconnus, on continue
+    while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses()) { 
         if(!WITH_WL && (literal = formula->monome())) {
             formula->deduce_true(literal);
             contains_false_clause = formula->contains_false_clause();
@@ -49,7 +49,7 @@ Affectation* satsolver::solve(Formula *formula) {
             }
         }
         else {
-            literal = formula->choose_literal() ;
+            literal = formula->choose_literal(HEURISTIC) ;
             if (WITH_WL)
                 contains_false_clause = !formula->bet_true(literal);
             else {
