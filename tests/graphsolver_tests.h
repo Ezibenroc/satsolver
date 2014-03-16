@@ -8,6 +8,7 @@ class GraphSolverTests : public CppUnit::TestFixture {
         void testEdgeFormula();
         void testMaxFormula();
         void testSolve();
+        void testSolveExtremeCases();
     public:
         static CppUnit::Test* suite();
 };

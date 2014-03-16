@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <memory>
 
@@ -13,6 +14,17 @@
 
 graphsolver::ColorAffectation::ColorAffectation(int nb_nodes, int *colors) : nb_nodes(nb_nodes), colors(colors) {
 }
+std::string graphsolver::ColorAffectation::to_string() const {
+    std::ostringstream oss;
+    oss << "{" ;
+    for(int i = 0 ; i < this->nb_nodes ; i++) {
+        if (i)
+            oss << ", ";
+        oss << i << "=" << this->colors[i];
+    }
+    oss << "}" ;
+    return oss.str() ;
+}
 
 graphsolver::ColorAffectation* graphsolver::ColorAffectation::from_sat_solution(satsolver::Affectation *affectation, std::shared_ptr<std::map<std::string, int>> name_to_variable, int nb_nodes, int nb_bits) {
     int *colors = (int*) malloc(sizeof(int)*nb_nodes);
@@ -21,10 +33,10 @@ graphsolver::ColorAffectation* graphsolver::ColorAffectation::from_sat_solution(
     for (i=0; i<nb_nodes; i++) {
         colors[i] = 0;
         for (j=nb_bits-1; j>=0; j--) {
-            variable_id = name_to_variable->at(std::to_string(i) + " " + std::to_string(j));
+            colors[i] <<= 1;
+            variable_id = name_to_variable->at(get_variable_of_node_bit(i, j));
             if (affectation->is_true(variable_id))
                 colors[i]++;
-            colors[i] <<= 1;
         }
     }
     return new graphsolver::ColorAffectation(nb_nodes, colors);
@@ -83,7 +95,7 @@ SPEF get_color_limitation_formula(int nb_nodes, int nb_colors, int nb_bits) {
 }
 
 int reduce_graph_coloration_to_extended_formula(graphsolver::Graph *graph, int nb_colors, SPEF *formula) {
-    int nb_bits = (int) ceil(log2(nb_colors+1));
+    int nb_bits = (int) ceil(log2(nb_colors));
     int nodes_count = graph->get_nodes_count();
     int i;
     std::set<int> *adjacent_nodes;
@@ -106,11 +118,12 @@ graphsolver::ColorAffectation* graphsolver::solve_colors(int nb_colors, Graph *g
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
     
     nb_bits = reduce_graph_coloration_to_extended_formula(graph, nb_colors, &ext_formula);
+    ext_formula = ext_formula->simplify();
     std::cout << ext_formula->to_string() << std::endl;
-    std::cout << ext_formula->simplify()->to_string() << std::endl;
     formula = ext_formula->reduce_to_formula(&name_to_variable);
-    std::cout << formula->to_string() << std::endl;
-    sat_solution = satsolver::solve(&*formula); // This may raise a satsolver::Conflict
+    if (!formula) // The formula is always false
+        throw satsolver::Conflict();
+    sat_solution = satsolver::solve(&*formula); // May raise a satsolver::Conflict
     color_affectation = ColorAffectation::from_sat_solution(sat_solution, name_to_variable, graph->get_nodes_count(), nb_bits);
     return color_affectation;
 }

@@ -15,6 +15,8 @@ using namespace satsolver;
 Affectation* satsolver::solve(Formula *formula) {
     int literal, tmp ;
     bool contains_false_clause;
+    if (formula->to_set().size() <= 1)
+        throw Conflict();
     while(formula->get_aff()->get_nb_unknown() != 0) { // tant qu'il reste des inconnus, on continue
         if(!WITH_WL && (literal = formula->monome())) {
             formula->deduce_true(literal);

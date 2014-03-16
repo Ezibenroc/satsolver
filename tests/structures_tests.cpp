@@ -218,6 +218,7 @@ void StructuresTests::testFormula() {
 
 void StructuresTests::testExtendedFormula() {
     std::shared_ptr<std::map<std::string, int>> variable_to_literal;
+    std::shared_ptr<Formula> formula;
     SPEF extended_formula =
             SPEF(new EF(EF::XOR,
                 SPEF(new EF(EF::AND,
@@ -231,12 +232,26 @@ void StructuresTests::testExtendedFormula() {
                     ))
                 ))
             ));
-    std::shared_ptr<Formula> formula = extended_formula->reduce_to_formula(&variable_to_literal);
+    formula = extended_formula->reduce_to_formula(&variable_to_literal);
     CPPUNIT_ASSERT(variable_to_literal);
     CPPUNIT_ASSERT(variable_to_literal->size() >= 2);
     CPPUNIT_ASSERT(variable_to_literal->find("foo") != variable_to_literal->end());
     Affectation *sat_solution = satsolver::solve(&*formula);
     CPPUNIT_ASSERT(sat_solution->is_true(variable_to_literal->at("foo")));
+
+    extended_formula =
+            SPEF(new EF(EF::AND,
+                SPEF(new EF(EF::XOR,
+                    SPEF(new EF(EF::LITERAL, "foo")),
+                    SPEF(new EF(EF::LITERAL, "bar"))
+                )),
+                SPEF(new EF(EF::AND,
+                    SPEF(new EF(EF::LITERAL, "foo")),
+                    SPEF(new EF(EF::LITERAL, "bar"))
+                ))
+            ));
+    variable_to_literal->clear();
+    CPPUNIT_ASSERT_THROW(satsolver::solve(&*formula), satsolver::Conflict);
 }
 
 void StructuresTests::testExtendedFormulaSimplification() {
@@ -267,7 +282,7 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testSetTrueClause));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testFormula",
                 &StructuresTests::testFormula));
-    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtenedFormula",
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtendedFormula",
                 &StructuresTests::testExtendedFormula));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtendedFormulaComparison",
                 &StructuresTests::testExtendedFormulaComparison));

@@ -93,9 +93,9 @@ std::string Formula::to_string2() {
 
 std::set<std::set<int> > Formula::to_set() {
     std::set<std::set<int> > set;
-    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-        if(!this->clauses[i]->is_true())
-        set.insert(this->clauses[i]->to_set()) ;
+    for(auto clause : this->clauses) {
+        if(!clause->is_true())
+            set.insert(clause->to_set()) ;
     }
     return set ;
 }

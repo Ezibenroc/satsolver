@@ -84,11 +84,11 @@ std::vector<std::vector<std::string>*>* EF::reduce() const {
             break;
         case OR:
             clause = new std::vector<std::string>{
-                    std::string("-") + f1->make_literal(),
-                    std::string("-") + f2->make_literal(),
+                    f1->make_literal(),
+                    f2->make_literal(),
                     std::string("-") + this->make_literal()
                 };
-            result->push_back(clause); // -A v -B v -C
+            result->push_back(clause); // A v B v -C
             clause = new std::vector<std::string>{
                     f1->make_literal(),
                     this->make_literal(),
@@ -143,16 +143,8 @@ std::vector<std::vector<std::string>*>* EF::reduce() const {
             result->push_back(clause); // -A v B v C
             break;
         case LITERAL:
-            clause = new std::vector<std::string>{this->literal, "", ""};
-            result->push_back(clause);
-            break;
         case TRUE:
-            break;
         case FALSE:
-            clause = new std::vector<std::string>{this->make_literal(), "", ""};
-            result->push_back(clause);
-            clause = new std::vector<std::string>{"-" + this->make_literal(), "", ""};
-            result->push_back(clause);
             break;
     }
     return result;
@@ -168,13 +160,16 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
     std::vector<int> *int_literals;
     std::string string_literal;
 
+    raw_clauses->push_back(new std::vector<std::string>{this->make_literal(), "", ""});
+
     for (auto raw_clause : *raw_clauses) {
         for (i=0; i<3; i++) {
             string_literal = raw_clause->at(i);
             if (string_literal[0] == '-')
                 string_literal.erase(string_literal.begin(), string_literal.begin()+1);
-            if (string_literal != "" && name_to_variable->find(string_literal) == name_to_variable->end())
+            if (string_literal != "" && name_to_variable->find(string_literal) == name_to_variable->end()) {
                 name_to_variable->insert(std::make_pair(string_literal, ++nb_variables));
+            }
         }
     }
 
@@ -185,15 +180,19 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
             if (string_literal[0] == '-') {
                 string_literal.erase(string_literal.begin(), string_literal.begin()+1);
                 int_literals->push_back(- name_to_variable->at(string_literal));
+                std::cout << -name_to_variable->at(string_literal) << " ";
             }
             else if (string_literal[0]) {
                 int_literals->push_back(name_to_variable->at(string_literal));
+                std::cout << name_to_variable->at(string_literal) << " ";
             }
         }
+        std::cout << "0" << std::endl;
         assert(int_literals->size());
         clauses.push_back(std::shared_ptr<satsolver::Clause>(new satsolver::Clause(nb_variables, *int_literals)));
     }
-    assert(clauses.size());
+    if (clauses.size() == 1) // Conjonction of zero clauses
+        return NULL;
     
     if (name_to_variable_ptr)
         *name_to_variable_ptr = name_to_variable;
@@ -203,26 +202,6 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
 }
 
 std::string EF::to_string() const {
-    switch (this->type) {
-        case EF::OR:
-            if (this->f1->type == EF::TRUE || this->f2->type == EF::TRUE)
-                return "⊤";
-            else if (this->f1->type == EF::FALSE)
-                return this->f2->to_string();
-            else if (this->f2->type == EF::FALSE)
-                return this->f1->to_string();
-            break;
-        case EF::AND:
-            if (this->f1->type == EF::FALSE || this->f2->type == EF::FALSE)
-                return "⊥";
-            else if (this->f1->type == EF::TRUE)
-                return this->f2->to_string();
-            else if (this->f2->type == EF::TRUE)
-                return this->f1->to_string();
-            break;
-        default:
-            break;
-    }
     switch (this->type) {
         case EF::XOR:
             return "(" + this->f1->to_string() + "⊕" + this->f2->to_string() + ")";
@@ -288,7 +267,11 @@ SPEF EF::simplify() const {
     }
     switch (this->type) {
         case EF::OR:
-            if (*f1 == EF(EF::NOT, f2))
+            if (f1->type == EF::TRUE)
+                return f1;
+            else if (f2->type == EF::TRUE)
+                return f2;
+            else if (*f1 == EF(EF::NOT, f2))
                 return SPEF(new EF(EF::TRUE));
             else if (*f2 == EF(EF::NOT, f1))
                 return SPEF(new EF(EF::TRUE));
@@ -298,7 +281,11 @@ SPEF EF::simplify() const {
                 return SPEF(new EF(*f1));
             break;
         case EF::AND:
-            if (*f1 == *f2)
+            if (f1->type == EF::FALSE)
+                return f1;
+            else if (f2->type == EF::FALSE)
+                return f2;
+            else if (*f1 == *f2)
                 return SPEF(new EF(*f1));
             else if (f1->type == TRUE)
                 return SPEF(new EF(*f2));
