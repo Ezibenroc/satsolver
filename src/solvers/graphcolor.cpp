@@ -119,7 +119,6 @@ graphsolver::ColorAffectation* graphsolver::solve_colors(int nb_colors, Graph *g
     
     nb_bits = reduce_graph_coloration_to_extended_formula(graph, nb_colors, &ext_formula);
     ext_formula = ext_formula->simplify();
-    std::cout << ext_formula->to_string() << std::endl;
     formula = ext_formula->reduce_to_formula(&name_to_variable);
     if (!formula) // The formula is always false
         throw satsolver::Conflict();

@@ -251,7 +251,9 @@ void StructuresTests::testExtendedFormula() {
                 ))
             ));
     variable_to_literal->clear();
-    CPPUNIT_ASSERT_THROW(satsolver::solve(&*formula), satsolver::Conflict);
+    CPPUNIT_ASSERT_THROW((
+        formula = extended_formula->reduce_to_formula(&variable_to_literal),
+        satsolver::solve(&*formula)), satsolver::Conflict);
 }
 
 void StructuresTests::testExtendedFormulaSimplification() {
