@@ -90,17 +90,17 @@ std::vector<std::vector<std::string>*>* EF::reduce() const {
                 };
             result->push_back(clause); // A v B v -C
             clause = new std::vector<std::string>{
-                    f1->make_literal(),
+                    std::string("-") + f1->make_literal(),
                     this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // A v C
+            result->push_back(clause); // -A v C
             clause = new std::vector<std::string>{
-                    f2->make_literal(),
+                    std::string("-") + f2->make_literal(),
                     this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // B v C
+            result->push_back(clause); // -B v C
             break;
         case XOR:
             clause = new std::vector<std::string>{
@@ -134,13 +134,13 @@ std::vector<std::vector<std::string>*>* EF::reduce() const {
                     std::string("-") + this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // A v -B v C
+            result->push_back(clause); // -A v -B
             clause = new std::vector<std::string>{
                     f1->make_literal(),
                     this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // -A v B v C
+            result->push_back(clause); // A v B
             break;
         case LITERAL:
         case TRUE:
@@ -180,14 +180,11 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
             if (string_literal[0] == '-') {
                 string_literal.erase(string_literal.begin(), string_literal.begin()+1);
                 int_literals->push_back(- name_to_variable->at(string_literal));
-                std::cout << -name_to_variable->at(string_literal) << " ";
             }
             else if (string_literal[0]) {
                 int_literals->push_back(name_to_variable->at(string_literal));
-                std::cout << name_to_variable->at(string_literal) << " ";
             }
         }
-        std::cout << "0" << std::endl;
         assert(int_literals->size());
         clauses.push_back(std::shared_ptr<satsolver::Clause>(new satsolver::Clause(nb_variables, *int_literals)));
     }

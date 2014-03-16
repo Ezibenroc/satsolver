@@ -22,7 +22,7 @@ int main(void)
     runner.addTest(DpllTests::suite());
     runner.addTest(SatParserTests::suite());
     runner.addTest(GraphParserTests::suite());
- //   runner.addTest(GraphSolverTests::suite());
+    runner.addTest(GraphSolverTests::suite());
     runner.run();
     return 0;
 }

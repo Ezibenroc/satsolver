@@ -15,7 +15,7 @@ using namespace satsolver;
 Affectation* satsolver::solve(Formula *formula) {
     int literal, tmp ;
     bool contains_false_clause;
-    if (formula->to_set().size() <= 1)
+    if (formula->to_set().size() == 0)
         throw Conflict();
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses()) { 
         if(!WITH_WL && (literal = formula->monome())) {
