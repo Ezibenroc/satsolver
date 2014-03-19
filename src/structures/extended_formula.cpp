@@ -8,6 +8,7 @@ using namespace satsolver;
 
 #define EF ExtendedFormula
 #define SPEF std::shared_ptr<EF>
+#define SPCEF std::shared_ptr<const EF>
 
 #define remove_minus(str) ((str[0] == '-' ? str.erase(str.begin()+1, str.end())), str)
 
@@ -42,121 +43,122 @@ std::string EF::make_literal() const {
         return std::string("@") + std::to_string(this->id);
 }
 
-std::vector<std::vector<std::string>*>* EF::reduce() const {
-    std::vector<std::vector<std::string>*> *result = new std::vector<std::vector<std::string>*>(), *f1_reduction=NULL, *f2_reduction=NULL;
+std::vector<std::vector<std::string>*>* EF::reduce_all() const {
+    std::vector<const EF *> *formulas = new std::vector<const EF *>();
+    std::vector<std::vector<std::string>*> *clauses = new std::vector<std::vector<std::string>*>();
+    const EF (*formula);
+    formulas->push_back(this);
+    while (formulas->size()) {
+        formula = formulas->at(formulas->size()-1);
+        formulas->pop_back();
+        formula->reduce(formulas, clauses);
+    }
+    return clauses;
+}
+void EF::reduce(std::vector<const EF*> *formulas, std::vector<std::vector<std::string>*> *clauses) const {
     std::vector<std::string> *clause;
 
     if (type == EF::LITERAL || type == EF::TRUE || type == EF::FALSE) {
     }
     else if (type == EF::NOT) {
-        f1_reduction = this->f1->reduce();
-        result->reserve(f1_reduction->size() + 2);
-        result->insert(result->end(), f1_reduction->begin(), f1_reduction->end());
+        formulas->push_back(&*this->f1);
     }
     else {
-        f1_reduction = this->f1->reduce();
-        f2_reduction = this->f2->reduce();
-        result->reserve(f1_reduction->size() + f2_reduction->size() + 4);
-        result->insert(result->end(), f1_reduction->begin(), f1_reduction->end());
-        result->insert(result->end(), f2_reduction->begin(), f2_reduction->end());
+        formulas->push_back(&*this->f1);
+        formulas->push_back(&*this->f2);
     }
 
     switch (this->type) {
         case AND:
             clause = new std::vector<std::string>{
-                    std::string("-") + f1->make_literal(),
-                    std::string("-") + f2->make_literal(),
+                    std::string("-") + this->f1->make_literal(),
+                    std::string("-") + this->f2->make_literal(),
                     this->make_literal()
                 };
-            result->push_back(clause); // -A v -B v C
+            clauses->push_back(clause); // -A v -B v C
             clause = new std::vector<std::string>{
-                    f1->make_literal(),
+                    this->f1->make_literal(),
                     std::string("-") + this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // A v -C
+            clauses->push_back(clause); // A v -C
             clause = new std::vector<std::string>{
-                    f2->make_literal(),
+                    this->f2->make_literal(),
                     std::string("-") + this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // B v -C
+            clauses->push_back(clause); // B v -C
             break;
         case OR:
             clause = new std::vector<std::string>{
-                    f1->make_literal(),
-                    f2->make_literal(),
+                    this->f1->make_literal(),
+                    this->f2->make_literal(),
                     std::string("-") + this->make_literal()
                 };
-            result->push_back(clause); // A v B v -C
+            clauses->push_back(clause); // A v B v -C
             clause = new std::vector<std::string>{
-                    std::string("-") + f1->make_literal(),
+                    std::string("-") + this->f1->make_literal(),
                     this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // -A v C
+            clauses->push_back(clause); // -A v C
             clause = new std::vector<std::string>{
-                    std::string("-") + f2->make_literal(),
+                    std::string("-") + this->f2->make_literal(),
                     this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // -B v C
+            clauses->push_back(clause); // -B v C
             break;
         case XOR:
             clause = new std::vector<std::string>{
-                    std::string("-") + f1->make_literal(),
-                    std::string("-") + f2->make_literal(),
+                    std::string("-") + this->f1->make_literal(),
+                    std::string("-") + this->f2->make_literal(),
                     std::string("-") + this->make_literal()
                 };
-            result->push_back(clause); // -A v -B v -C
+            clauses->push_back(clause); // -A v -B v -C
             clause = new std::vector<std::string>{
-                    f1->make_literal(),
-                    f2->make_literal(),
+                    this->f1->make_literal(),
+                    this->f2->make_literal(),
                     std::string("-") + this->make_literal()
                 };
-            result->push_back(clause); // A v B v -C
+            clauses->push_back(clause); // A v B v -C
             clause = new std::vector<std::string>{
-                    f1->make_literal(),
-                    std::string("-") + f2->make_literal(),
+                    this->f1->make_literal(),
+                    std::string("-") + this->f2->make_literal(),
                     this->make_literal()
                 };
-            result->push_back(clause); // A v -B v C
+            clauses->push_back(clause); // A v -B v C
             clause = new std::vector<std::string>{
-                    std::string("-") + f1->make_literal(),
-                    f2->make_literal(),
+                    std::string("-") + this->f1->make_literal(),
+                    this->f2->make_literal(),
                     this->make_literal()
                 };
-            result->push_back(clause); // -A v B v C
+            clauses->push_back(clause); // -A v B v C
             break;
         case NOT:
             clause = new std::vector<std::string>{
-                    std::string("-") + f1->make_literal(),
+                    std::string("-") + this->f1->make_literal(),
                     std::string("-") + this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // -A v -B
+            clauses->push_back(clause); // -A v -B
             clause = new std::vector<std::string>{
-                    f1->make_literal(),
+                    this->f1->make_literal(),
                     this->make_literal(),
                     ""
                 };
-            result->push_back(clause); // A v B
+            clauses->push_back(clause); // A v B
             break;
         case LITERAL:
         case TRUE:
         case FALSE:
             break;
     }
-    if (f1_reduction)
-        delete f1_reduction;
-    if (f2_reduction)
-        delete f2_reduction;
-    return result;
 }
 
 
 std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::string, int>> *name_to_variable_ptr) const {
-    std::vector<std::vector<std::string>*> *raw_clauses = this->reduce();
+    std::vector<std::vector<std::string>*> *raw_clauses = this->reduce_all();
     std::shared_ptr<std::map<std::string, int>> name_to_variable = std::make_shared<std::map<std::string, int>>();
     int nb_variables = 0;
     int i;

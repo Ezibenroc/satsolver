@@ -36,7 +36,8 @@ class ExtendedFormula {
         ExtendedFormula(Type type, std::shared_ptr<ExtendedFormula> f);
         ExtendedFormula(Type type, std::shared_ptr<ExtendedFormula> f1, std::shared_ptr<ExtendedFormula> f2);
 
-        std::vector<std::vector<std::string>*>* reduce() const; // Returns a conjunction of disjonctions using Tseitin transformation
+        std::vector<std::vector<std::string>*>* reduce_all() const; // Returns a conjunction of disjonctions using Tseitin transformation
+        void reduce(std::vector<const ExtendedFormula*> *formulas, std::vector<std::vector<std::string>*> *clauses) const;
         std::shared_ptr<Formula> reduce_to_formula(std::shared_ptr<std::map<std::string, int>> *name_to_variable_ptr) const; // Calls reduce and returns a formula from it.
 
         std::string to_string() const;

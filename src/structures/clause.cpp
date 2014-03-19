@@ -23,7 +23,16 @@ Clause::Clause(int nb_var, std::shared_ptr<std::vector<int>> literals) {
         this->watched = std::pair<int,int>(0,0) ;
     this->aff = NULL ;
 }
-Clause::Clause(int nb_var, std::vector<int> literals) : Clause::Clause(nb_var, std::shared_ptr<std::vector<int>>(&literals)) {
+Clause::Clause(int nb_var, std::vector<int> literals) {
+    this->literals = std::unordered_set<int>() ;
+    this->nb_variables = nb_var;
+    for(std::vector<int>::iterator it = literals.begin(); it != literals.end(); ++it) {
+        assert(*it != 0 && abs(*it) <= nb_var);
+        this->literals.insert(*it) ;
+    }
+    if (WITH_WL)
+        this->watched = std::pair<int,int>(0,0) ;
+    this->aff = NULL ;
 }
 
 Clause::Clause(const Clause &c){

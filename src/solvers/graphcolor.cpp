@@ -133,6 +133,10 @@ graphsolver::ColorAffectation* graphsolver::solve_colors(int nb_colors, Graph *g
     if (VERBOSE)
         std::cout << "Reduction of formula to SAT: " << formula->to_string() << std::endl;
     sat_solution = satsolver::solve(&*formula); // May raise a satsolver::Conflict
+    if (VERBOSE)
+        std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
     color_affectation = ColorAffectation::from_sat_solution(sat_solution, name_to_variable, graph->get_nodes_count(), nb_bits);
+    if (VERBOSE)
+        std::cout << "Color affectation: " << color_affectation->to_string() << std::endl;
     return color_affectation;
 }
