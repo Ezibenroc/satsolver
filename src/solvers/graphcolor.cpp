@@ -15,6 +15,9 @@
 
 graphsolver::ColorAffectation::ColorAffectation(int nb_nodes, int *colors) : nb_nodes(nb_nodes), colors(colors) {
 }
+graphsolver::ColorAffectation::~ColorAffectation() {
+    free(this->colors);
+}
 std::string graphsolver::ColorAffectation::to_string() const {
     std::ostringstream oss;
     oss << "{" ;

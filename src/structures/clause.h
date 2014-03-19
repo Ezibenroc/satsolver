@@ -2,6 +2,7 @@
 #define STRUCTURES_CLAUSE_H
 
 #include <set>
+#include <memory>
 #include <unordered_set>
 #include <string>
 #include <vector>
@@ -20,6 +21,7 @@ class Clause {
 
     public:
 
+        Clause(int nb_variables, std::shared_ptr<std::vector<int>> literals);
         Clause(int nb_variables, std::vector<int> literals);
         Clause(const satsolver::Clause &c) ; // initialise une nouvelle clause, copie de la clause donnée
         Clause& operator=(const Clause &that);

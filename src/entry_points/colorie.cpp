@@ -53,4 +53,7 @@ int main(int argc, char *argv[]) {
 
     if (!using_stdin)
         delete input;
+    delete solution;
+    delete parser;
+    delete graph;
 }

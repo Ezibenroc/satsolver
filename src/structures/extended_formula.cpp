@@ -43,7 +43,7 @@ std::string EF::make_literal() const {
 }
 
 std::vector<std::vector<std::string>*>* EF::reduce() const {
-    std::vector<std::vector<std::string>*> *result = new std::vector<std::vector<std::string>*>(), *f1_reduction, *f2_reduction;
+    std::vector<std::vector<std::string>*> *result = new std::vector<std::vector<std::string>*>(), *f1_reduction=NULL, *f2_reduction=NULL;
     std::vector<std::string> *clause;
 
     if (type == EF::LITERAL || type == EF::TRUE || type == EF::FALSE) {
@@ -147,6 +147,10 @@ std::vector<std::vector<std::string>*>* EF::reduce() const {
         case FALSE:
             break;
     }
+    if (f1_reduction)
+        delete f1_reduction;
+    if (f2_reduction)
+        delete f2_reduction;
     return result;
 }
 
@@ -157,7 +161,7 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
     int nb_variables = 0;
     int i;
     std::vector<std::shared_ptr<satsolver::Clause>> clauses;
-    std::vector<int> *int_literals;
+    std::shared_ptr<std::vector<int>> int_literals;
     std::string string_literal;
 
     raw_clauses->push_back(new std::vector<std::string>{this->make_literal(), "", ""});
@@ -174,7 +178,7 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
     }
 
     for (auto raw_clause : *raw_clauses) {
-        int_literals = new std::vector<int>();
+        int_literals = std::make_shared<std::vector<int>>();
         for (i=0; i<3; i++) {
             string_literal = raw_clause->at(i);
             if (string_literal[0] == '-') {
@@ -186,8 +190,10 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
             }
         }
         assert(int_literals->size());
-        clauses.push_back(std::shared_ptr<satsolver::Clause>(new satsolver::Clause(nb_variables, *int_literals)));
+        clauses.push_back(std::shared_ptr<satsolver::Clause>(new satsolver::Clause(nb_variables, int_literals)));
+        delete raw_clause;
     }
+    delete raw_clauses;
     if (clauses.size() == 1) // Conjonction of zero clauses
         return NULL;
     
