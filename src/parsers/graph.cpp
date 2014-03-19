@@ -78,7 +78,7 @@ enum GraphParser::State GraphParser::transition(enum GraphParser::State state) {
 
         case WAITING_FOR_NODE_VALUE:
             this->stream >> input_integer;
-            this->graph->set_value(this->current_node_id, input_integer);
+            this->graph->set_value(this->current_node_id-1, input_integer);
             this->current_node_id = -1;
             return WAITING_FOR_LINE;
 
@@ -89,7 +89,7 @@ enum GraphParser::State GraphParser::transition(enum GraphParser::State state) {
 
         case WAITING_FOR_EDGE_SECOND:
             this->stream >> input_integer;
-            this->graph->add_edge(this->current_node_id, input_integer);
+            this->graph->add_edge(this->current_node_id-1, input_integer-1);
             this->current_node_id = -1;
             return WAITING_FOR_LINE;
 

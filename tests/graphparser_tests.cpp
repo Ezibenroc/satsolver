@@ -11,7 +11,7 @@
 #include "graphparser_tests.h"
 
 void GraphParserTests::testBasic() {
-    std::istringstream stream("p edge 5 3\ne 3 0\ne 1 2\ne 4 1\ne 4 3\n");
+    std::istringstream stream("p edge 5 3\ne 4 1\ne 2 3\ne 5 2\ne 5 4\n");
     std::istringstream &stream2 = stream;
     graphsolver::Graph *graph;
     graphsolver::GraphParser *parser;
@@ -27,7 +27,7 @@ void GraphParserTests::testBasic() {
     delete graph;
 }
 void GraphParserTests::testExtraWhitespaces() {
-    std::istringstream stream("p   edge 5   3\ne    3  0\n\ne   1  2   \ne 4 1\n\n\ne 4 3");
+    std::istringstream stream("p   edge 5   3\ne    4  1\n\ne   2  3   \ne 5 2\n\n\ne 5 4");
     std::istringstream &stream2 = stream;
     graphsolver::Graph *graph;
     graphsolver::GraphParser *parser;

@@ -6,12 +6,13 @@
 #include "dpll_tests.h"
 #include "heuristics_tests.h"
 #include "structures/formula.h"
+#include "config.h"
 #include <time.h>
 #include <stdlib.h>
 
 bool VERBOSE = false;
 bool WITH_WL = false;
-int HEURISTIC = DUMB ;
+satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
 int main(void)
 {

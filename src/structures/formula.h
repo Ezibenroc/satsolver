@@ -6,14 +6,7 @@
 #include <memory>
 #include <stack>
 
-#include "clause.h"
-
-
-// Heuristiques :
-#define DUMB 0
-#define RANDOM 1
-#define MOMS 2
-#define DLIS 3 
+#include "structures/clause.h"
 
 namespace satsolver {
 
