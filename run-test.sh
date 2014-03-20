@@ -1,6 +1,12 @@
 #!/bin/bash
 
-NB_TEST=50
+if [ $# != 1 ]
+then
+echo "Please provide the number of tests to perform."
+exit 1
+fi
+
+NB_TEST=$1
 
 # preparation du fichier comparaison.dat: on l'enleve s'il existe, 
 rm -f comparaison.dat
@@ -47,6 +53,10 @@ for nb in `seq 40 50`; do
 	echo $nb $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> ./comparaison.dat 
 # fin de la boucle
 done
+
+gnuplot script-plot.p
+
+evince courbe1.pdf &
 
 # Si une formule n'était pas satisfaite par l'affectation, on aura des "assert" dans le fichier
 #grep "assert" /tmp/output.txt
