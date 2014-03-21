@@ -4,9 +4,10 @@ let nvar = ref 0
 let nclause = ref 0
 let sclause = ref 0
 let depth = ref 0
+let nedge = ref 0
 let name_f = ref ""
 
-type mode_t = Clause_set | Formula | Unknown
+type mode_t = Clause_set | Formula | Graph | Unknown
 let mode = ref Unknown
 
 ;;
@@ -154,7 +155,7 @@ let rec clean_clause_set (f : clause list) : clause list =
 
 
 (* Génère nb clauses de taille size *)
-let rec gen_clause_set (nb_var : int) (nb : int) (size : int) : clause list =
+let gen_clause_set (nb_var : int) (nb : int) (size : int) : clause list =
   let rec process1 (n : int) : clause list =
     if n = 0 then []
     else (gen_clause nb_var size)::(process1 (n-1))
@@ -167,11 +168,15 @@ let rec gen_clause_set (nb_var : int) (nb : int) (size : int) : clause list =
 
 (* Génère et affiche l'ensemble de clauses au format DIMACS dans le fichier (stdin si nom de fichier vide) *)
 let print_clause_set (nb_var : int) (nb_clause : int) (size_clause : int) (name_file : string) : unit =
+  if not(nb_var > 0 && nb_clause > 0 && size_clause > 0) 
+  then failwith "Incorrect number of variables and clauses, and size of clauses."
+  else 
   let f = gen_clause_set nb_var nb_clause size_clause in
   let file = if name_file <> "" then open_out(name_file) else stdout in
   fprintf file "p cnf %d %d\n" nb_var (List.length f) ;
   List.iter (fun x -> fprintf file "%s\n" ((string_of_clause x))) f ;
   if(file <> stdout) then close_out(file)
+  
   
 (** FORMULAE ********************************)
 
@@ -216,11 +221,51 @@ let rec gen_formula (nvar : int) (depth : int)  : formula =
        
 (* Génère et affiche la formule dans le fichier (stdin si nom de fichier vide) *)
 let print_formula (nb_var : int) (depth : int) (name_file : string) : unit =
+  if not(nb_var > 0 && depth > 0) 
+  then failwith "Incorrect depth and number of variables."
+  else 
   let f = gen_formula nb_var depth in
   let file = if name_file <> "" then open_out(name_file) else stdout in
   fprintf file "%s\n" (string_of_formula f) ;
   if(file <> stdout) then close_out(file)
 
+
+(** GRAPH ***********************************)
+
+type pair = int * int
+
+let eq_pair (p1 : pair) (p2 : pair) : bool =
+  (fst p1 = fst p2 && snd p1 = snd p2) || (fst p1 = snd p2 && snd p1 = fst p2)
+
+type graph = pair list 
+
+(* Ajoute une arête au graphe (renvoie une exception si inccorect *)
+let add_edge (p : pair) (g : graph) : graph =
+  if fst p = snd p || List.exists (eq_pair p) g then raise Abort else p::g
+
+(* Génère un graphe aléatoirement, de nvar noeuds et nedge arêtes. *)
+let gen_graph (nvar : int) (nedge  : int) : graph =
+  let rec process (nedge : int) (g : graph) : graph =
+    if nedge = 0 then g
+    else 
+      try 
+	process (nedge -1) (add_edge (((Random.int nvar)+1),((Random.int nvar)+1)) g)
+      with | Abort -> process  nedge g |_ -> failwith ""
+  in process nedge []
+
+let string_of_pair (p : pair) : string = 
+  "e "^(string_of_int (fst p))^" "^(string_of_int (snd p))
+
+(* Génère et affiche le graphe dans le fichier (stdin si nom de fichier vide) *)
+let print_graph (nb_var : int) (nb_edge : int) (name_file : string) : unit =
+  if not(nb_var > 0 && nb_edge > 0 && (nb_var*(nb_var-1)/2 >= nb_edge)) 
+  then failwith "Incorrect number of nodes and edges."
+  else 
+  let g = gen_graph nb_var nb_edge in
+  let file = if name_file <> "" then open_out(name_file) else stdout in
+  fprintf file "p edge %d %d\n" nb_var nb_edge ;
+  List.iter (fun x -> fprintf file "%s\n" (string_of_pair x)) g ;
+  if(file <> stdout) then close_out(file)
 
 (** MAIN ************************************)
 
@@ -229,6 +274,7 @@ let speclist = [
     ("-nclause", Arg.Int    (fun n -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; nclause := n)),  "the number of clauses to generate (clause set generator).");
     ("-sclause", Arg.Int    (fun n -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; sclause := n)),  "the size of the clauses to generate (clause set generator).");
     ("-depth", Arg.Int    (fun n -> if !mode != Unknown && !mode != Formula then failwith "Contradictory options." else (mode := Formula ; depth := n)),  "the depth of the formula to generate (formula generator).");
+    ("-nedge", Arg.Int    (fun n -> if !mode != Unknown && !mode != Graph then failwith "Contradictory options." else (mode := Graph ; nedge := n)),  "the number of edges to generate (graph generator).");
     ("-o", Arg.String (fun s -> name_f := s), ": output file (stdout while be used if not specified).")
 ]
 
@@ -239,8 +285,10 @@ let main() =
   if !mode = Clause_set && !nclause <= 0 then failwith "Please provide the number of clauses." ;
   if !mode = Clause_set && !sclause <= 0 then failwith "Please provide the size of clauses." ;
   if !mode = Formula && !depth <= 0 then failwith "Please provide the depth of formula." ;
+  if !mode = Graph && !nedge <= 0 then failwith "Please provide the number of edges of the graph." ;
   
   if !mode = Clause_set then print_clause_set !nvar !nclause !sclause !name_f ;
   if !mode = Formula then print_formula !nvar !depth !name_f ;
+  if !mode = Graph then print_graph !nvar !nedge !name_f ;
 ;;
 main()
