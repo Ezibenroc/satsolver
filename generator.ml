@@ -3,12 +3,19 @@ open Printf
 let nvar = ref 0 
 let nclause = ref 0
 let sclause = ref 0
+let depth = ref 0
 let name_f = ref ""
+
+type mode_t = Clause_set | Formula | Unknown
+let mode = ref Unknown
 
 ;;
 Random.self_init() ;
 ;;
 exception Abort
+
+
+(** CLAUSES *********************************)
 
 (* On construit les clauses, ensemble de littéraux, à partir de tableaux *)
 module Clauses =
@@ -112,14 +119,14 @@ struct
 	(* Génère un litéral aléatoirement *)
 	let r_int (n : int) : int = (if Random.bool() then 1 else -1) * (Random.int(n) + 1) 
 
-	(* Génère une clause de taille size, avec !nvar variables *)
-	(* Pré-condition : size <= !nvar *)
-	let gen_clause (size : int) : clause =
-	  let c = init !nvar in
+	(* Génère une clause de taille size, avec nb_var variables *)
+	(* Pré-condition : size <= nb_var *)
+	let gen_clause (nb_var : int) (size : int) : clause =
+	  let c = init nb_var in
 	  let rec process (s : int) : unit =
 	    if s = 0 then ()
 	    else ( 
-	      let l = r_int !nvar in
+	      let l = r_int nb_var in
 		 if not (mem l c) && not (mem (-l) c) then (
 		   add l c ; process (s-1)
 		 )
@@ -132,7 +139,7 @@ end
 open Clauses
 
 (* Supprime les clauses contenant une autre clause *)	
-let rec clean_formula (f : clause list) : clause list =
+let rec clean_clause_set (f : clause list) : clause list =
 	let rec process1 (c : Clauses.clause) (f : clause list) : clause list =
 		match f with
 		| [] -> [c]
@@ -147,45 +154,93 @@ let rec clean_formula (f : clause list) : clause list =
 
 
 (* Génère nb clauses de taille size *)
-let rec gen_formula (nb : int) (size : int) : clause list =
+let rec gen_clause_set (nb_var : int) (nb : int) (size : int) : clause list =
   let rec process1 (n : int) : clause list =
     if n = 0 then []
-    else (gen_clause size)::(process1 (n-1))
+    else (gen_clause nb_var size)::(process1 (n-1))
   in 
   let rec process2 (n : int) (l : clause list) : clause list =
     if n = 0 then l
-    else let l2 = clean_formula((process1 n)@l) in
+    else let l2 = clean_clause_set((process1 n)@l) in
 	 process2 (nb-(List.length l2)) (l2)
   in process2 nb []
 
-(* Génère et affiche la formule au format DIMACS dans le fichier *)
-let print_form (nb_clause : int) (size_clause : int) (name_file : string) : unit =
-  let f = gen_formula nb_clause size_clause in
+(* Génère et affiche l'ensemble de clauses au format DIMACS dans le fichier (stdin si nom de fichier vide) *)
+let print_clause_set (nb_var : int) (nb_clause : int) (size_clause : int) (name_file : string) : unit =
+  let f = gen_clause_set nb_var nb_clause size_clause in
   let file = if name_file <> "" then open_out(name_file) else stdout in
-  fprintf file "p cnf %d %d\n" !nvar (List.length f) ;
+  fprintf file "p cnf %d %d\n" nb_var (List.length f) ;
   List.iter (fun x -> fprintf file "%s\n" ((string_of_clause x))) f ;
   if(file <> stdout) then close_out(file)
   
-(***********************)
+(** FORMULAE ********************************)
+
+type formula = | Var of string
+	       | And of formula * formula
+	       | Or of formula * formula
+	       | Imp of formula * formula
+	       | Xor of formula * formula
+	       | Not of formula
+
+let rec string_of_formula (f : formula) : string =
+  match f with
+  | Var(s) -> s
+  | And(f1,f2) -> "("^(string_of_formula f1)^"/\\"^(string_of_formula f2)^")"
+  | Or(f1,f2) -> "("^(string_of_formula f1)^"\\/"^(string_of_formula f2)^")"
+  | Imp(f1,f2) -> "("^(string_of_formula f1)^"=>"^(string_of_formula f2)^")"
+  | Xor(f1,f2) -> "("^(string_of_formula f1)^"+"^(string_of_formula f2)^")"
+  | Not(f1) -> "~"^(string_of_formula f1)
+
+(* nombre d'opérateurs différents *)
+let nb_op = 5
+
+let rec var_of_int (n : int) : string =
+  let s = String.make 1 (char_of_int ((int_of_char 'a') + (n mod 26))) in
+  if n < 26 then s
+  else (var_of_int (n/26))^s
+
+(* Génère une formule aléatoirement.
+   nvar : nombre total de variables (pas forcément toutes utilisées)
+   depth : profondeur de l'arbre représentant la formule *)
+let rec gen_formula (nvar : int) (depth : int)  : formula =
+  if depth = 0 then Var(var_of_int (Random.int nvar))
+  else let op = Random.int nb_op in
+       let 	f1 = gen_formula nvar (depth-1) and
+	   				f2 = gen_formula nvar (depth-1) in
+       match op with
+       | 0 -> And(f1,f2)
+       | 1 -> Or(f1,f2)
+       | 2 -> Imp(f1,f2)
+       | 3 -> Xor(f1,f2)
+       | _ -> Not(f1)
+       
+(* Génère et affiche la formule dans le fichier (stdin si nom de fichier vide) *)
+let print_formula (nb_var : int) (depth : int) (name_file : string) : unit =
+  let f = gen_formula nb_var depth in
+  let file = if name_file <> "" then open_out(name_file) else stdout in
+  fprintf file "%s\n" (string_of_formula f) ;
+  if(file <> stdout) then close_out(file)
+
+
+(** MAIN ************************************)
 
 let speclist = [
-    ("-nvar", Arg.Int    (fun n -> nvar := n),  "the number of variables to use.");
-    ("-nclause", Arg.Int    (fun n -> nclause := n),  "the number of clauses to use.");
-    ("-sclause", Arg.Int    (fun n -> sclause := n),  "the size of the clauses to use.");
+    ("-nvar", Arg.Int    (fun n -> nvar := n),  "the number of variables to generate (clause set and formula generator).");
+    ("-nclause", Arg.Int    (fun n -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; nclause := n)),  "the number of clauses to generate (clause set generator).");
+    ("-sclause", Arg.Int    (fun n -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; sclause := n)),  "the size of the clauses to generate (clause set generator).");
+    ("-depth", Arg.Int    (fun n -> if !mode != Unknown && !mode != Formula then failwith "Contradictory options." else (mode := Formula ; depth := n)),  "the depth of the formula to generate (formula generator).");
     ("-o", Arg.String (fun s -> name_f := s), ": output file (stdout while be used if not specified).")
 ]
 
-(* Arrondi à n chiffres après la virgule (s représente un flottant) *)
-let round (s : string) (n : int) : string =
-	let x = String.index s '.' in
-	try String.sub s 0 (x+n+1)
-	with |_ -> s
-
 let main() =
   Arg.parse speclist (fun x -> raise (Arg.Bad ("Bad argument : " ^ x))) "SYNTAXE :" ;
-  if(!nvar <= 0) then failwith("Please provide the number of variables.") ;
-  if(!nclause <= 0) then failwith("Please provide the number of clauses.") ;
-  if(!sclause <= 0) then failwith("Please provide the size of clauses.") ;
-  print_form !nclause !sclause !name_f ;
+  if !mode = Unknown then failwith "Please provide more options." ;
+  if !nvar <= 0 then failwith "Please provide the number of variables." ;
+  if !mode = Clause_set && !nclause <= 0 then failwith "Please provide the number of clauses." ;
+  if !mode = Clause_set && !sclause <= 0 then failwith "Please provide the size of clauses." ;
+  if !mode = Formula && !depth <= 0 then failwith "Please provide the depth of formula." ;
+  
+  if !mode = Clause_set then print_clause_set !nvar !nclause !sclause !name_f ;
+  if !mode = Formula then print_formula !nvar !depth !name_f ;
 ;;
 main()
