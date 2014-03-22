@@ -32,16 +32,16 @@ void parser_result(SPEF formula);
 
 %%
 whole_formula:
-      formula { parser_result(*(SPEF*) $1); }
+      formula { parser_result(SPEF((EF*) $1)); }
     ;
 
 formula:
       LEFT_PAREN formula RIGHT_PAREN { $$ = $2; }
-    | VAR { $$ = new SPEF(new EF(EF::LITERAL, std::string($1))); }
-    | NOT formula { $$ = new SPEF(new EF(EF::NOT, *(SPEF*) $2)); }
-    | formula OR formula { $$ = new SPEF(new EF(EF::OR, *(SPEF*) $1, *(SPEF*) $3)); }
-    | formula AND formula { $$ = new SPEF(new EF(EF::AND, *(SPEF*) $1, *(SPEF*) $3)); }
-    | formula IMPLIES formula { $$ = new SPEF(new EF(EF::IMPLIES, *(SPEF*) $1, *(SPEF*) $3)); }
+    | VAR { $$ = new EF(EF::LITERAL, std::string($1)); }
+    | NOT formula { $$ = new EF(EF::NOT, SPEF((EF*) $2)); }
+    | formula OR formula { $$ = new EF(EF::OR, SPEF((EF*) $1), SPEF((EF*) $3)); }
+    | formula AND formula { $$ = new EF(EF::AND, SPEF((EF*) $1), SPEF((EF*) $3)); }
+    | formula IMPLIES formula { $$ = new EF(EF::IMPLIES, SPEF((EF*) $1), SPEF((EF*) $3)); }
     ;
 
 %%
