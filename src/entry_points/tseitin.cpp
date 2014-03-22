@@ -18,6 +18,7 @@ extern int yyparse();
 bool VERBOSE = false;
 bool WITH_WL = false;
 bool DISPLAY_SAT;
+bool DISPLAY_FORMULA;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
 void parser_result(SPEF ext_formula) {
@@ -25,6 +26,8 @@ void parser_result(SPEF ext_formula) {
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
     std::shared_ptr<std::unordered_set<std::string>> literals = ext_formula->get_literals();
 
+    if (VERBOSE || DISPLAY_FORMULA)
+        std::cout << "Interpreted formula as: " << ext_formula->to_string() << std::endl;
     ext_formula = ext_formula->simplify();
     if (VERBOSE)
         std::cout << "Reduction of formula to: " << ext_formula->to_string() << std::endl;
@@ -68,7 +71,7 @@ void parser_result(SPEF ext_formula) {
 }
 
 int main (int argc, char *argv[]) {
-    CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>({"-print-sat"}), "[-print-sat] [<filename>]");
+    CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>({"-print-interpretation", "-print-sat"}), "[-print-sat] [<filename>]");
     if (cli_parser.get_nb_parsed_args() == -1)
         return 1;
     int nb_remaining_args = argc - cli_parser.get_nb_parsed_args();
@@ -85,5 +88,6 @@ int main (int argc, char *argv[]) {
         return 1;
     }
     DISPLAY_SAT = cli_parser.get_arg("-print-sat");
+    DISPLAY_FORMULA = cli_parser.get_arg("-print-interpretation");
     return yyparse();
 }
