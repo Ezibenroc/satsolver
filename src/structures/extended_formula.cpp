@@ -210,11 +210,11 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
 std::string EF::to_string() const {
     switch (this->type) {
         case EF::XOR:
-            return "(" + this->f1->to_string() + "⊕" + this->f2->to_string() + ")";
+            return "(" + this->f1->to_string() + "⊻" + this->f2->to_string() + ")";
         case EF::OR:
-            return "(" + this->f1->to_string() + "+" + this->f2->to_string() + ")";
+            return "(" + this->f1->to_string() + "∨" + this->f2->to_string() + ")";
         case EF::AND:
-            return "(" + this->f1->to_string() + "•" + this->f2->to_string() + ")";
+            return "(" + this->f1->to_string() + "∧" + this->f2->to_string() + ")";
         case EF::IMPLIES:
             return "(" + this->f1->to_string() + "→" + this->f2->to_string() + ")";
         case EF::NOT:
