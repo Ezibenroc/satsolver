@@ -51,18 +51,18 @@ set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/extended_formula.y.cpp P
 add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Affectation Clause Formula)
 
-add_library(GraphColorSolver src/solvers/graphcolor.cpp)
-target_link_libraries(GraphColorSolver Graph ExtendedFormula Formula)
-
 add_library(ExtendedFormulaSolver src/solvers/extended_formula.cpp)
 target_link_libraries(ExtendedFormulaSolver ExtendedFormula Formula)
+
+add_library(GraphColorSolver src/solvers/graphcolor.cpp)
+target_link_libraries(GraphColorSolver Graph ExtendedFormula ExtendedFormulaSolver Formula DPLL)
 
 
 add_executable(resol src/entry_points/resol.cpp)
 target_link_libraries(resol Affectation Formula SatParser CommandLineParser DPLL)
 
 add_executable(colorie src/entry_points/colorie.cpp)
-target_link_libraries(colorie GraphParser CommandLineParser GraphColorSolver DPLL)
+target_link_libraries(colorie GraphParser CommandLineParser GraphColorSolver)
 
 add_executable(tseitin src/entry_points/tseitin.cpp)
 target_link_libraries(tseitin CommandLineParser ExtendedFormulaParser ExtendedFormulaSolver)
