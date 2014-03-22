@@ -26,6 +26,11 @@ add_library(AbstractParser src/parsers/abstract.cpp)
 add_library(SatParser src/parsers/sat.cpp)
 target_link_libraries(SatParser AbstractParser Clause Formula)
 
+file(WRITE structures.cpp "")
+add_library(Structures structures.cpp)
+target_link_libraries(Structures Formula Clause Affectation Graph ExtendedFormula)
+
+
 add_library(GraphParser src/parsers/graph.cpp)
 target_link_libraries(GraphParser AbstractParser Graph)
 
@@ -36,7 +41,6 @@ bison_target(ExtendedFormulaYacc src/parsers/extended_formula.y ${CMAKE_CURRENT_
 flex_target(ExtendedFormulaLex src/parsers/extended_formula.l ${CMAKE_CURRENT_BINARY_DIR}/extended_formula.l.cpp)
 add_flex_bison_dependency(ExtendedFormulaLex ExtendedFormulaYacc)
 add_library(ExtendedFormulaParser src/parsers/extended_formula.cpp ${BISON_ExtendedFormulaYacc_OUTPUTS} ${FLEX_ExtendedFormulaLex_OUTPUTS})
-message("ExtendedFormulaParser src/parsers/extended_formula.cpp ${BISON_ExtendedFormulaYacc_OUTPUTS} ${FLEX_ExtendedFormulaLex_OUTPUTS}")
 target_link_libraries(ExtendedFormulaParser ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
 #add_library(ExtendedFormulaYacc ${BISON_ExtendedFormulaYacc_OUTPUTS})
 #add_library(ExtendedFormulaLex ${FLEX_ExtendedFormulaLex_OUTPUTS})
@@ -46,6 +50,10 @@ target_link_libraries(ExtendedFormulaParser ${FLEX_LIBRARIES} ${BISON_LIBRARIES}
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/extended_formula.l.cpp PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-unused-function")
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/extended_formula.y.cpp PROPERTIES COMPILE_FLAGS -Wno-conversion)
 
+file(WRITE parsers.cpp "")
+add_library(Parsers parsers.cpp)
+target_link_libraries(Parsers SatParser GraphParser ExtendedFormulaParser)
+
 
 
 add_library(DPLL src/solvers/dpll.cpp)
@@ -53,6 +61,10 @@ target_link_libraries(DPLL Affectation Clause Formula)
 
 add_library(GraphColorSolver src/solvers/graphcolor.cpp)
 target_link_libraries(GraphColorSolver Graph ExtendedFormula Formula DPLL)
+
+file(WRITE solvers.cpp "")
+add_library(Solvers solvers.cpp)
+target_link_libraries(Solvers DPLL GraphColorSolver)
 
 
 add_executable(resol src/entry_points/resol.cpp)
@@ -66,32 +78,9 @@ target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL Ext
 
 find_package(CppUnit)
 if (CPPUNIT_FOUND)
-    add_library(StructuresTests tests/structures_tests.cpp)
-    target_link_libraries(StructuresTests Affectation Clause Formula ExtendedFormula DPLL)
-    target_link_libraries(StructuresTests cppunit)
-    
-    add_library(HeuristicsTests tests/heuristics_tests.cpp)
-    target_link_libraries(HeuristicsTests Affectation Clause Formula ExtendedFormula DPLL)
-    target_link_libraries(HeuristicsTests cppunit)
 
-    add_library(DpllTests tests/dpll_tests.cpp)
-    target_link_libraries(StructuresTests Affectation Clause Formula DPLL)
-    target_link_libraries(StructuresTests cppunit)
-
-    add_library(SatParserTests tests/satparser_tests.cpp)
-    target_link_libraries(SatParserTests SatParser)
-    target_link_libraries(SatParserTests cppunit)
-
-    add_library(GraphParserTests tests/graphparser_tests.cpp)
-    target_link_libraries(GraphParserTests GraphParser)
-    target_link_libraries(GraphParserTests cppunit)
-
-    add_library(GraphSolverTests tests/graphsolver_tests.cpp)
-    target_link_libraries(GraphSolverTests GraphColorSolver)
-    target_link_libraries(GraphSolverTests cppunit)
-
-    add_executable(testrunner tests/main.cpp)
-    target_link_libraries(testrunner StructuresTests HeuristicsTests DpllTests SatParserTests GraphParserTests GraphSolverTests)
+    add_executable(testrunner tests/main.cpp tests/structures_tests.cpp tests/heuristics_tests.cpp tests/dpll_tests.cpp tests/satparser_tests tests/graphparser_tests.cpp tests/graphsolver_tests.cpp)
+    target_link_libraries(testrunner Structures Parsers Solvers)
     target_link_libraries(testrunner cppunit)
 else (CPPUNIT_FOUND)
     message("+---------------------------------------------+")
