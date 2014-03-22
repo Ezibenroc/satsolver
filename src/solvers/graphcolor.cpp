@@ -30,7 +30,7 @@ std::string graphsolver::ColorAffectation::to_string() const {
     return oss.str() ;
 }
 
-graphsolver::ColorAffectation* graphsolver::ColorAffectation::from_sat_solution(satsolver::Affectation *affectation, std::shared_ptr<std::map<std::string, int>> name_to_variable, int nb_nodes, int nb_bits) {
+std::shared_ptr<graphsolver::ColorAffectation> graphsolver::ColorAffectation::from_sat_solution(satsolver::Affectation *affectation, std::shared_ptr<std::map<std::string, int>> name_to_variable, int nb_nodes, int nb_bits) {
     int *colors = (int*) malloc(sizeof(int)*nb_nodes);
     int i, j;
     int variable_id;
@@ -43,7 +43,7 @@ graphsolver::ColorAffectation* graphsolver::ColorAffectation::from_sat_solution(
                 colors[i]++;
         }
     }
-    return new graphsolver::ColorAffectation(nb_nodes, colors);
+    return std::make_shared<graphsolver::ColorAffectation>(nb_nodes, colors);
 }
 
 SPEF get_color_disjonction_of_edge(int first_node_id, int second_node_id, int nb_bits) {
@@ -113,12 +113,12 @@ int reduce_graph_coloration_to_extended_formula(graphsolver::Graph *graph, int n
     return nb_bits;
 }
 
-graphsolver::ColorAffectation* graphsolver::solve_colors(int nb_colors, Graph *graph) {
+std::shared_ptr<graphsolver::ColorAffectation> graphsolver::solve_colors(int nb_colors, Graph *graph) {
     int nb_bits;
     SPEF ext_formula;
     std::shared_ptr<satsolver::Formula> formula;
     satsolver::Affectation *sat_solution;
-    graphsolver::ColorAffectation *color_affectation;
+    std::shared_ptr<graphsolver::ColorAffectation> color_affectation;
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
     
     nb_bits = reduce_graph_coloration_to_extended_formula(graph, nb_colors, &ext_formula);

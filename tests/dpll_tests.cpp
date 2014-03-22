@@ -62,12 +62,11 @@ void DpllTests::testBasicUsageWithWL() {
 }
 
 void DpllTests::testSmallConflict() {
-    Formula *f;
     Clause *c1 = new Clause(1, {1}), *c2 = new Clause(1, {-1});
     std::vector<std::shared_ptr<Clause>> clauses;
     clauses.push_back(std::shared_ptr<Clause>(c1));
     clauses.push_back(std::shared_ptr<Clause>(c2));
-    CPPUNIT_ASSERT_THROW(f = new Formula(clauses, 3),Conflict) ;
+    CPPUNIT_ASSERT_THROW(Formula(clauses, 3), Conflict) ;
 }
 void DpllTests::testSmallConflictWithWL() {
     WITH_WL = true;

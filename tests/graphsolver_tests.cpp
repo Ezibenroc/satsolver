@@ -49,7 +49,6 @@ void GraphSolverTests::testMaxFormula() {
 
 // Test the solver
 void GraphSolverTests::testSolve() {
-    graphsolver::ColorAffectation *solution;
     graphsolver::Graph graph(5, 1);
     graph.add_edge(4, 0);
     graph.add_edge(1, 2);

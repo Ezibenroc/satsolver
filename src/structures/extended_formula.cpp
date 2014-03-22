@@ -53,6 +53,7 @@ std::vector<std::vector<std::string>*>* EF::reduce_all() const {
         formulas->pop_back();
         formula->reduce(formulas, clauses);
     }
+    delete formulas;
     return clauses;
 }
 void EF::reduce(std::vector<const EF*> *formulas, std::vector<std::vector<std::string>*> *clauses) const {

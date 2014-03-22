@@ -15,10 +15,10 @@ class ColorAffectation {
         ~ColorAffectation();
         std::string to_string() const;
 
-        static ColorAffectation* from_sat_solution(satsolver::Affectation *affectation, std::shared_ptr<std::map<std::string, int>> name_to_variable, int nodes_count, int nb_bits);
+        static std::shared_ptr<ColorAffectation> from_sat_solution(satsolver::Affectation *affectation, std::shared_ptr<std::map<std::string, int>> name_to_variable, int nodes_count, int nb_bits);
 };
 
-ColorAffectation* solve_colors(int nb_colors, Graph *graph);
+std::shared_ptr<ColorAffectation> solve_colors(int nb_colors, Graph *graph);
 
 }
 

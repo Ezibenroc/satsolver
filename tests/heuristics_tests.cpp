@@ -59,6 +59,7 @@ void HeuristicsTests::testRandom() {
     for(int i = 0 ; i < 1000 ; i++) {
     	CPPUNIT_ASSERT(f->choose_literal_random() == 2) ;
     }
+    delete f;
 }
 
 void HeuristicsTests::testMoms() {
@@ -78,9 +79,11 @@ void HeuristicsTests::testMoms() {
     g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
     v = { 2,-4 } ;
     g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
+    delete f;
     f = new Formula(g,4) ;
     CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{1,2,3,4},{-1,-2,-3},{-1,2,3,4},{1,-4},{2,-4}}));
     CPPUNIT_ASSERT(f->choose_literal_moms() == -4) ;
+    delete f;
 }
 
 void HeuristicsTests::testDlis() {
@@ -100,9 +103,11 @@ void HeuristicsTests::testDlis() {
     g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
     v = { 2,-4 } ;
     g.push_back(std::shared_ptr<Clause>(new Clause(4,v))) ;
+    delete f;
     f = new Formula(g,4) ;
     CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{1,2,-3},{1,2,3,4},{-1,-2,-3},{-1,2,3,4},{1,-4},{2,-4}}));
     CPPUNIT_ASSERT(f->choose_literal_dlis() == -4 || f->choose_literal_dlis() == 2) ;
+    delete f;
 }
 
 

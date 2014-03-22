@@ -17,7 +17,7 @@ satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 int main(int argc, char *argv[]) {
     bool using_stdin = true;
     std::istream *input = &std::cin;
-    graphsolver::ColorAffectation *solution;
+    std::shared_ptr<graphsolver::ColorAffectation> solution;
     graphsolver::GraphParser *parser;
     int nb_colors;
     graphsolver::Graph *graph;
@@ -53,7 +53,6 @@ int main(int argc, char *argv[]) {
 
     if (!using_stdin)
         delete input;
-    delete solution;
     delete parser;
     delete graph;
 }

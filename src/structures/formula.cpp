@@ -55,6 +55,7 @@ Formula::~Formula() {
 Formula& Formula::operator=(const Formula &that) {
     this->nb_variables = that.nb_variables;
     this->clauses = that.clauses;
+    delete this->aff;
     this->aff = that.aff ;
     this->mem = that.mem ;
     this->to_do = that.to_do ;
