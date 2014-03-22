@@ -22,29 +22,29 @@ void GraphSolverTests::testEdgeFormula() {
     // The following formula may vary; change it if needed if the implementation
     // of get_color_disjonction_of_edge() or EF::to_string() changes in the
     // future (but check it manually before changing it).
-    CPPUNIT_ASSERT(formula->to_string() == "(((“2 0”⊕“5 0”)+(“2 1”⊕“5 1”))+(“2 2”⊕“5 2”))");
+    CPPUNIT_ASSERT(formula->to_string() == "(((“2 0”⊻“5 0”)∨(“2 1”⊕“5 1”))∨(“2 2”⊻“5 2”))");
 }
 
 // Test generation of the “maximum color” formula
 void GraphSolverTests::testMaxFormula() {
     SPEF formula;
     formula = get_color_limitation_formula_for_node(2, 1, 2)->simplify();
-    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 1”)•(¬“2 0”))");
+    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 1”)∧(¬“2 0”))");
     formula = get_color_limitation_formula_for_node(2, 2, 2)->simplify();
     CPPUNIT_ASSERT(formula->to_string() == "(¬“2 1”)");
     formula = get_color_limitation_formula_for_node(2, 3, 2)->simplify();
-    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 1”)+(“2 1”•(¬“2 0”)))");
+    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 1”)∨(“2 1”∧(¬“2 0”)))");
     formula = get_color_limitation_formula_for_node(2, 1, 3)->simplify();
-    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 2”)•((¬“2 1”)•(¬“2 0”)))");
+    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 2”)∧((¬“2 1”)∧(¬“2 0”)))");
     formula = get_color_limitation_formula_for_node(2, 2, 3)->simplify();
-    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 2”)•(¬“2 1”))");
+    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 2”)∧(¬“2 1”))");
     formula = get_color_limitation_formula_for_node(2, 3, 3)->simplify();
-    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 2”)•((¬“2 1”)+(“2 1”•(¬“2 0”))))");
+    CPPUNIT_ASSERT(formula->to_string() == "((¬“2 2”)∧((¬“2 1”)∨(“2 1”∧(¬“2 0”))))");
     formula = get_color_limitation_formula_for_node(2, 4, 3)->simplify();
     CPPUNIT_ASSERT(formula->to_string() == "(¬“2 2”)");
 
     formula = get_color_limitation_formula(2, 2, 2)->simplify();
-    CPPUNIT_ASSERT(formula->to_string() == "((¬“0 1”)•(¬“1 1”))");
+    CPPUNIT_ASSERT(formula->to_string() == "((¬“0 1”)∧(¬“1 1”))");
 }
 
 // Test the solver
