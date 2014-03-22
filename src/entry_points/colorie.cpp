@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     graphsolver::GraphParser *parser;
     int nb_colors;
     graphsolver::Graph *graph;
-    CommandLineParser cli_parser(argc, argv, "<color> [<filename>]");
+    CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>(), "<color> [<filename>]");
     if (cli_parser.get_nb_parsed_args() == -1)
         return 1;
     int nb_remaining_args = argc - cli_parser.get_nb_parsed_args();

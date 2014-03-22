@@ -47,6 +47,7 @@ class Clause {
 
         // Renvoie la représentation textuelle de la clause
         std::string to_string() ;
+        std::string to_string2() ;
 
         // Renvoie un ensemble contenant tous les entiers de la clause.
         std::set<int> to_set() const;

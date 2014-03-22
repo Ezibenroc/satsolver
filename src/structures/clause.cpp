@@ -111,6 +111,21 @@ std::string Clause::to_string()  {
     return oss.str() ;
 }
 
+
+std::string Clause::to_string2()  {
+    std::ostringstream oss;
+    for(int i = 1 ; i <= this->nb_variables ; i++) {
+        if(this->contains_literal(-i)) {
+            oss << -i << " ";
+        }
+        if(this->contains_literal(i)) {
+            oss << i << " ";
+        }
+    }
+    oss << "0" ;
+    return oss.str() ;
+}
+
 std::set<int> Clause::to_set() const {
     std::set<int> s = std::set<int>() ;
     for(auto l : this->literals) {

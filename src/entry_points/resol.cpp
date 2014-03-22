@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     std::set<int>::iterator solution_set_iterator;
     bool using_stdin = true;
     std::istream *input = &std::cin;
-    CommandLineParser cli_parser(argc, argv, "[<filename>]");
+    CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>(), "[<filename>]");
     if (cli_parser.get_nb_parsed_args() == -1)
         return 1;
     int nb_remaining_args = argc - cli_parser.get_nb_parsed_args();
