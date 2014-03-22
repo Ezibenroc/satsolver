@@ -4,18 +4,14 @@
 
 #include "structures/graph.h"
 #include "parsers/graph.h"
+#include "parsers/cli.h"
 #include "solvers/graphcolor.h"
 #include "solvers/dpll.h"
 #include "config.h"
 
 bool VERBOSE = false;
 bool WITH_WL = false;
-int HEURISTIC = DUMB ;
-
-void bad_command_options(char *executable) {
-    std::cout << "Syntax: " << executable << " [-verbose] [<filename>]\n\n";
-    std::cout << "If filename is not given, stdin is used instead." << std::endl;
-}
+satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
 
 int main(int argc, char *argv[]) {
@@ -25,29 +21,23 @@ int main(int argc, char *argv[]) {
     graphsolver::GraphParser *parser;
     int nb_colors;
     graphsolver::Graph *graph;
-    int i;
-    for (i=1; i<argc && argv[i][0]=='-'; i++) {
-        if (!strcmp(argv[i], "-verbose")) {
-            VERBOSE = true;
-        }
-        else {
-            bad_command_options(argv[0]);
-            return 1;
-        }
+    CommandLineParser cli_parser(argc, argv, "<color> [<filename>]");
+    if (cli_parser.get_nb_parsed_args() == -1)
+        return 1;
+    int nb_remaining_args = argc - cli_parser.get_nb_parsed_args();
+    if (nb_remaining_args == 1 && atoi(argv[argc-nb_remaining_args])) {
+        // One option left; hopefully the number of colors
+        nb_colors = atoi(argv[argc-nb_remaining_args]);
     }
-    if (i == argc-1) {
-        // No other option
-        nb_colors = atoi(argv[i]);
-    }
-    else if (i == argc-2) {
-        // One option left; hopefully the file name
-        nb_colors = atoi(argv[i]);
-        input = new std::ifstream(argv[i+1]);
+    else if (nb_remaining_args == 2) {
+        // One option left; hopefully the number of colors and the file name
+        nb_colors = atoi(argv[argc-nb_remaining_args]);
+        input = new std::ifstream(argv[argc-nb_remaining_args+1]);
         using_stdin = false;
     }
     else {
         // Too many unknown options
-        bad_command_options(argv[0]);
+        cli_parser.print_syntax_error(argv[0]);
         return 1;
     }
     parser = new graphsolver::GraphParser(*input);
@@ -63,4 +53,7 @@ int main(int argc, char *argv[]) {
 
     if (!using_stdin)
         delete input;
+    delete solution;
+    delete parser;
+    delete graph;
 }

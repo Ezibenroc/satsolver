@@ -7,12 +7,16 @@
 #include "structures/extended_formula.h"
 #include "solvers/dpll.h"
 #include "solvers/graphcolor.h"
+#include "config.h"
 
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
 #define get_variable_of_node_bit(node_id, bit_id) (std::to_string(node_id) + " " + std::to_string(bit_id))
 
 graphsolver::ColorAffectation::ColorAffectation(int nb_nodes, int *colors) : nb_nodes(nb_nodes), colors(colors) {
+}
+graphsolver::ColorAffectation::~ColorAffectation() {
+    free(this->colors);
 }
 std::string graphsolver::ColorAffectation::to_string() const {
     std::ostringstream oss;
@@ -118,11 +122,21 @@ graphsolver::ColorAffectation* graphsolver::solve_colors(int nb_colors, Graph *g
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
     
     nb_bits = reduce_graph_coloration_to_extended_formula(graph, nb_colors, &ext_formula);
+    if (VERBOSE)
+        std::cout << "Reduction of graph coloring problem to: " << ext_formula->to_string() << std::endl;
     ext_formula = ext_formula->simplify();
+    if (VERBOSE)
+        std::cout << "Reduction of formula to: " << ext_formula->to_string() << std::endl;
     formula = ext_formula->reduce_to_formula(&name_to_variable);
     if (!formula) // The formula is always false
         throw satsolver::Conflict();
+    if (VERBOSE)
+        std::cout << "Reduction of formula to SAT: " << formula->to_string() << std::endl;
     sat_solution = satsolver::solve(&*formula); // May raise a satsolver::Conflict
+    if (VERBOSE)
+        std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
     color_affectation = ColorAffectation::from_sat_solution(sat_solution, name_to_variable, graph->get_nodes_count(), nb_bits);
+    if (VERBOSE)
+        std::cout << "Color affectation: " << color_affectation->to_string() << std::endl;
     return color_affectation;
 }

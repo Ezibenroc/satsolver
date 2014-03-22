@@ -16,6 +16,8 @@ target_link_libraries(Formula Clause Affectation)
 add_library(ExtendedFormula src/structures/extended_formula.cpp)
 add_library(Graph src/structures/graph.cpp)
 
+add_library(CommandLineParser src/parsers/cli.cpp)
+
 add_library(AbstractParser src/parsers/abstract.cpp)
 add_library(SatParser src/parsers/sat.cpp)
 target_link_libraries(SatParser AbstractParser Clause Formula)
@@ -29,13 +31,12 @@ target_link_libraries(DPLL Affectation Clause Formula)
 add_library(GraphColorSolver src/solvers/graphcolor.cpp)
 target_link_libraries(GraphColorSolver Graph ExtendedFormula Formula)
 
+
 add_executable(resol src/entry_points/resol.cpp)
-target_link_libraries(resol Affectation Formula)
-target_link_libraries(resol SatParser)
-target_link_libraries(resol DPLL)
+target_link_libraries(resol Affectation Formula SatParser CommandLineParser DPLL)
 
 add_executable(colorie src/entry_points/colorie.cpp)
-target_link_libraries(colorie GraphParser GraphColorSolver DPLL)
+target_link_libraries(colorie GraphParser CommandLineParser GraphColorSolver DPLL)
 
 find_package(CppUnit)
 if (CPPUNIT_FOUND)

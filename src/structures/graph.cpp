@@ -33,6 +33,8 @@ void Graph::set_value(int node_id, int value) {
 }
 
 void Graph::add_edge(int first, int second) {
+    assert(first < this->nodes_count);
+    assert(second < this->nodes_count);
     assert(first != second);
     if (first > second)
         this->adjacency[first]->insert(second);
