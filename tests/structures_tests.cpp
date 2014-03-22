@@ -254,6 +254,60 @@ void StructuresTests::testExtendedFormula() {
     CPPUNIT_ASSERT_THROW((
         formula = extended_formula->reduce_to_formula(&variable_to_literal),
         satsolver::solve(&*formula)), satsolver::Conflict);
+
+
+
+    extended_formula =
+            SPEF(new EF(EF::AND,
+                SPEF(new EF(EF::IMPLIES,
+                    SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "bar")))),
+                    SPEF(new EF(EF::OR,
+                        SPEF(new EF(EF::LITERAL, "foo")),
+                        SPEF(new EF(EF::LITERAL, "bar"))
+                    ))
+                )),
+                SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "bar"))))
+            ));
+    variable_to_literal->clear();
+    formula = extended_formula->reduce_to_formula(&variable_to_literal);
+    sat_solution = satsolver::solve(&*formula);
+    CPPUNIT_ASSERT(sat_solution->is_true(variable_to_literal->at("foo")));
+
+    extended_formula =
+            SPEF(new EF(EF::AND,
+                SPEF(new EF(EF::IMPLIES,
+                    SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "bar")))),
+                    SPEF(new EF(EF::AND,
+                        SPEF(new EF(EF::LITERAL, "foo")),
+                        SPEF(new EF(EF::LITERAL, "bar"))
+                    ))
+                )),
+                SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "foo"))))
+            ));
+    variable_to_literal->clear();
+    formula = extended_formula->reduce_to_formula(&variable_to_literal);
+    sat_solution = satsolver::solve(&*formula);
+    CPPUNIT_ASSERT(sat_solution->is_false(variable_to_literal->at("foo")));
+    CPPUNIT_ASSERT(sat_solution->is_true(variable_to_literal->at("bar")));
+
+    extended_formula =
+            SPEF(new EF(EF::AND,
+                SPEF(new EF(EF::AND,
+                    SPEF(new EF(EF::IMPLIES,
+                        SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "bar")))),
+                        SPEF(new EF(EF::AND,
+                            SPEF(new EF(EF::LITERAL, "foo")),
+                            SPEF(new EF(EF::LITERAL, "bar"))
+                        ))
+                    )),
+                    SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "foo"))))
+                )),
+                SPEF(new EF(EF::NOT, SPEF(new EF(EF::LITERAL, "bar"))))
+            ));
+    variable_to_literal->clear();
+    CPPUNIT_ASSERT_THROW((
+        formula = extended_formula->reduce_to_formula(&variable_to_literal),
+        satsolver::solve(&*formula)), satsolver::Conflict);
 }
 
 void StructuresTests::testExtendedFormulaSimplification() {
