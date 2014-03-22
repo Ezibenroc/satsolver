@@ -320,3 +320,27 @@ SPEF EF::simplify() const {
     }
     assert(false);
 }
+
+std::shared_ptr<std::unordered_set<std::string>> EF::get_literals() const {
+    std::shared_ptr<std::unordered_set<std::string>> items1, items2;
+    switch (this->type) {
+        case EF::TRUE:
+        case EF::FALSE:
+            return std::make_shared<std::unordered_set<std::string>>();
+        case EF::LITERAL:
+            items1 = std::make_shared<std::unordered_set<std::string>>();
+            items1->insert(this->literal);
+            return items1;
+        case EF::NOT:
+            return this->f1->get_literals();
+        case EF::AND:
+        case EF::OR:
+        case EF::IMPLIES:
+        case EF::XOR:
+            items1 = this->f1->get_literals();
+            items2 = this->f2->get_literals();
+            items1->insert(items2->begin(), items2->end());
+            return items1;
+    }
+    assert(false);
+}

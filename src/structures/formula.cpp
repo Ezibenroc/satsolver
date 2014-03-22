@@ -83,11 +83,9 @@ std::string Formula::to_string() {
 
 std::string Formula::to_string2() {
     std::ostringstream oss;
-    oss << "######\n" ;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-        oss << "# " << this->clauses[i]->to_string() << "\n";
+        oss << this->clauses[i]->to_string2() << std::endl;
     }
-    oss << "######\n" ;
     return oss.str() ;
 }
 

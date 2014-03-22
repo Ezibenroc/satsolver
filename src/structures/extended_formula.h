@@ -1,6 +1,7 @@
 #ifndef STRUCTURED_EXTENDED_FORMULE_H
 #define STRUCTURED_EXTENDED_FORMULE_H
 
+#include <unordered_set>
 #include <string>
 #include <memory>
 #include <map>
@@ -44,6 +45,7 @@ class ExtendedFormula {
         bool operator==(const ExtendedFormula &that) const;
         bool operator!=(const ExtendedFormula &that) const;
         std::shared_ptr<ExtendedFormula> simplify() const;
+        std::shared_ptr<std::unordered_set<std::string>> get_literals() const;
 };
 
 }
