@@ -22,7 +22,7 @@ void GraphSolverTests::testEdgeFormula() {
     // The following formula may vary; change it if needed if the implementation
     // of get_color_disjonction_of_edge() or EF::to_string() changes in the
     // future (but check it manually before changing it).
-    CPPUNIT_ASSERT(formula->to_string() == "(((“2 0”⊻“5 0”)∨(“2 1”⊕“5 1”))∨(“2 2”⊻“5 2”))");
+    CPPUNIT_ASSERT(formula->to_string() == "(((“2 0”⊻“5 0”)∨(“2 1”⊻“5 1”))∨(“2 2”⊻“5 2”))");
 }
 
 // Test generation of the “maximum color” formula
