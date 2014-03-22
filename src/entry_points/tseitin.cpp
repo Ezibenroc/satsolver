@@ -13,6 +13,7 @@
 #define SPEF std::shared_ptr<EF>
 
 extern FILE *yyin;
+extern int yyparse();
 
 bool VERBOSE = false;
 bool WITH_WL = false;
