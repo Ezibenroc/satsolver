@@ -184,7 +184,7 @@ type formula = | Var of string
 	       | And of formula * formula
 	       | Or of formula * formula
 	       | Imp of formula * formula
-	       | Xor of formula * formula
+	       (*| Xor of formula * formula*)
 	       | Not of formula
 
 let rec string_of_formula (f : formula) : string =
@@ -193,11 +193,11 @@ let rec string_of_formula (f : formula) : string =
   | And(f1,f2) -> "("^(string_of_formula f1)^"/\\"^(string_of_formula f2)^")"
   | Or(f1,f2) -> "("^(string_of_formula f1)^"\\/"^(string_of_formula f2)^")"
   | Imp(f1,f2) -> "("^(string_of_formula f1)^"=>"^(string_of_formula f2)^")"
-  | Xor(f1,f2) -> "("^(string_of_formula f1)^"+"^(string_of_formula f2)^")"
+(*  | Xor(f1,f2) -> "("^(string_of_formula f1)^"+"^(string_of_formula f2)^")"*)
   | Not(f1) -> "~"^(string_of_formula f1)
 
 (* nombre d'opérateurs différents *)
-let nb_op = 5
+let nb_op = 4
 
 let rec var_of_int (n : int) : string =
   let s = String.make 1 (char_of_int ((int_of_char 'a') + (n mod 26))) in
@@ -216,7 +216,7 @@ let rec gen_formula (nvar : int) (depth : int)  : formula =
        | 0 -> And(f1,f2)
        | 1 -> Or(f1,f2)
        | 2 -> Imp(f1,f2)
-       | 3 -> Xor(f1,f2)
+ (*      | 3 -> Xor(f1,f2) *)
        | _ -> Not(f1)
        
 (* Génère et affiche la formule dans le fichier (stdin si nom de fichier vide) *)
