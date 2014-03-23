@@ -10,7 +10,7 @@ reset
  set output "courbe1.pdf" # le nom du fichier qui est engendre
 
 set title "Comparaison des heuristiques du solveur SAT"
-set xlabel "Nombre de clauses"
+set xlabel "Nombre de variables"
 set ylabel "Temps d'execution"
 
 

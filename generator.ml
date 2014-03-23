@@ -5,6 +5,7 @@ let nclause = ref 0
 let sclause = ref 0
 let depth = ref 0
 let nedge = ref 0
+let pathologic = ref false
 let name_f = ref ""
 
 type mode_t = Clause_set | Formula | Graph | Unknown
@@ -124,6 +125,7 @@ struct
 	(* Pré-condition : size <= nb_var *)
 	let gen_clause (nb_var : int) (size : int) : clause =
 	  let c = init nb_var in
+	  if !pathologic then add ((if Random.bool() then 1 else -1)*nb_var) c ;
 	  let rec process (s : int) : unit =
 	    if s = 0 then ()
 	    else ( 
@@ -133,7 +135,7 @@ struct
 		 )
 		else process s 
 	    )
-	  in process size ; c
+	  in process (size-(if !pathologic then 1 else 0)) ; c
 end
 
 
@@ -297,6 +299,7 @@ let speclist = [
     ("-sclause", Arg.Int    (fun n -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; sclause := n)),  "the size of the clauses to generate (clause set generator).");
     ("-depth", Arg.Int    (fun n -> if !mode != Unknown && !mode != Formula then failwith "Contradictory options." else (mode := Formula ; depth := n)),  "the depth of the formula to generate (formula generator).");
     ("-nedge", Arg.Int    (fun n -> if !mode != Unknown && !mode != Graph then failwith "Contradictory options." else (mode := Graph ; nedge := n)),  "the number of edges to generate (graph generator).");
+    ("-pathologic", Arg.Unit    (fun () -> pathologic := true),  "Generation of pathologic case for dumb heuristic.");
     ("-o", Arg.String (fun s -> name_f := s), ": output file (stdout while be used if not specified).")
 ]
 
