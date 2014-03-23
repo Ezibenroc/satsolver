@@ -166,9 +166,31 @@ let gen_clause_set (nb_var : int) (nb : int) (size : int) : clause list =
 	 process2 (nb-(List.length l2)) (l2)
   in process2 nb []
 
+exception Overflow
+
+let among (k : int) (n : int) : int =
+	let tab = Array.make_matrix (n+1) (n+1) 1 in
+	for i=1 to n do
+		for j = 1 to i-1 do
+		  tab.(i).(j) <- tab.(i-1).(j-1) + tab.(i-1).(j) ;
+		  if tab.(i).(j) <= 0 then raise Overflow ; 
+		done ;
+	done ;
+	tab.(n).(k)
+
+(* Vérifie qu'on peut générer un tel ensemble de clauses.
+		Pour n variables, avec des clauses de taille k, on peut générer au plus (k parmi n)*2^k clauses *)
+let check_generation_feasibility (nb_var : int) (nb_clause : int) (size_clause : int) : bool =
+  try
+    let a = among size_clause nb_var in
+    let a = a*(int_of_float (2.**(float_of_int size_clause))) in
+    a=0 || nb_clause <= a
+  with | Overflow -> true | e -> raise e
+	
+
 (* Génère et affiche l'ensemble de clauses au format DIMACS dans le fichier (stdin si nom de fichier vide) *)
 let print_clause_set (nb_var : int) (nb_clause : int) (size_clause : int) (name_file : string) : unit =
-  if not(nb_var > 0 && nb_clause > 0 && size_clause > 0) 
+  if not(nb_var > 0 && nb_clause > 0 && size_clause > 0 && size_clause <= nb_var && check_generation_feasibility nb_var nb_clause size_clause) 
   then failwith "Incorrect number of variables and clauses, and size of clauses."
   else 
   let f = gen_clause_set nb_var nb_clause size_clause in
