@@ -1,5 +1,8 @@
+#include <string>
 #include <cstring>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <iostream>
 
 #include "structures/graph.h"
@@ -13,6 +16,11 @@ bool VERBOSE = false;
 bool WITH_WL = false;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
+std::string to_hex(int i) {
+    std::ostringstream oss;
+    oss << std::setw(6) << std::setfill('0') << std::hex << i;
+    return oss.str();
+}
 
 int main(int argc, char *argv[]) {
     bool using_stdin = true;
@@ -21,6 +29,10 @@ int main(int argc, char *argv[]) {
     graphsolver::GraphParser *parser;
     int nb_colors;
     graphsolver::Graph *graph;
+    int i;
+    std::set<int>* nodes;
+    int *colors, color;
+    srand((unsigned int) time(NULL));
     CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>(), "<color> [<filename>]");
     if (cli_parser.get_nb_parsed_args() == -1)
         return 1;
@@ -50,6 +62,22 @@ int main(int argc, char *argv[]) {
         std::cout << "graph G { n [label=\"No solution.\"] }" << std::endl;
         return 1;
     }
+    std::cout << "graph G {\n";
+    colors = (int*) malloc(sizeof(int)*nb_colors);
+    memset(colors, 0, sizeof(int)*nb_colors);
+    for (i=0; i<graph->get_nodes_count(); i++) {
+        color = colors[solution->colors[i]];
+        while (color <= 1) {
+            color = rand() % (256*256*256);
+        }
+        colors[solution->colors[i]] = color;
+        nodes = graph->get_lower_adjacent_nodes(i);
+        std::cout << "\t" << i << " [color = \"#" << to_hex(color) << "\"];\n";
+        for (auto j : *nodes)
+            std::cout << "\t\t" << i << " -- " << j << ";\n";
+    }
+    std::cout << "}" << std::endl;
+    free(colors);
 
     if (!using_stdin)
         delete input;

@@ -15,16 +15,38 @@ des options données à g++ (ligne 5 du fichier CMakeLists.txt).
 Exécution
 ---------
 
-La compilation engendre deux exécutables `resol` et `resol-wl`, qui prennent
-en paramètre un nom de fichier dans le format de FNC du DIMACS (celui
-utilisé par minisat, et détaillé dans l’énoncé du DM1), et affiche en sortie
-une solution, dans le format détaillé dans l’énoncé du DM1.
+La compilation engendre trois exécutables `resol`, `colorie`, et `tseitin`.
 
-Celui-ci peut également :
-* ne pas prendre de nom de fichier en paramètre ; l’entrée standard est
-  alors utilisée.
-* prendre l’option -verbose en paramètre, qui affiche des informations
-  pendant l’exécution de l’algorithme de DPLL.
+Ils peuvent tous prendre les paramètres suivants (qui doivent être avant
+les autres paramètres) :
+
+* -verbose pour activer le mode verbeux
+* -WL pour activer les litéraux surveillés
+* -rand, -moms, ou -dlis (mutuellement exclusifs) pour activer les heuristiques
+  du même nom
+
+`colorie` prend également un entier qui est le nombre de couleur maximal à
+utiliser.
+`tseitin` peut également prendre deux paramètres :
+* -print-interpretation qui indique comment le parseur a interprété la
+  formule (revient à afficher la même formule, mais avec des parenthèses
+  au lieu d’une priorité « implicite »
+* -print-sat qui affiche le problème SAT engendré par cette formule.
+
+Enfin, ils peuvent tous prendre un nom de fichier comme dernier paramètre,
+qui sert d’entrée (si le nom de fichier n’est pas donné, l’entrée standard
+est utilisée).
+
+Les fichiers en entrée de `resol` et `colorie` sont respectivement aux
+formats `cnf` et `edge` du DIMACS. Celui de `tseitin` est une formule
+telle que définite dans le cours.
+
+
+Remarque : vu que la sortie de `colorie` est le format d’entrée de `dot`,
+on peut utiliser cette commande pour afficher directement le graphe, avec
+la commande `display` d’ImageMagick (ou n’importe quel autre programme
+lisant du PNG sur son entrée standard) :
+ ./colorie 2 example.col | dot -Tpng | display
 
 Tests
 -----
