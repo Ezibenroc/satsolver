@@ -272,7 +272,7 @@ int Formula::choose_literal_dumb() const {
 }
 
 
-bool to_delete(std::shared_ptr<Clause> c, std::set<int> &literals_to_delete) {
+bool to_delete(std::shared_ptr<Clause> c, std::unordered_set<int> &literals_to_delete) {
     for(auto x : literals_to_delete) {
         if(c->contains_literal(x))
             return true ;
@@ -282,7 +282,7 @@ bool to_delete(std::shared_ptr<Clause> c, std::set<int> &literals_to_delete) {
 
 void Formula::clean() {
     // Affectation des monomes
-    std::set<int> literals_to_delete = std::set<int>() ;
+    std::unordered_set<int> literals_to_delete = std::unordered_set<int>() ;
     int literal ;
     do {
         for(auto c : this->clauses) {
@@ -301,13 +301,14 @@ void Formula::clean() {
             }
         }
     } while(literal != 0) ;
-    // Suppression des clauses contenant d'autres clauses ou des littéraux vrais
-    int n = 0 ;
+    // Suppression des clauses
+ //   int n = 0 ;
     std::vector<std::shared_ptr<Clause>> old_clauses(this->clauses) ;
     this->clauses.clear() ;
     this->clauses.reserve(old_clauses.size()) ;
-    unsigned j ;
+//    unsigned j ;
     for(unsigned i = 0 ; i < old_clauses.size() ; i++) {
+/*	Les lignes suivantes suppriment les clauses contenant d'autres clauses : cela prend beaucoup trop de temps
         j = 0 ;
         if(!to_delete(old_clauses[i],literals_to_delete)) {
               while(j < old_clauses.size() && (old_clauses[j] == NULL || j == i
@@ -322,7 +323,11 @@ void Formula::clean() {
         else {    // la clause i ne contient aucune autre clauses
             this->clauses.push_back(old_clauses[i]) ;
         }
+*/
+		if(!to_delete(old_clauses[i],literals_to_delete))
+			this->clauses.push_back(old_clauses[i]) ;
     }
+
 }
 
 
