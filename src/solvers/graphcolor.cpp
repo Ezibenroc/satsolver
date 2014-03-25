@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <exception>
 
 #include "structures/extended_formula.h"
 #include "solvers/dpll.h"
@@ -43,7 +44,7 @@ std::shared_ptr<graphsolver::ColorAffectation> graphsolver::ColorAffectation::fr
                 if (affectation->is_true(variable_id))
                     colors[i]++;
             }
-            catch (std::out_of_range) { // This variable does not occur in the formula
+            catch (std::out_of_range &e) { // This variable does not occur in the formula
                 // We could also increment color[i]++, it does not matter.
             }
         }
