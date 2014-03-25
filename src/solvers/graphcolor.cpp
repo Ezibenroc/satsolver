@@ -38,9 +38,14 @@ std::shared_ptr<graphsolver::ColorAffectation> graphsolver::ColorAffectation::fr
         colors[i] = 0;
         for (j=nb_bits-1; j>=0; j--) {
             colors[i] <<= 1;
-            variable_id = name_to_variable->at(get_variable_of_node_bit(i, j));
-            if (affectation->is_true(variable_id))
-                colors[i]++;
+            try {
+                variable_id = name_to_variable->at(get_variable_of_node_bit(i, j));
+                if (affectation->is_true(variable_id))
+                    colors[i]++;
+            }
+            catch (std::out_of_range) { // This variable does not occur in the formula
+                // We could also increment color[i]++, it does not matter.
+            }
         }
     }
     return std::make_shared<graphsolver::ColorAffectation>(nb_nodes, colors);
