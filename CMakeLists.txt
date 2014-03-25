@@ -26,8 +26,8 @@ add_library(AbstractParser src/parsers/abstract.cpp)
 add_library(SatParser src/parsers/sat.cpp)
 target_link_libraries(SatParser AbstractParser Clause Formula)
 
-file(WRITE structures.cpp "")
-add_library(Structures structures.cpp)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp "")
+add_library(Structures ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
 target_link_libraries(Structures Formula Clause Affectation Graph ExtendedFormula)
 
 
@@ -50,8 +50,8 @@ target_link_libraries(ExtendedFormulaParser ${FLEX_LIBRARIES} ${BISON_LIBRARIES}
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/extended_formula.l.cpp PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-unused-function")
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/extended_formula.y.cpp PROPERTIES COMPILE_FLAGS -Wno-conversion)
 
-file(WRITE parsers.cpp "")
-add_library(Parsers parsers.cpp)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp "")
+add_library(Parsers ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp)
 target_link_libraries(Parsers SatParser GraphParser ExtendedFormulaParser)
 
 
@@ -62,8 +62,8 @@ target_link_libraries(DPLL Affectation Clause Formula)
 add_library(GraphColorSolver src/solvers/graphcolor.cpp)
 target_link_libraries(GraphColorSolver Graph ExtendedFormula Formula DPLL)
 
-file(WRITE solvers.cpp "")
-add_library(Solvers solvers.cpp)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp "")
+add_library(Solvers ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp)
 target_link_libraries(Solvers DPLL GraphColorSolver)
 
 
