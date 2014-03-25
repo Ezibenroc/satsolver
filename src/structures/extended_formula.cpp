@@ -34,6 +34,9 @@ EF::EF(EF::Type type, SPEF f1, SPEF f2) : type (type), f1(f1), f2(f2), id(++this
     assert(type != EF::FALSE);
     assert(type != EF::LITERAL);
     assert(type != EF::NOT);
+    if (type == EF::IMPLIES) {
+        this->translation = SPEF(new ExtendedFormula(EF::OR, SPEF(new EF(EF::NOT, this->f1)), this->f2));
+    }
 }
 
 std::string EF::make_literal() const {
@@ -58,7 +61,7 @@ std::vector<std::vector<std::string>*>* EF::reduce_all() const {
 }
 void EF::reduce(std::vector<const EF*> *formulas, std::vector<std::vector<std::string>*> *clauses) const {
     std::vector<std::string> *clause;
-    EF *f;
+    const EF *f;
 
     if (type == EF::LITERAL || type == EF::TRUE || type == EF::FALSE) {
     }
@@ -152,7 +155,7 @@ void EF::reduce(std::vector<const EF*> *formulas, std::vector<std::vector<std::s
             clauses->push_back(clause); // A v B
             break;
         case IMPLIES:
-            f = new ExtendedFormula(EF::OR, SPEF(new EF(EF::NOT, this->f1)), this->f2);
+            f = &*this->translation;
             formulas->push_back(f);
             clause = new std::vector<std::string>{
                     f->make_literal(),

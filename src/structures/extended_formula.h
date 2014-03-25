@@ -24,6 +24,7 @@ class ExtendedFormula {
 
         std::shared_ptr<ExtendedFormula> f1;
         std::shared_ptr<ExtendedFormula> f2;
+        std::shared_ptr<const ExtendedFormula> translation;
         std::string literal;
         int id;
 
