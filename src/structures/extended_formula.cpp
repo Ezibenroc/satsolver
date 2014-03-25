@@ -47,7 +47,6 @@ std::string EF::make_literal() const {
 }
 
 std::vector<std::vector<std::string>*>* EF::reduce_all() const {
-    std::unordered_set<int> handled;
     std::vector<const EF *> *formulas = new std::vector<const EF *>();
     std::vector<std::vector<std::string>*> *clauses = new std::vector<std::vector<std::string>*>();
     const EF (*formula);
@@ -55,8 +54,6 @@ std::vector<std::vector<std::string>*>* EF::reduce_all() const {
     while (formulas->size()) {
         formula = formulas->at(formulas->size()-1);
         formulas->pop_back();
-        if (handled.find(formula->id) != handled.end())
-            continue; // This formula has already been handled. Why?
         formula->reduce(formulas, clauses);
     }
     delete formulas;
@@ -70,6 +67,8 @@ void EF::reduce(std::vector<const EF*> *formulas, std::vector<std::vector<std::s
     }
     else if (type == EF::NOT) {
         formulas->push_back(&*this->f1);
+    }
+    else if (type == EF::IMPLIES) {
     }
     else {
         formulas->push_back(&*this->f1);
