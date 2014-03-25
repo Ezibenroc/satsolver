@@ -13,7 +13,7 @@ EXEC="./resol"						# executable
 # preparation du fichier comparaison.dat: on l'enleve s'il existe, 
 rm -f comparaison.dat
 rm -f $DIRECTORY/output.txt
-echo "Clause_number DUMB RAND MOMS DLIS MINISAT" >> comparaison.dat
+echo "Variable_number DUMB RAND MOMS DLIS" >> comparaison.dat
 
 for nb in `seq 4 50`; do
 	TIME_DUMB=0

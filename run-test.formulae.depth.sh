@@ -9,33 +9,51 @@ fi
 NB_TEST=$1								# number of tests to perform for each configuration
 DIRECTORY=/tmp						# working directory where files will be saved
 EXEC="./tseitin"					# executable
-NB_VAR=10
+NVAR=5
 
 # preparation du fichier comparaison.dat: on l'enleve s'il existe, 
 rm -f comparaison.dat
 rm -f $DIRECTORY/output.txt
-echo "Depth Time" >> comparaison.dat
+echo "Depth DUMB RAND MOMS DLIS" >> comparaison.dat
 
 for depth in `seq 1 7`; do
-	TIME=0
-
-  echo "Computing test for" $depth "depth."
+	TIME_DUMB=0
+	TIME_RAND=0
+	TIME_MOMS=0
+	TIME_DLIS=0
+  echo "Computing test for " $depth " depth."
 
 	# On fait plusieurs tests par taille
+
 	for test in `seq 1 $NB_TEST` ; do
 		# Génération de la formule dans le fichier $DIRECTORY/formula.cnf
-		./generator -nvar $NB_VAR -depth $depth -o $DIRECTORY/formula.cnf
+		./generator -nvar $NVAR -depth $depth -o $DIRECTORY/formula.cnf
 
-		# Résolution de la formule 
+		# Résolution de la formule (en vérifiant la correction de la solution)
 	
 		# Heuristique DUMB
 		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
 		TMP=`cat $DIRECTORY/result.txt`
-		TIME=$(echo "scale=3; $TIME + $TMP" | bc)
+		TIME_DUMB=$(echo "scale=3; $TIME_DUMB + $TMP" | bc)
+		# Heuristique RAND
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -rand $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		TMP=`cat $DIRECTORY/result.txt`
+		TIME_RAND=$(echo "scale=3; $TIME_RAND + $TMP" | bc)
+		# Heuristique MOMS
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -moms $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		TMP=`cat $DIRECTORY/result.txt`
+		TIME_MOMS=$(echo "scale=3; $TIME_MOMS + $TMP" | bc)
+		# Heuristique DLIS
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -dlis $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		TMP=`cat $DIRECTORY/result.txt`
+		TIME_DLIS=$(echo "scale=3; $TIME_DLIS + $TMP" | bc)
 		
 	done
-	TIME=$(echo "scale=3; $TIME / $NB_TEST" | bc)
-	echo $depth $TIME >> ./comparaison.dat 
+	TIME_DUMB=$(echo "scale=3; $TIME_DUMB / $NB_TEST" | bc)
+	TIME_RAND=$(echo "scale=3; $TIME_RAND / $NB_TEST" | bc)	
+	TIME_MOMS=$(echo "scale=3; $TIME_MOMS / $NB_TEST" | bc)	
+	TIME_DLIS=$(echo "scale=3; $TIME_DLIS / $NB_TEST" | bc)	
+	echo $depth $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> ./comparaison.dat 
 # fin de la boucle
 done
 

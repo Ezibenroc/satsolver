@@ -6,6 +6,7 @@
 #include <cstring>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include "config.h"
 
@@ -15,6 +16,7 @@ using namespace satsolver;
 int depth_stack = 0 ; // used only for verbosity mode
 
 void print_space() {
+		std::cout << "TIME : " << ((float) clock())/CLOCKS_PER_SEC << "\t" ;
     for(int i = 0 ; i < depth_stack ; i++)
         std::cout << "\t" ;
 }
