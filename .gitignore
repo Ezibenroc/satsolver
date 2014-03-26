@@ -9,3 +9,7 @@ testrunner
 Makefile
 CMakeFiles
 CMakeCache.txt
+CMakeLists.txt.user
+*.cmi
+*.cmo
+*.cmx

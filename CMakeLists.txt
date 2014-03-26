@@ -1,5 +1,11 @@
+###########################################
+# Software versions and compiler options
+###########################################
+
 cmake_minimum_required (VERSION 2.6)
 project(satsolver)
+set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 
 find_package(BISON)
 find_package(FLEX)
@@ -7,11 +13,17 @@ find_package(FLEX)
 add_definitions(-std=c++0x)
 add_definitions(-g -Wall -Wextra -pedantic  -Wcast-qual -Wcast-align -Wconversion -Wdouble-promotion -Wfloat-equal -Wpointer-arith -fmax-errors=2)
 
-set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
-
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+
+
+###########################################
+# Main source code
+###########################################
+
+
+# Structures
+############
 
 add_library(Affectation src/structures/affectation.cpp)
 add_library(Clause src/structures/clause.cpp)
@@ -30,6 +42,9 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp "")
 add_library(Structures ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
 target_link_libraries(Structures Formula Clause Affectation Graph ExtendedFormula)
 
+
+# Parsers
+#########
 
 add_library(GraphParser src/parsers/graph.cpp)
 target_link_libraries(GraphParser AbstractParser Graph)
@@ -55,6 +70,8 @@ add_library(Parsers ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp)
 target_link_libraries(Parsers SatParser GraphParser ExtendedFormulaParser)
 
 
+# Solvers
+#########
 
 add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Affectation Clause Formula)
@@ -75,6 +92,34 @@ target_link_libraries(colorie GraphParser CommandLineParser GraphColorSolver)
 
 add_executable(tseitin src/entry_points/tseitin.cpp)
 target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL ExtendedFormulaParser)
+
+
+
+###########################################
+# Benchmarks
+###########################################
+
+file(GLOB HelperFiles ${CMAKE_SOURCE_DIR}/benchmarks/* ${CMAKE_SOURCE_DIR}/check_result.py)
+
+add_custom_target(Helpers)
+foreach(HelperFile ${HelperFiles})
+    add_custom_command(TARGET Helpers PRE_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E
+                     copy ${HelperFile} ${CMAKE_CURRENT_BINARY_DIR})
+endforeach()
+
+#add_ocaml_executable(generator SOURCES generator.ml)
+
+add_custom_target(generator
+    COMMAND ocamlopt ${CMAKE_SOURCE_DIR}/generator.ml -o ${CMAKE_CURRENT_BINARY_DIR}/generator
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    SOURCES ${CMAKE_SOURCE_DIR}/generator.ml)
+
+add_custom_target(Benchmarks DEPENDS Helpers resol colorie tseitin)
+
+###########################################
+# Unit tests
+###########################################
 
 find_package(CppUnit)
 if (CPPUNIT_FOUND)
