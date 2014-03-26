@@ -110,12 +110,13 @@ endforeach()
 
 #add_ocaml_executable(generator SOURCES generator.ml)
 
-add_custom_target(generator
+add_custom_target(generator ALL
     COMMAND ocamlopt ${CMAKE_SOURCE_DIR}/generator.ml -o ${CMAKE_CURRENT_BINARY_DIR}/generator
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     SOURCES ${CMAKE_SOURCE_DIR}/generator.ml)
 
-add_custom_target(Benchmarks DEPENDS Helpers resol colorie tseitin)
+add_custom_target(Benchmarks ALL
+                  DEPENDS Helpers resol colorie tseitin generator)
 
 ###########################################
 # Unit tests
