@@ -16,7 +16,7 @@ rm -f comparaison.dat
 rm -f $DIRECTORY/output.txt
 echo "Depth DUMB RAND MOMS DLIS" >> comparaison.dat
 
-for depth in `seq 1 7`; do
+for depth in `seq 1 12`; do
 	TIME_DUMB=0
 	TIME_RAND=0
 	TIME_MOMS=0
@@ -26,10 +26,11 @@ for depth in `seq 1 7`; do
 	# On fait plusieurs tests par taille
 
 	for test in `seq 1 $NB_TEST` ; do
+		echo -e "\t\tTest $test"
 		# Génération de la formule dans le fichier $DIRECTORY/formula.cnf
 		./generator -nvar $NVAR -depth $depth -o $DIRECTORY/formula.cnf
 
-		# Résolution de la formule (en vérifiant la correction de la solution)
+		# Résolution de la formule
 	
 		# Heuristique DUMB
 		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
