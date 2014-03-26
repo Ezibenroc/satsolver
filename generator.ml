@@ -7,6 +7,7 @@ let depth = ref 0
 let nedge = ref 0
 let pathologic = ref false
 let name_f = ref ""
+let non_constant = ref false 
 
 type mode_t = Clause_set | Formula | Graph | Unknown
 let mode = ref Unknown
@@ -160,7 +161,7 @@ let rec clean_clause_set (f : clause list) : clause list =
 let gen_clause_set (nb_var : int) (nb : int) (size : int) : clause list =
   let rec process1 (n : int) : clause list =
     if n = 0 then []
-    else (gen_clause nb_var size)::(process1 (n-1))
+    else (gen_clause nb_var (if !non_constant then ((Random.int size)+1) else size))::(process1 (n-1))
   in 
   let rec process2 (n : int) (l : clause list) : clause list =
     if n = 0 then l
@@ -300,6 +301,7 @@ let speclist = [
     ("-depth", Arg.Int    (fun n -> if !mode != Unknown && !mode != Formula then failwith "Contradictory options." else (mode := Formula ; depth := n)),  "the depth of the formula to generate (formula generator).");
     ("-nedge", Arg.Int    (fun n -> if !mode != Unknown && !mode != Graph then failwith "Contradictory options." else (mode := Graph ; nedge := n)),  "the number of edges to generate (graph generator).");
     ("-pathologic", Arg.Unit    (fun () -> pathologic := true),  "Generation of pathologic case for dumb heuristic.");
+    ("-non_constant_sclause", Arg.Unit    (fun () -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; non_constant := true)),  "Generation of variable length clauses.");
     ("-o", Arg.String (fun s -> name_f := s), ": output file (stdout while be used if not specified).")
 ]
 
