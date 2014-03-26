@@ -25,6 +25,7 @@ for nb in `seq 4 50`; do
 
 	# On fait plusieurs tests par taille
 	for test in `seq 1 $NB_TEST` ; do
+		echo -e "\t\tTest $test"
 		# Génération de la formule dans le fichier $DIRECTORY/formula.cnf
 		A=`expr $nb \* 4`
 		./generator -nvar $nb -nclause $A -sclause 3 -o $DIRECTORY/formula.cnf -pathologic
