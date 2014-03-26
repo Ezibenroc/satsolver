@@ -9,13 +9,13 @@ fi
 NB_TEST=$1								# number of tests to perform for each configuration
 DIRECTORY=/tmp						# working directory where files will be saved
 EXEC="./colorie 4"					# executable
+OUTPUT=graph.nvar.dat
 
-# preparation du fichier comparaison.dat: on l'enleve s'il existe, 
-rm -f comparaison.dat
+rm -f $OUTPUT
 rm -f $DIRECTORY/output.txt
-echo "nb_nodes DUMB RAND MOMS DLIS" >> comparaison.dat
+echo "nb_nodes DUMB RAND MOMS DLIS" >> $OUTPUT
 
-for nvar in `seq 5 100`; do
+for nvar in `seq 5 20`; do
 	TIME_DUMB=0
 	TIME_RAND=0
 	TIME_MOMS=0
@@ -73,7 +73,7 @@ for nvar in `seq 5 100`; do
 	TIME_RAND=$(echo "scale=3; $TIME_RAND / $NB_TEST" | bc)	
 	TIME_MOMS=$(echo "scale=3; $TIME_MOMS / $NB_TEST" | bc)	
 	TIME_DLIS=$(echo "scale=3; $TIME_DLIS / $NB_TEST" | bc)	
-	echo $nvar $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> ./comparaison.dat 
+	echo $nvar $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> $OUTPUT
 # fin de la boucle
 done
 

@@ -10,11 +10,11 @@ NB_TEST=$1								# number of tests to perform for each configuration
 DIRECTORY=/tmp						# working directory where files will be saved
 EXEC="./tseitin"					# executable
 NVAR=5
+OUTPUT=formulae.depth.dat
 
-# preparation du fichier comparaison.dat: on l'enleve s'il existe, 
-rm -f comparaison.dat
+rm -f $OUTPUT
 rm -f $DIRECTORY/output.txt
-echo "Depth DUMB RAND MOMS DLIS" >> comparaison.dat
+echo "Depth DUMB RAND MOMS DLIS" >> $OUTPUT
 
 for depth in `seq 1 12`; do
 	TIME_DUMB=0
@@ -54,7 +54,7 @@ for depth in `seq 1 12`; do
 	TIME_RAND=$(echo "scale=3; $TIME_RAND / $NB_TEST" | bc)	
 	TIME_MOMS=$(echo "scale=3; $TIME_MOMS / $NB_TEST" | bc)	
 	TIME_DLIS=$(echo "scale=3; $TIME_DLIS / $NB_TEST" | bc)	
-	echo $depth $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> ./comparaison.dat 
+	echo $depth $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> $OUTPUT
 # fin de la boucle
 done
 

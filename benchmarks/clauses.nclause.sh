@@ -10,11 +10,11 @@ NB_TEST=$1								# number of tests to perform for each configuration
 DIRECTORY=/tmp						# working directory where files will be saved
 EXEC="./resol"						# executable
 NVAR=30
+OUTPUT=clauses.nclause.dat
 
-# preparation du fichier comparaison.dat: on l'enleve s'il existe, 
-rm -f comparaison.dat
+rm -f $OUTPUT
 rm -f $DIRECTORY/output.txt
-echo "Clause_number DUMB RAND MOMS DLIS" >> comparaison.dat
+echo "Clause_number DUMB RAND MOMS DLIS" >> $OUTPUT
 
 for nb in `seq 1 40`; do
 	TIME_DUMB=0
@@ -55,7 +55,7 @@ for nb in `seq 1 40`; do
 	TIME_RAND=$(echo "scale=3; $TIME_RAND / $NB_TEST" | bc)	
 	TIME_MOMS=$(echo "scale=3; $TIME_MOMS / $NB_TEST" | bc)	
 	TIME_DLIS=$(echo "scale=3; $TIME_DLIS / $NB_TEST" | bc)	
-	echo $A $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> ./comparaison.dat 
+	echo $A $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> $OUTPUT
 # fin de la boucle
 done
 

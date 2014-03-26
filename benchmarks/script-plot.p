@@ -7,10 +7,8 @@ reset
 ### decommenter les 2 lignes ci-dessous pour engendrer un fichier pdf
 ### plutot qu`un dessin a l`ecran
  set term pdfcairo
- set output "courbe1.pdf" # le nom du fichier qui est engendre
+ set output "courbes.pdf" # le nom du fichier qui est engendre
 
-set title "Comparaison des heuristiques du solveur SAT"
-set xlabel "Nombre de variables"
 set ylabel "Temps d'execution"
 
 
@@ -22,7 +20,16 @@ set pointsize 0.5   # la taille des points
 
 # on trace deux courbes: avec les colonnes 1 et 2, avec les colonnes 1 et 3
 # a chaque fois, le nom de la courbe est lu en tete de colonne
-plot "comparaison.dat" using 1:2 title columnheader(2), \
-     "comparaison.dat" using 1:3 title columnheader(3), \
-     "comparaison.dat" using 1:4 title columnheader(4), \
-     "comparaison.dat" using 1:5 title columnheader(5)
+set title "Génération de clauses"
+set xlabel "Nombre de clauses"
+plot for [IDX=2:5] "clauses.nclause.dat" using 1:IDX title columnheader(IDX)
+set xlabel "Nombre de variables"
+plot for [IDX=2:5] "clauses.nvar.dat" using 1:IDX title columnheader(IDX)
+
+set title "Génération de formules"
+set xlabel "Profondeur"
+plot for [IDX=2:5] "formulae.depth.dat" using 1:IDX title columnheader(IDX)
+
+set title "Génération de graphe"
+set xlabel "Nombre de nœuds"
+plot for [IDX=2:5] "graph.nvar.dat" using 1:IDX title columnheader(IDX)
