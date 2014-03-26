@@ -63,8 +63,8 @@ class Clause {
        void init_WL() ;
 
        // Renvoie le premier ou le second watched literal
-       int fst_WL() ;
-       int snd_WL() ;
+       int fst_WL() const ;
+       int snd_WL() const;
 
        // Test si l'entier donné est un watched literal
        bool is_WL(int x) ;

@@ -389,19 +389,20 @@ int Formula::choose_literal_moms() const {
 int Formula::choose_literal_dlis() const {
 	bool there_is_literals = false ;
 	std::vector<int> v = std::vector<int>() ;
-	float *count = (float*) malloc((2*this->nb_variables+1)*sizeof(float)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
-	float point ;
+	double *count = (double*) malloc((2*this->nb_variables+1)*sizeof(double)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
+	double point ;
 	memset(count,0,(2*this->nb_variables+1)*sizeof(float)) ;
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
 		v.clear() ;
 		this->clauses[i]->add_literals_to_vector(v) ;
 		there_is_literals = there_is_literals || v.size() > 0 ;
-		point = (float) pow(2,-(float)v.size()) ;
-		for(unsigned j = 0 ; j < v.size() ; j ++)
+		point = (double) pow(2,-(double)v.size()) ;
+		for(unsigned j = 0 ; j < v.size() ; j ++) {
 			count[v[j]+this->nb_variables] += point ;
+		}
 	}
 	// Recherche du maximum dans count
-	float max_occurence ;
+	double max_occurence ;
 	int max_literal ;
 	max_occurence = 0 ;  max_literal = 0 ;
 	for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) {
