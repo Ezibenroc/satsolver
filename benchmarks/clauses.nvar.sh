@@ -13,13 +13,18 @@ OUTPUT=clauses.nvar.dat
 
 rm -f $OUTPUT
 rm -f $DIRECTORY/output.txt
-echo "Variable_number DUMB RAND MOMS DLIS" >> $OUTPUT
+echo "Variable_number DUMB RAND MOMS DLIS DUMB_WL RAND_WL MOMS_WL DLIS_WL" >> $OUTPUT
 
 for nb in `seq 4 50`; do
 	TIME_DUMB=0
 	TIME_RAND=0
 	TIME_MOMS=0
 	TIME_DLIS=0
+	
+	TIME_DUMB_WL=0
+	TIME_RAND_WL=0
+	TIME_MOMS_WL=0
+	TIME_DLIS_WL=0
 
   echo "Computing test for " $nb " variables."
 
@@ -49,12 +54,36 @@ for nb in `seq 4 50`; do
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_DLIS=$(echo "scale=3; $TIME_DLIS + $TMP" | bc)
 		
+		# La même chose, avec les watched literals
+		
+				# Heuristique DUMB
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL $DIRECTORY/formula.cnf | ./check_result.py $DIRECTORY/formula.cnf >> $DIRECTORY/output.txt
+		TMP=`cat $DIRECTORY/result.txt`
+		TIME_DUMB_WL=$(echo "scale=3; $TIME_DUMB_WL + $TMP" | bc)
+		# Heuristique RAND
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -rand $DIRECTORY/formula.cnf | ./check_result.py $DIRECTORY/formula.cnf >> $DIRECTORY/output.txt
+		TMP=`cat $DIRECTORY/result.txt`
+		TIME_RAND_WL=$(echo "scale=3; $TIME_RAND_WL + $TMP" | bc)
+		# Heuristique MOMS
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -moms $DIRECTORY/formula.cnf | ./check_result.py $DIRECTORY/formula.cnf >> $DIRECTORY/output.txt
+		TMP=`cat $DIRECTORY/result.txt`
+		TIME_MOMS_WL=$(echo "scale=3; $TIME_MOMS_WL + $TMP" | bc)
+		# Heuristique DLIS
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -dlis $DIRECTORY/formula.cnf | ./check_result.py $DIRECTORY/formula.cnf >> $DIRECTORY/output.txt
+		TMP=`cat $DIRECTORY/result.txt`
+		TIME_DLIS_WL=$(echo "scale=3; $TIME_DLIS_WL + $TMP" | bc)
+		
 	done
 	TIME_DUMB=$(echo "scale=3; $TIME_DUMB / $NB_TEST" | bc)
 	TIME_RAND=$(echo "scale=3; $TIME_RAND / $NB_TEST" | bc)	
 	TIME_MOMS=$(echo "scale=3; $TIME_MOMS / $NB_TEST" | bc)	
 	TIME_DLIS=$(echo "scale=3; $TIME_DLIS / $NB_TEST" | bc)	
-	echo $nb $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS >> $OUTPUT
+	
+	TIME_DUMB_WL=$(echo "scale=3; $TIME_DUMB_WL / $NB_TEST" | bc)
+	TIME_RAND_WL=$(echo "scale=3; $TIME_RAND_WL / $NB_TEST" | bc)	
+	TIME_MOMS_WL=$(echo "scale=3; $TIME_MOMS_WL / $NB_TEST" | bc)	
+	TIME_DLIS_WL=$(echo "scale=3; $TIME_DLIS_WL / $NB_TEST" | bc)	
+	echo $nb $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS $TIME_DUMB_WL $TIME_RAND_WL $TIME_MOMS_WL $TIME_DLIS_WL >> $OUTPUT
 # fin de la boucle
 done
 
