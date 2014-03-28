@@ -27,7 +27,7 @@ for nb in `seq 4 50`; do
 	for test in `seq 1 $NB_TEST` ; do
 		echo -e "\t\tTest $test"
 		# Génération de la formule dans le fichier $DIRECTORY/formula.cnf
-		A=`expr $nb \* 4`
+	A=$(echo "scale=0; $nb * 4.26 / 1" | bc) # on divise par 1 afin que bc fasse l'arrondi
 		./generator -nvar $nb -nclause $A -sclause 3 -o $DIRECTORY/formula.cnf -pathologic
 
 		# Résolution de la formule (en vérifiant la correction de la solution)
