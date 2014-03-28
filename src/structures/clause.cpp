@@ -216,14 +216,6 @@ int Clause::set_false(int x) {
     return this->set_true(-x) ;
 }
 
-bool Clause::is_true() {
-    for(auto l : this->literals) {
-        if(this->aff->is_true(l))
-            return true ;
-    }
-    return false ;
-}
-
 int Clause::monome_begin() {
     if(this->literals.size() == 1)
         return *(this->literals.begin()) ;

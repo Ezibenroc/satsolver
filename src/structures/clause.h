@@ -77,8 +77,6 @@ class Clause {
        int set_true(int x) ;
        int set_false(int x) ;
 
-       bool is_true() ;
-
        // Si la clause est un monome {x}, renvoie x (appelé seulement dans clean)
        int monome_begin() ;
 
