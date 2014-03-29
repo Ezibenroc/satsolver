@@ -24,6 +24,9 @@ set title "Génération de clauses"
 #set xlabel "Nombre de clauses"
 #plot for [IDX=2:5] "clauses.nclause.dat" using 1:IDX title columnheader(IDX)
 set xlabel "Nombre de variables"
+#plot for [IDX=3:9] "clauses.nvar.dat" using 1:IDX title columnheader(IDX)
+set logscale y
+#plot for [IDX=3:5] "clauses.nvar.dat" using 1:IDX title columnheader(IDX),for [IDX=7:9] "clauses.nvar.dat" using 1:IDX title columnheader(IDX)
 plot for [IDX=2:9] "clauses.nvar.dat" using 1:IDX title columnheader(IDX)
 
 #set title "Génération de formules"
