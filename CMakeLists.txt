@@ -10,7 +10,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 find_package(BISON)
 find_package(FLEX)
 
-add_definitions(-std=c++0x)
+add_definitions(-std=c++0x -O2)
 add_definitions(-g -Wall -Wextra -pedantic  -Wcast-qual -Wcast-align -Wconversion -Wdouble-promotion -Wfloat-equal -Wpointer-arith -fmax-errors=2)
 
 include_directories ("${PROJECT_SOURCE_DIR}")
@@ -41,6 +41,7 @@ target_link_libraries(SatParser AbstractParser Clause Formula)
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp "")
 add_library(Structures ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
 target_link_libraries(Structures Formula Clause Affectation Graph ExtendedFormula)
+set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
 
 
 # Parsers
@@ -68,6 +69,7 @@ set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/extended_formula.y.cpp P
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp "")
 add_library(Parsers ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp)
 target_link_libraries(Parsers SatParser GraphParser ExtendedFormulaParser)
+set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp)
 
 
 # Solvers
@@ -82,6 +84,7 @@ target_link_libraries(GraphColorSolver Graph ExtendedFormula Formula DPLL)
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp "")
 add_library(Solvers ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp)
 target_link_libraries(Solvers DPLL GraphColorSolver)
+set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp)
 
 
 add_executable(resol src/entry_points/resol.cpp)
@@ -101,19 +104,17 @@ target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL Ext
 
 file(GLOB HelperFiles ${CMAKE_SOURCE_DIR}/benchmarks/* ${CMAKE_SOURCE_DIR}/check_result.py)
 
-add_custom_target(Helpers)
+add_custom_target(Helpers SOURCES ${HelperFile})
 foreach(HelperFile ${HelperFiles})
     add_custom_command(TARGET Helpers PRE_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E
-                     copy ${HelperFile} ${CMAKE_CURRENT_BINARY_DIR})
+                       COMMAND ${CMAKE_COMMAND} -E copy ${HelperFile} ${CMAKE_CURRENT_BINARY_DIR})
 endforeach()
-
-#add_ocaml_executable(generator SOURCES generator.ml)
 
 add_custom_target(generator ALL
     COMMAND ocamlopt ${CMAKE_SOURCE_DIR}/generator.ml -o ${CMAKE_CURRENT_BINARY_DIR}/generator
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     SOURCES ${CMAKE_SOURCE_DIR}/generator.ml)
+set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generator)
 
 add_custom_target(Benchmarks ALL
                   DEPENDS Helpers resol colorie tseitin generator)
