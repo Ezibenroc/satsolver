@@ -48,6 +48,7 @@ la commande `display` d’ImageMagick (ou n’importe quel autre programme
 lisant du PNG sur son entrée standard) :
  ./colorie 2 example.col | dot -Tpng | display
 
+
 Tests
 -----
 
@@ -77,16 +78,16 @@ de s’affranchir complètement de l’implémentation des structures
 de données.
 
 Dans le but d’éviter la duplication de code, chaque exécutable
-engendré (excepté testrunner) correspond à un des brefs fichiers
-de src/entry_points/, qui ne fait qu’utiliser le code écrit dans
-src/solver_main.cpp.
+engendré (excepté testrunner) correspond à un des fichiers
+de src/entry_points/.
 
-Le format imposé étant très simple, il peut être analysé par un simple
-automate fini, implémenté dans src/parser.cpp.
-Parser::parse appelle Parser::transition (qui lit quelques caractères
-du fichier donné en entrée au parseur puis change l’état de l’automate
-en fonction de ce qui a été lu) jusqu’à ce que l’état de l’automate
-devienne END_OF_FILE (qui est donc l’état final).
+Les formats imposés pour les fichiers CNF et EDGE étant très simples,
+ils peuvent être analysés par un simple automate fini,
+implémenté dans src/parsers/{abstract,sat,graph}.cpp.
+
+Le format pour les formules étant plus complexe, il faut au moins un
+automate à pile pour le reconnaitre, ce qui est fait en utilisant
+Flex et Bison, dans src/parsers/extended_formula.*.
 
 
 Structures de données et choix d’implémentation
@@ -109,21 +110,18 @@ Structures de données et choix d’implémentation
       engendrées lors d'une affectation (tous les littéraux de cet ensemble
       doivent être affectés à vrai, et si x et -x sont présents alors
       il y a un conflit).
-
-Répartition du travail
-======================
-
-Tom :
-* Implémentation des structures
-* Ajout des littéraux surveillés à l’algorithme de DPLL
-
-Valentin :
-* Implémentation du parseur
-* Implémentation de l’algorithme de DPLL (sans les littéraux surveillés)
+* Formules étendues :
+    * Arbre (évidemment)
+    * Éventuellement une « traduction » en un sous-langage ne contenant
+      par de =>, si un nœud est étiqueté par =>. (Pour éviter de la
+      recalculer plusieurs fois si on en a besoin)
 
 
-Comparaison des performance avec et sans les littéraux surveillés
-=================================================================
+Comparaison des performances
+============================
+
+Avec et sans litéraux surveillés ; sans les heuristiques
+--------------------------------------------------------
 
 Le gain des littéraux surveillés est négligeable (voire même légèrement
 négatif) sur des instances de 3-SAT (voir les fichiers examples/ex{1,5}-*.cnf)
@@ -131,3 +129,25 @@ négatif) sur des instances de 3-SAT (voir les fichiers examples/ex{1,5}-*.cnf)
 En revanche, un gain de temps conséquent peut être observé sur de
 plus grandes instances, par exemple examples/ex6-unsat.cnf (31s au lieu de
 42s)
+
+
+Heuristiques
+------------
+
+[[[[ À REMPLIR ]]]]
+
+
+Répartition du travail
+======================
+
+Tom :
+* Structures du rendu 1
+* Ajout des littéraux surveillés à l’algorithme de DPLL
+* Heuristiques
+* Tests de performances, moulinettes
+
+Valentin :
+* Parseur de CNF et EDGE
+* Algorithme de DPLL (sans les littéraux surveillés)
+* Classe et parseur pour les formules étendues ; réduction de Tseitin
+* Réduction problème de graphe -> formule étendue
