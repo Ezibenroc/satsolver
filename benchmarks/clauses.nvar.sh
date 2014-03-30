@@ -15,7 +15,7 @@ rm -f $OUTPUT
 rm -f $DIRECTORY/output.txt
 echo "Variable_number DUMB RAND MOMS DLIS DUMB_WL RAND_WL MOMS_WL DLIS_WL" >> $OUTPUT
 
-for nb in `seq 4 50`; do
+for nb in `seq 4 70`; do
 	TIME_DUMB=0
 	TIME_RAND=0
 	TIME_MOMS=0
