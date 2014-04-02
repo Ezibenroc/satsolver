@@ -19,13 +19,6 @@ Affectation* satsolver::solve(Formula *formula) {
         if(!WITH_WL && (literal = formula->monome())) {
             formula->deduce_true(literal);
             contains_false_clause = formula->contains_false_clause();
-            while(contains_false_clause) {
-                tmp = formula->back() ;
-                if(tmp == 0)
-                    throw Conflict() ;
-                formula->deduce_false(tmp);
-                contains_false_clause = formula->contains_false_clause();
-            }
         }
         else if((literal = formula->isolated_literal())) {
             if (WITH_WL)
@@ -33,17 +26,6 @@ Affectation* satsolver::solve(Formula *formula) {
             else {
                 formula->deduce_true(literal);
                 contains_false_clause = formula->contains_false_clause();
-            }
-            while(contains_false_clause) {
-                tmp = formula->back() ;
-                if(tmp == 0)
-                    throw Conflict() ;
-                if (WITH_WL)
-                    contains_false_clause = !formula->deduce_false(tmp);
-                else {
-                    formula->deduce_false(tmp);
-                    contains_false_clause = formula->contains_false_clause();
-                }
             }
         }
         else {
@@ -54,16 +36,16 @@ Affectation* satsolver::solve(Formula *formula) {
                 formula->bet_true(literal);
                 contains_false_clause = formula->contains_false_clause();
             }
-            while(contains_false_clause){
-                tmp = formula->back() ;
-                if(tmp == 0)
-                    throw Conflict() ;
-                if (WITH_WL)
-                    contains_false_clause = !formula->deduce_false(tmp);
-                else {
-                    formula->deduce_false(tmp);
-                    contains_false_clause = formula->contains_false_clause();
-                }
+        }
+        while(contains_false_clause){
+            tmp = formula->back() ;
+            if(tmp == 0)
+                throw Conflict() ;
+            if (WITH_WL)
+                contains_false_clause = !formula->deduce_false(tmp);
+            else {
+                formula->deduce_false(tmp);
+                contains_false_clause = formula->contains_false_clause();
             }
         }
     }
