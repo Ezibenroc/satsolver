@@ -118,7 +118,10 @@ bool Formula::set_true(int x) {
             if(literal){// on a engendré un monome
                 if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
                     this->to_do.clear();
-                    if(VERBOSE) {print_space() ; std::cout << "[Watched Literals] Detected a conflict : " << literal << std::endl ;}
+                    if(VERBOSE) {
+                        print_space() ;
+                        std::cout << "[Watched Literals] Detected a conflict : " << literal << std::endl ;
+                    }
                     return false ;
                 }
                 this->to_do.insert(literal) ;
