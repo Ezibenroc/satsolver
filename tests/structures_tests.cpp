@@ -160,7 +160,7 @@ void StructuresTests::testSetTrueClause() {
 }
 
 void StructuresTests::testFormula() {
-    int clause_id;
+    unsigned int clause_id;
     std::vector<std::shared_ptr<Clause>> g ;
     std::vector <int> v = {1,2,-3} ;
     g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
@@ -185,7 +185,7 @@ void StructuresTests::testFormula() {
     CPPUNIT_ASSERT(f2->bet_true(-1, NULL)) ;
     CPPUNIT_ASSERT(!f2->contains_false_clause(NULL));
 
-    CPPUNIT_ASSERT(f2->monome() == 2) ;
+    CPPUNIT_ASSERT(f2->monome(NULL) == 2) ;
 
     f2->bet_false(2, NULL);
     CPPUNIT_ASSERT(f2->contains_false_clause(&clause_id));

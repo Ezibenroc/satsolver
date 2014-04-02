@@ -118,7 +118,7 @@ std::vector<Clause*> Formula::to_clauses_vector() {
 }
 
 
-bool Formula::set_true(int x, int *clause_id) {
+bool Formula::set_true(int x, unsigned int *clause_id) {
     int literal ;
     if(WITH_WL) {
         for(unsigned int i=0; i<this->clauses.size(); i++) {
@@ -147,7 +147,7 @@ bool Formula::set_true(int x, int *clause_id) {
     return true ;
 }
 
-bool Formula::deduce_true(int x, int *clause_id) {
+bool Formula::deduce_true(int x, unsigned int *clause_id) {
     if(VERBOSE) {
         print_space() ;
         std::cout << "Deduce " << x << std::endl ;
@@ -159,11 +159,11 @@ bool Formula::deduce_true(int x, int *clause_id) {
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::deduce_false(int x, int *clause_id) {
+bool Formula::deduce_false(int x, unsigned int *clause_id) {
     return deduce_true(-x, clause_id) ;
 }
 
-bool Formula::bet_true(int x, int *clause_id) {
+bool Formula::bet_true(int x, unsigned int *clause_id) {
     if(VERBOSE) {
         print_space() ;
         std::cout << "Bet " << x << std::endl ;
@@ -176,7 +176,7 @@ bool Formula::bet_true(int x, int *clause_id) {
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::bet_false(int x, int *clause_id) {
+bool Formula::bet_false(int x, unsigned int *clause_id) {
     return bet_true(-x, clause_id) ;
 }
 
@@ -203,12 +203,15 @@ int Formula::back() {
     return 0 ;
 }
 
-int Formula::monome() {
+int Formula::monome(unsigned int *clause_id) {
     int literal ;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
         literal = this->clauses[i]->monome() ;
-        if(literal)
+        if(literal) {
+            if (clause_id)
+                *clause_id = i;
             return literal ;
+        }
     }
     return 0 ;
 }
@@ -262,7 +265,7 @@ int Formula::get_size() const {
 int Formula::get_nb_variables() const {
     return this->nb_variables;
 }
-bool Formula::contains_false_clause(int *clause_id) const {
+bool Formula::contains_false_clause(unsigned int *clause_id) const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
         if (this->clauses[i]->is_evaluated_to_false()) {
             if (clause_id)
@@ -272,7 +275,7 @@ bool Formula::contains_false_clause(int *clause_id) const {
     }
     return false;
 }
-bool Formula::only_true_clauses(int *clause_id) const {
+bool Formula::only_true_clauses(unsigned int *clause_id) const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
         if (!this->clauses[i]->is_evaluated_to_true()) {
             if (clause_id)

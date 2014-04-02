@@ -20,7 +20,7 @@ class Formula {
 
         // Affectation d'un litéral x
         // Si WITH_WL, renvoie faux ssi un conflit est généré
-        bool set_true(int x, int *clause_id) ;
+        bool set_true(int x, unsigned int *clause_id) ;
 
 
     public :
@@ -45,20 +45,20 @@ class Formula {
 
         // Déduction de l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
-        bool deduce_true(int x, int *clause_id) ;
-        bool deduce_false(int x, int *clause_id) ;
+        bool deduce_true(int x, unsigned int *clause_id) ;
+        bool deduce_false(int x, unsigned int *clause_id) ;
 
         // Pari sur l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
-        bool bet_true(int x, int *clause_id) ;
-        bool bet_false(int x, int *clause_id) ;
+        bool bet_true(int x, unsigned int *clause_id) ;
+        bool bet_false(int x, unsigned int *clause_id) ;
 
         // Retourne en arrière jusqu'au dernier pari
         // Renvoie le dernier littéral parié (0 si inexistant)
         int back() ;
 
         // Renvoie un monome de la formule (0 si inexistant)
-        int monome() ;
+        int monome(unsigned int *clause_id) ;
 
         // Renvoie un litéral isolé de la formule (0 si inexistant)
         int isolated_literal() ;
@@ -76,10 +76,10 @@ class Formula {
         bool contains_empty_clause() const;
 
         // Determines whether one of the clauses is evaluated to false.
-        bool contains_false_clause(int *clause_id) const;
+        bool contains_false_clause(unsigned int *clause_id) const;
         
         // Determines whether all the clauses are evaluated to true.
-        bool only_true_clauses(int *clause_id) const;
+        bool only_true_clauses(unsigned int *clause_id) const;
 
         // Supprime toute les clauses contenant d'autres clauses
         // Affecte tous les monomes

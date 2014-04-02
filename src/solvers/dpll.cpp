@@ -16,7 +16,7 @@ Affectation* satsolver::solve(Formula *formula) {
     int literal, tmp ;
     bool contains_false_clause;
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
-        if(!WITH_WL && (literal = formula->monome())) {
+        if(!WITH_WL && (literal = formula->monome(NULL))) {
             formula->deduce_true(literal, NULL);
             contains_false_clause = formula->contains_false_clause(NULL);
         }
