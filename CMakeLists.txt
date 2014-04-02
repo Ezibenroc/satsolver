@@ -134,3 +134,12 @@ else (CPPUNIT_FOUND)
     message("| CppUnit not found, tests won’t be compiled. |")
     message("+---------------------------------------------+")
 endif (CPPUNIT_FOUND)
+
+###########################################
+# Archive
+###########################################
+
+add_custom_target(archive ALL
+    COMMAND git archive --prefix=satsolver_Cornebize-Lorentz/ -o satsolver_CornebizeLorentz_rendu2.tar master
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    SOURCES ${CMAKE_SOURCE_DIR}/)
