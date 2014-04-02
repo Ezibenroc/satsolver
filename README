@@ -112,8 +112,8 @@ Structures de données et choix d’implémentation
       il y a un conflit).
 * Formules étendues :
     * Arbre (évidemment)
-    * Éventuellement une « traduction » en un sous-langage ne contenant
-      par de =>, si un nœud est étiqueté par =>. (Pour éviter de la
+    * Éventuellement, si un nœud est étiqueté par =>, une « traduction » en
+      un sous-arbre en substituant (A ∨ ¬B) à (A => B). (Pour éviter de la
       recalculer plusieurs fois si on en a besoin)
 
 
