@@ -143,7 +143,8 @@ bool Formula::deduce_true(int x) {
         this->mem.push(std::pair<int,bool>(x,true)) ;
         return this->set_true(x) ;
     }
-		else return this->aff->is_true(x) ;
+    else
+        return this->aff->is_true(x) ;
 }
 bool Formula::deduce_false(int x) {
     return deduce_true(-x) ;
@@ -159,7 +160,8 @@ bool Formula::bet_true(int x) {
         this->mem.push(std::pair<int,bool>(x,false)) ;
         return this->set_true(x) ;
     }
-		else return this->aff->is_true(x) ;
+    else
+        return this->aff->is_true(x) ;
 }
 bool Formula::bet_false(int x) {
     return bet_true(-x) ;
@@ -183,7 +185,8 @@ int Formula::back() {
             return p.first ;
         }
     }
-    if(VERBOSE) std::cout << std::endl ;
+    if(VERBOSE)
+        std::cout << std::endl ;
     return 0 ;
 }
 
