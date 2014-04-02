@@ -139,7 +139,7 @@ endif (CPPUNIT_FOUND)
 # Archive
 ###########################################
 
-add_custom_target(archive ALL
+add_custom_target(archive
     COMMAND git archive --prefix=satsolver_Cornebize_Lorentz/ -o satsolver_Cornebize_Lorentz_rendu2.tar master
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     SOURCES ${CMAKE_SOURCE_DIR}/)
