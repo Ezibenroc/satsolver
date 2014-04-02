@@ -37,7 +37,7 @@ void HeuristicsTests::testRandom() {
     v = {1,2,3} ;
     g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
     Formula *f = new Formula(g,3) ;
-    std::vector<int> literals = f->to_vector() ;
+    std::vector<int> literals = f->get_unknown_literals() ;
     CPPUNIT_ASSERT(literals.size() == 4) ;
 		CPPUNIT_ASSERT(literals[0]+literals[1]+literals[2]+literals[3] == 4) ;
     CPPUNIT_ASSERT(f->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));

@@ -95,7 +95,7 @@ class Formula {
         Affectation *get_aff() ;
         
         // Renvoie un vecteur de littéraux inconnus
-        std::vector<int> to_vector (void) const ;
+        std::vector<int> get_unknown_literals(void) const ;
 
         // Renvoie un littéral de la formule
         // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide

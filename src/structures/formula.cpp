@@ -335,7 +335,7 @@ Affectation *Formula::get_aff() {
     return (this->aff) ;
 }
 
-std::vector<int> Formula::to_vector (void) const {
+std::vector<int> Formula::get_unknown_literals(void) const {
 	std::vector<int> v = std::vector<int>() ;
 	for(unsigned i = 0 ; i < clauses.size() ; i++) {
 		clauses[i]->add_literals_to_vector(v) ;
@@ -354,7 +354,7 @@ int Formula::choose_literal_dumb() const {
 }
 
 int Formula::choose_literal_random() const {
-	std::vector<int> v = this->to_vector() ;
+	std::vector<int> v = this->get_unknown_literals() ;
 	assert(v.size() > 0) ;
 	return v[rand()%v.size()] ;
 }
