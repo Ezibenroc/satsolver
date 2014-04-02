@@ -109,12 +109,20 @@ std::set<Clause*> Formula::to_clauses_set() {
     return set ;
 }
 
+std::vector<Clause*> Formula::to_clauses_vector() {
+    std::vector<Clause*> vector;
+    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+        vector.push_back(new Clause(*this->clauses[i].get())) ;
+    }
+    return vector ;
+}
 
-bool Formula::set_true(int x) {
+
+bool Formula::set_true(int x, int *clause_id) {
     int literal ;
     if(WITH_WL) {
-        for(auto c : this->clauses) {
-            literal = c->set_true(x) ;
+        for(unsigned int i=0; i<this->clauses.size(); i++) {
+            literal = this->clauses[i]->set_true(x) ;
             if(literal){// on a engendré un monome
                 if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
                     this->to_do.clear();
@@ -122,6 +130,8 @@ bool Formula::set_true(int x) {
                         print_space() ;
                         std::cout << "[Watched Literals] Detected a conflict : " << literal << std::endl ;
                     }
+                    if (clause_id)
+                        *clause_id = i;
                     return false ;
                 }
                 this->to_do.insert(literal) ;
@@ -132,28 +142,28 @@ bool Formula::set_true(int x) {
     if(!this->to_do.empty()) { // on doit affecter ces littéraux
         literal = *this->to_do.begin() ;
         this->to_do.erase(literal) ;
-        return deduce_true(literal) ;
+        return deduce_true(literal, clause_id) ;
     }
     return true ;
 }
 
-bool Formula::deduce_true(int x) {
+bool Formula::deduce_true(int x, int *clause_id) {
     if(VERBOSE) {
         print_space() ;
         std::cout << "Deduce " << x << std::endl ;
     }
     if(this->aff->is_unknown(x)) {
         this->mem.push(std::pair<int,bool>(x,true)) ;
-        return this->set_true(x) ;
+        return this->set_true(x, clause_id) ;
     }
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::deduce_false(int x) {
-    return deduce_true(-x) ;
+bool Formula::deduce_false(int x, int *clause_id) {
+    return deduce_true(-x, clause_id) ;
 }
 
-bool Formula::bet_true(int x) {
+bool Formula::bet_true(int x, int *clause_id) {
     if(VERBOSE) {
         print_space() ;
         std::cout << "Bet " << x << std::endl ;
@@ -161,13 +171,13 @@ bool Formula::bet_true(int x) {
     depth_stack ++ ;
     if(this->aff->is_unknown(x)) {
         this->mem.push(std::pair<int,bool>(x,false)) ;
-        return this->set_true(x) ;
+        return this->set_true(x, clause_id) ;
     }
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::bet_false(int x) {
-    return bet_true(-x) ;
+bool Formula::bet_false(int x, int *clause_id) {
+    return bet_true(-x, clause_id) ;
 }
 
 int Formula::back() {
@@ -252,17 +262,23 @@ int Formula::get_size() const {
 int Formula::get_nb_variables() const {
     return this->nb_variables;
 }
-bool Formula::contains_false_clause() const {
+bool Formula::contains_false_clause(int *clause_id) const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
-        if (this->clauses[i]->is_evaluated_to_false())
+        if (this->clauses[i]->is_evaluated_to_false()) {
+            if (clause_id)
+                *clause_id = i;
             return true;
+        }
     }
     return false;
 }
-bool Formula::only_true_clauses() const {
+bool Formula::only_true_clauses(int *clause_id) const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
-        if (!this->clauses[i]->is_evaluated_to_true())
+        if (!this->clauses[i]->is_evaluated_to_true()) {
+            if (clause_id)
+                *clause_id = i;
             return false;
+        }
     }
     return true;
 }

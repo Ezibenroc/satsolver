@@ -160,6 +160,7 @@ void StructuresTests::testSetTrueClause() {
 }
 
 void StructuresTests::testFormula() {
+    int clause_id;
     std::vector<std::shared_ptr<Clause>> g ;
     std::vector <int> v = {1,2,-3} ;
     g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
@@ -181,9 +182,14 @@ void StructuresTests::testFormula() {
     Formula *f2 = new Formula(f) ;
     CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
     CPPUNIT_ASSERT(f2->isolated_literal() == 2) ;
-    CPPUNIT_ASSERT(f2->bet_true(-1)) ;
+    CPPUNIT_ASSERT(f2->bet_true(-1, NULL)) ;
+    CPPUNIT_ASSERT(!f2->contains_false_clause(NULL));
 
     CPPUNIT_ASSERT(f2->monome() == 2) ;
+
+    f2->bet_false(2, NULL);
+    CPPUNIT_ASSERT(f2->contains_false_clause(&clause_id));
+    CPPUNIT_ASSERT(f2->to_clauses_vector()[clause_id]->to_string() == "{1,2}");
 /*    CPPUNIT_ASSERT(f2->get_aff()->is_true(-1) && f2->get_aff()->is_true(2) && f2->get_aff()->is_true(-3)) ;
     CPPUNIT_ASSERT(f2->get_aff()->get_nb_unknown() == 0) ;
     st = f2->get_mem() ;

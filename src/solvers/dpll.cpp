@@ -15,26 +15,26 @@ using namespace satsolver;
 Affectation* satsolver::solve(Formula *formula) {
     int literal, tmp ;
     bool contains_false_clause;
-    while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses()) { 
+    while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
         if(!WITH_WL && (literal = formula->monome())) {
-            formula->deduce_true(literal);
-            contains_false_clause = formula->contains_false_clause();
+            formula->deduce_true(literal, NULL);
+            contains_false_clause = formula->contains_false_clause(NULL);
         }
         else if((literal = formula->isolated_literal())) {
             if (WITH_WL)
-                contains_false_clause = !formula->deduce_true(literal);
+                contains_false_clause = !formula->deduce_true(literal, NULL);
             else {
-                formula->deduce_true(literal);
-                contains_false_clause = formula->contains_false_clause();
+                formula->deduce_true(literal, NULL);
+                contains_false_clause = formula->contains_false_clause(NULL);
             }
         }
         else {
             literal = formula->choose_literal(HEURISTIC) ;
             if (WITH_WL)
-                contains_false_clause = !formula->bet_true(literal);
+                contains_false_clause = !formula->bet_true(literal, NULL);
             else {
-                formula->bet_true(literal);
-                contains_false_clause = formula->contains_false_clause();
+                formula->bet_true(literal, NULL);
+                contains_false_clause = formula->contains_false_clause(NULL);
             }
         }
         while(contains_false_clause){
@@ -42,10 +42,10 @@ Affectation* satsolver::solve(Formula *formula) {
             if(tmp == 0)
                 throw Conflict() ;
             if (WITH_WL)
-                contains_false_clause = !formula->deduce_false(tmp);
+                contains_false_clause = !formula->deduce_false(tmp, NULL);
             else {
-                formula->deduce_false(tmp);
-                contains_false_clause = formula->contains_false_clause();
+                formula->deduce_false(tmp, NULL);
+                contains_false_clause = formula->contains_false_clause(NULL);
             }
         }
     }
