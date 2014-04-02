@@ -115,6 +115,11 @@ Structures de données et choix d’implémentation
     * Éventuellement, si un nœud est étiqueté par =>, une « traduction » en
       un sous-arbre en substituant (A ∨ ¬B) à (A => B). (Pour éviter de la
       recalculer plusieurs fois si on en a besoin)
+    * Lors de l’analyse des formules étendues (c’est-à-dire dans
+      src/parsers/extended_formula.y), la priorité suivante est donnée
+      aux opérateurs : NOT > AND > OR > IMPLIES (entre AND et OR le
+      choix est arbitraire ; pour les autres il s’agit de la priorité
+      usuelle en logique).
 
 
 Comparaison des performances

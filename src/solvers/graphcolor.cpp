@@ -31,6 +31,7 @@ std::string graphsolver::ColorAffectation::to_string() const {
     return oss.str() ;
 }
 
+// Get the graph coloration from the SAT solution.
 std::shared_ptr<graphsolver::ColorAffectation> graphsolver::ColorAffectation::from_sat_solution(satsolver::Affectation *affectation, std::shared_ptr<std::map<std::string, int>> name_to_variable, int nb_nodes, int nb_bits) {
     int *colors = (int*) malloc(sizeof(int)*nb_nodes);
     int i, j;
@@ -52,6 +53,8 @@ std::shared_ptr<graphsolver::ColorAffectation> graphsolver::ColorAffectation::fr
     return std::make_shared<graphsolver::ColorAffectation>(nb_nodes, colors);
 }
 
+// Get a disjonction of XORs saying “I don't want these two nodes to be the
+// same color”.
 SPEF get_color_disjonction_of_edge(int first_node_id, int second_node_id, int nb_bits) {
     int i;
     SPEF literal1, literal2, formula2;
@@ -65,6 +68,8 @@ SPEF get_color_disjonction_of_edge(int first_node_id, int second_node_id, int nb
     return formula;
 }
 
+// Get a disjonction saying “I don't want the color identifier of the node
+// to be greater or equal to X”.
 SPEF get_color_limitation_formula_for_node(int node_id, int nb_colors, int nb_bits) {
     int i;
     SPEF formula, this_bit, not_this_bit;
@@ -78,7 +83,7 @@ SPEF get_color_limitation_formula_for_node(int node_id, int nb_colors, int nb_bi
         this_bit = SPEF(new EF(EF::LITERAL, get_variable_of_node_bit(node_id, i)));
         not_this_bit = SPEF(new EF(EF::NOT, this_bit));
         if (nb_colors % 2) {
-            // (¬“node_id i”)+((“node_id i”•formula))
+            // (¬“node_id i”)+((“node_id i”∧formula))
             formula = SPEF(new EF(EF::OR,
                                   not_this_bit,
                                   SPEF(new EF(EF::AND,
@@ -94,6 +99,8 @@ SPEF get_color_limitation_formula_for_node(int node_id, int nb_colors, int nb_bi
     return formula;
 }
 
+// Conjonction of all formulas returned by all calls (one per node) to
+// get_color_limitation_formula_for_node.
 SPEF get_color_limitation_formula(int nb_nodes, int nb_colors, int nb_bits) {
     int i;
     SPEF formula = SPEF(new EF(EF::TRUE));
@@ -104,6 +111,7 @@ SPEF get_color_limitation_formula(int nb_nodes, int nb_colors, int nb_bits) {
     return formula;
 }
 
+// Returns an extended formula from a graph coloration problem.
 int reduce_graph_coloration_to_extended_formula(graphsolver::Graph *graph, int nb_colors, SPEF *formula) {
     int nb_bits = (int) ceil(log2(nb_colors));
     int nodes_count = graph->get_nodes_count();
@@ -119,6 +127,7 @@ int reduce_graph_coloration_to_extended_formula(graphsolver::Graph *graph, int n
     return nb_bits;
 }
 
+// Main function of the solver.
 std::shared_ptr<graphsolver::ColorAffectation> graphsolver::solve_colors(int nb_colors, Graph *graph) {
     int nb_bits;
     SPEF ext_formula;

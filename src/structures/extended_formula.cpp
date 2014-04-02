@@ -63,6 +63,7 @@ void EF::reduce(std::vector<const EF*> *formulas, std::vector<std::vector<std::s
     std::vector<std::string> *clause;
     const EF *f;
 
+    // First add the subtrees to the list of formulas
     if (type == EF::LITERAL || type == EF::TRUE || type == EF::FALSE) {
     }
     else if (type == EF::NOT) {
@@ -75,6 +76,7 @@ void EF::reduce(std::vector<const EF*> *formulas, std::vector<std::vector<std::s
         formulas->push_back(&*this->f2);
     }
 
+    // Add clauses to the list of clauses.
     switch (this->type) {
         case AND:
             clause = new std::vector<std::string>{
@@ -188,8 +190,11 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
     std::shared_ptr<std::vector<int>> int_literals;
     std::string string_literal;
 
+    // Force the literal representing the root to be true (because we want the
+    // whole formula to be true, not a subset).
     raw_clauses->push_back(new std::vector<std::string>{this->make_literal(), "", ""});
 
+    // Fill the name_to_variable map.
     for (auto raw_clause : *raw_clauses) {
         for (i=0; i<3; i++) {
             string_literal = raw_clause->at(i);
@@ -201,6 +206,7 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
         }
     }
 
+    // Actually create a SAT instance.
     for (auto raw_clause : *raw_clauses) {
         int_literals = std::make_shared<std::vector<int>>();
         for (i=0; i<3; i++) {
@@ -218,7 +224,7 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
         delete raw_clause;
     }
     delete raw_clauses;
-    if (clauses.size() == 1) // Conjonction of zero clauses
+    if (clauses.size() == 1) // Conjonction of one clause (the literal of the “root” formula)
         return NULL;
     
     if (name_to_variable_ptr)

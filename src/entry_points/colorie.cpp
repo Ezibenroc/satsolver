@@ -33,6 +33,10 @@ int main(int argc, char *argv[]) {
     std::set<int>* nodes;
     int *colors, color;
     srand((unsigned int) time(NULL));
+
+    /*********************
+     * Get input
+     ********************/
     CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>(), "<color> [<filename>]");
     if (cli_parser.get_nb_parsed_args() == -1)
         return 1;
@@ -52,6 +56,10 @@ int main(int argc, char *argv[]) {
         cli_parser.print_syntax_error(argv[0]);
         return 1;
     }
+
+    /*********************
+     * Solve
+     ********************/
     parser = new graphsolver::GraphParser(*input);
     parser->parse();
     graph = parser->get_graph();
@@ -62,6 +70,10 @@ int main(int argc, char *argv[]) {
         std::cout << "graph G { n [label=\"No solution.\"] }" << std::endl;
         return 1;
     }
+
+    /*********************
+     * Display solution
+     ********************/
     std::cout << "graph G {\n";
     colors = (int*) malloc(sizeof(int)*nb_colors);
     memset(colors, 0, sizeof(int)*nb_colors);

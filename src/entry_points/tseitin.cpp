@@ -22,6 +22,9 @@ bool DISPLAY_FORMULA;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
 void parser_result(SPEF ext_formula) {
+    /*********************
+     * Solve
+     ********************/
     satsolver::Affectation *sat_solution;
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
     std::shared_ptr<std::unordered_set<std::string>> literals = ext_formula->get_literals();
@@ -37,6 +40,10 @@ void parser_result(SPEF ext_formula) {
     }
     catch (satsolver::Conflict) {
     }
+
+    /*********************
+     * Display solution
+     ********************/
     if (!formula) { // The formula is always false
         if (DISPLAY_SAT)
             std::cout << "c The formula is so obviously wrong it is not even needed to convert it to conjonctive form." << std::endl;
@@ -71,6 +78,9 @@ void parser_result(SPEF ext_formula) {
 }
 
 int main (int argc, char *argv[]) {
+    /*********************
+     * Get input
+     ********************/
     CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>({"-print-interpretation", "-print-sat"}), "[-print-sat] [<filename>]");
     if (cli_parser.get_nb_parsed_args() == -1)
         return 1;

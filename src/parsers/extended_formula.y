@@ -8,7 +8,7 @@
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
 
-// #define YYSTYPE SPEF
+// Operator priority: NOT > AND > OR > IMPLIES
 
 extern "C" {
 int yylex(void);

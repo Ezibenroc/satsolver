@@ -26,6 +26,10 @@ int main(int argc, char *argv[]) {
     std::set<int>::iterator solution_set_iterator;
     bool using_stdin = true;
     std::istream *input = &std::cin;
+
+    /*********************
+     * Get input
+     ********************/
     CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>(), "[<filename>]");
     if (cli_parser.get_nb_parsed_args() == -1)
         return 1;
@@ -43,6 +47,10 @@ int main(int argc, char *argv[]) {
         cli_parser.print_syntax_error(argv[0]);
         return 1;
     }
+
+    /*********************
+     * Solve
+     ********************/
     parser = new satsolver::SatParser(*input);
     parser->parse();
     formula = parser->get_formula();
@@ -54,6 +62,9 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
+    /*********************
+     * Display solution
+     ********************/
     std::cout << "s SATISFIABLE" << std::endl;
     solution_set = solution->to_set();
     for (solution_set_iterator=solution_set->begin(); solution_set_iterator!=solution_set->end(); solution_set_iterator++) {
