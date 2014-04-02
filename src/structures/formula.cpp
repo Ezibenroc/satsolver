@@ -261,16 +261,6 @@ bool Formula::only_true_clauses() const {
     return true;
 }
 
-int Formula::choose_literal_dumb() const {
-    for(int i = 1 ; i <= this->nb_variables ; i ++) {
-        if (this->aff->is_unknown(i)) {
-            return i ;
-        }
-    }
-    std::cout << "Error in choose_literal : all clauses are empty, or there is no clauses." << std::endl ;
-    return 0;
-}
-
 
 bool to_delete(std::shared_ptr<Clause> c, std::unordered_set<int> &literals_to_delete) {
     for(auto x : literals_to_delete) {
@@ -345,6 +335,16 @@ std::vector<int> Formula::to_vector (void) const {
 		clauses[i]->add_literals_to_vector(v) ;
 	}
 	return v ;
+}
+
+int Formula::choose_literal_dumb() const {
+    for(int i = 1 ; i <= this->nb_variables ; i ++) {
+        if (this->aff->is_unknown(i)) {
+            return i ;
+        }
+    }
+    std::cout << "Error in choose_literal : all clauses are empty, or there is no clauses." << std::endl ;
+    return 0;
 }
 
 int Formula::choose_literal_random() const {
