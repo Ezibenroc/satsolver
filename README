@@ -122,6 +122,22 @@ Structures de données et choix d’implémentation
       usuelle en logique).
 
 
+Réduction d’un problème de coloriage en une formule
+---------------------------------------------------
+
+Pour un problème de coloriage à k couleurs, on crée ceil(log2(k)) variables
+par nœud, correspondant à un codage en binaire de la coloration de ce nœud.
+
+On crée alors des formules :
+* Pour chaque nœud, s’assurer que sa couleur est strictement inférieure à k
+* Pour chaque arrête, s’assurer que ses deux extrémités sont de couleur
+  différente (revient à vérifier qu’au moins un bit diffère entre les deux)
+
+Il ne reste alors plus qu’à effectuer une transformation de Tseitin sur
+la formule, résoudre le problème SAT, et retrouver l’affectation des
+variables de la formule à partir des « litéraux de SAT ».
+
+
 Comparaison des performances
 ============================
 
