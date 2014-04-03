@@ -148,8 +148,19 @@ std::shared_ptr<graphsolver::ColorAffectation> graphsolver::solve_colors(int nb_
     formula = ext_formula->reduce_to_formula(&name_to_variable);
     if (!formula) // The formula is always false
         throw satsolver::Conflict();
-    if (VERBOSE || DISPLAY_SAT)
+    if (VERBOSE)
         std::cout << "Reduction of formula to SAT: " << formula->to_string() << std::endl;
+    if (DISPLAY_SAT) {
+        std::cout << "c Start of formula\n" ;
+        std::cout << formula->to_string2();
+        for (int i=1; i<=formula->get_nb_variables(); i++) {
+            if (formula->get_aff()->is_true(i))
+                std::cout << i << " 0\n";
+            else if (formula->get_aff()->is_false(i))
+                std::cout << -i << " 0\n";
+        }
+        std::cout << "c End of formula\n" << std::endl ;
+    }
     sat_solution = satsolver::solve(&*formula); // May raise a satsolver::Conflict
     if (VERBOSE)
         std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
