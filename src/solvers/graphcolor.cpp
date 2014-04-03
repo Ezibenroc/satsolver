@@ -14,6 +14,9 @@
 #define SPEF std::shared_ptr<EF>
 #define get_variable_of_node_bit(node_id, bit_id) (std::to_string(node_id) + " " + std::to_string(bit_id))
 
+bool DISPLAY_FORMULA = false;
+bool DISPLAY_SAT = false;
+
 graphsolver::ColorAffectation::ColorAffectation(int nb_nodes, int *colors) : nb_nodes(nb_nodes), colors(colors) {
 }
 graphsolver::ColorAffectation::~ColorAffectation() {
@@ -137,15 +140,15 @@ std::shared_ptr<graphsolver::ColorAffectation> graphsolver::solve_colors(int nb_
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
     
     nb_bits = reduce_graph_coloration_to_extended_formula(graph, nb_colors, &ext_formula);
-    if (VERBOSE)
+    if (VERBOSE || DISPLAY_FORMULA)
         std::cout << "Reduction of graph coloring problem to: " << ext_formula->to_string() << std::endl;
     ext_formula = ext_formula->simplify();
-    if (VERBOSE)
+    if (VERBOSE || DISPLAY_FORMULA)
         std::cout << "Reduction of formula to: " << ext_formula->to_string() << std::endl;
     formula = ext_formula->reduce_to_formula(&name_to_variable);
     if (!formula) // The formula is always false
         throw satsolver::Conflict();
-    if (VERBOSE)
+    if (VERBOSE || DISPLAY_SAT)
         std::cout << "Reduction of formula to SAT: " << formula->to_string() << std::endl;
     sat_solution = satsolver::solve(&*formula); // May raise a satsolver::Conflict
     if (VERBOSE)

@@ -5,6 +5,9 @@
 #include "structures/graph.h"
 #include "structures/affectation.h"
 
+extern bool DISPLAY_FORMULA;
+extern bool DISPLAY_SAT;
+
 namespace graphsolver {
 
 class ColorAffectation {

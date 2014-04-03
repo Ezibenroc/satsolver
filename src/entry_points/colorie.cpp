@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     /*********************
      * Get input
      ********************/
-    CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>(), "<color> [<filename>]");
+    CommandLineParser cli_parser(argc, argv, std::unordered_set<std::string>({"-print-formula", "-print-sat"}), "[-print-formula] [-print-sat] <color> [<filename>]");
     if (cli_parser.get_nb_parsed_args() == -1)
         return 1;
     int nb_remaining_args = argc - cli_parser.get_nb_parsed_args();
@@ -56,6 +56,8 @@ int main(int argc, char *argv[]) {
         cli_parser.print_syntax_error(argv[0]);
         return 1;
     }
+    DISPLAY_FORMULA = cli_parser.get_arg("-print-formula");
+    DISPLAY_SAT = cli_parser.get_arg("-print-sat");
 
     /*********************
      * Solve
