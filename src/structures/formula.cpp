@@ -395,10 +395,9 @@ int Formula::choose_literal_moms() const {
 int Formula::choose_literal_dlis() const {
 	bool there_is_literals = false ;
 	std::vector<int> v = std::vector<int>() ;
-	//double *count = (double*) malloc((2*this->nb_variables+1)*sizeof(double)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
+	// count[i] = nombre d'apparitions du littéral i-nb_variables
 	std::vector<double> count = std::vector<double>(2*this->nb_variables+1,0.0) ;
 	double point ;
-//	memset(count,0,(2*this->nb_variables+1)*sizeof(float)) ;
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
 		v.clear() ;
 		this->clauses[i]->add_literals_to_vector(v) ;

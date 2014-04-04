@@ -6,10 +6,10 @@ then
 	exit 1
 fi
 
-NB_TEST=$1								# number of tests to perform for each configuration
-DIRECTORY=/tmp						# working directory where files will be saved
+NB_TEST=$1								# nombre de tests pour chaque configuration
+DIRECTORY=/tmp						# endroit de sauvegarde des fichiers temporaires
 EXEC="./colorie"					# executable
-NB_COL=4									# number of colors
+NB_COL=4									# nombre de couleurs
 OUTPUT=graph.nvar.dat
 
 rm -f $OUTPUT
@@ -32,11 +32,11 @@ for nb in `seq 5 70`; do
 	# On fait plusieurs tests par taille
 	for test in `seq 1 $NB_TEST` ; do
 		echo -e "\t\tTest $test"
-		# Génération de la formule dans le fichier $NB_COL $DIRECTORY/graph
+		# Génération du graphe dans le fichier $NB_COL $DIRECTORY/graph
 		A=$(echo "scale=0; 0.35 * $nb * ( $nb - 1 ) / 2" | bc) 
 		./generator -nvar $nb -nedge $A -o $DIRECTORY/graph
 
-		# Résolution de la formule (en vérifiant la correction de la solution)
+		# Coloration du graphe
 	
 		# Heuristique DUMB
 		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC $NB_COL $DIRECTORY/graph > /dev/null

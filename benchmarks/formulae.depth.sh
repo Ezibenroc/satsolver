@@ -6,14 +6,14 @@ echo "Please provide the number of tests to perform."
 exit 1
 fi
 
-NB_TEST=$1								# number of tests to perform for each configuration
-DIRECTORY=/tmp						# working directory where files will be saved
+NB_TEST=$1								# nombre de tests pour chaque configuration
+DIRECTORY=/tmp						# endroit de sauvegarde des fichiers temporaires
 EXEC="./tseitin"					# executable
 NVAR=5
 OUTPUT=formulae.depth.dat
 
 rm -f $OUTPUT
-rm -f $DIRECTORY/output.txt
+rm -f /dev/null
 echo "Depth DUMB RAND MOMS DLIS DUMB_WL RAND_WL MOMS_WL DLIS_WL" >> $OUTPUT
 
 for depth in `seq 1 20`; do
@@ -39,38 +39,38 @@ for depth in `seq 1 20`; do
 		# Résolution de la formule
 	
 		# Heuristique DUMB
-		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC $DIRECTORY/formula.cnf > /dev/null
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_DUMB=$(echo "scale=3; $TIME_DUMB + $TMP" | bc)
 		# Heuristique RAND
-		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -rand $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -rand $DIRECTORY/formula.cnf > /dev/null
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_RAND=$(echo "scale=3; $TIME_RAND + $TMP" | bc)
 		# Heuristique MOMS
-		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -moms $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -moms $DIRECTORY/formula.cnf > /dev/null
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_MOMS=$(echo "scale=3; $TIME_MOMS + $TMP" | bc)
 		# Heuristique DLIS
-		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -dlis $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -dlis $DIRECTORY/formula.cnf > /dev/null
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_DLIS=$(echo "scale=3; $TIME_DLIS + $TMP" | bc)
 		
 		# La même chose, avec les watched literals
 		
 				# Heuristique DUMB
-		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL $DIRECTORY/formula.cnf > /dev/null
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_DUMB_WL=$(echo "scale=3; $TIME_DUMB_WL + $TMP" | bc)
 		# Heuristique RAND
-		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -rand $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -rand $DIRECTORY/formula.cnf > /dev/null
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_RAND_WL=$(echo "scale=3; $TIME_RAND_WL + $TMP" | bc)
 		# Heuristique MOMS
-		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -moms $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -moms $DIRECTORY/formula.cnf > /dev/null
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_MOMS_WL=$(echo "scale=3; $TIME_MOMS_WL + $TMP" | bc)
 		# Heuristique DLIS
-		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -dlis $DIRECTORY/formula.cnf > $DIRECTORY/output.txt
+		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL -dlis $DIRECTORY/formula.cnf > /dev/null
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_DLIS_WL=$(echo "scale=3; $TIME_DLIS_WL + $TMP" | bc)
 		
@@ -94,4 +94,4 @@ done
 # evince courbe1.pdf &
 
 # Si une formule n'était pas satisfaite par l'affectation, on aura des "assert" dans le fichier
-#grep "assert" $DIRECTORY/output.txt
+#grep "assert" /dev/null

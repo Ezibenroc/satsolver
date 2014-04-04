@@ -6,8 +6,8 @@ echo "Please provide the number of tests to perform."
 exit 1
 fi
 
-NB_TEST=$1								# number of tests to perform for each configuration
-DIRECTORY=/tmp						# working directory where files will be saved
+NB_TEST=$1								# nombre de tests pour chaque configuration
+DIRECTORY=/tmp						# endroit de sauvegarde des fichiers temporaires
 EXEC="./resol"						# executable
 OUTPUT=clauses.nvar.dat
 
@@ -15,7 +15,7 @@ rm -f $OUTPUT
 rm -f $DIRECTORY/output.txt
 echo "Variable_number DUMB RAND MOMS DLIS DUMB_WL RAND_WL MOMS_WL DLIS_WL" >> $OUTPUT
 
-for nb in `seq 4 70`; do
+for nb in `seq 5 200`; do
 	TIME_DUMB=0
 	TIME_RAND=0
 	TIME_MOMS=0
@@ -32,7 +32,7 @@ for nb in `seq 4 70`; do
 	for test in `seq 1 $NB_TEST` ; do
 		echo -e "\t\tTest $test"
 		# Génération de la formule dans le fichier $DIRECTORY/formula.cnf
-	A=$(echo "scale=0; $nb * 4.26 / 1" | bc) # on divise par 1 afin que bc fasse l'arrondi
+		A=$(echo "scale=0; $nb * 4.26 / 1" | bc) # on divise par 1 afin que bc fasse l'arrondi
 		./generator -nvar $nb -nclause $A -sclause 3 -o $DIRECTORY/formula.cnf -pathologic
 
 		# Résolution de la formule (en vérifiant la correction de la solution)
@@ -56,7 +56,7 @@ for nb in `seq 4 70`; do
 		
 		# La même chose, avec les watched literals
 		
-				# Heuristique DUMB
+		# Heuristique DUMB
 		/usr/bin/time --quiet -f'%U' -o $DIRECTORY/result.txt $EXEC -WL $DIRECTORY/formula.cnf | ./check_result.py $DIRECTORY/formula.cnf >> $DIRECTORY/output.txt
 		TMP=`cat $DIRECTORY/result.txt`
 		TIME_DUMB_WL=$(echo "scale=3; $TIME_DUMB_WL + $TMP" | bc)
