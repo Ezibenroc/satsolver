@@ -137,20 +137,20 @@ Heuristiques
 Quatre heuristiques sont implémentées pour le moment.
   * DUMB : on pari sur les littéraux 1,2,...,n dans cet ordre.
   * RAND : on choisi avec une probabilité uniforme un littéral parmi toutes les 
-    instances de littéraux non affectés dans des clauses non satisfaites.
-        Ainsi, un littéral apparaissant plus souvent a plus de chances d'être 
-        sélectionné.
-        Un littéral présent seulement dans des clauses satisfaites (ou 
-        totalement absent) ne sera jamais sélectionné.
+           instances de littéraux non affectés dans des clauses non satisfaites.
+           Ainsi, un littéral apparaissant plus souvent a plus de chances d'être 
+           sélectionné.
+           Un littéral présent seulement dans des clauses satisfaites (ou 
+           totalement absent) ne sera jamais sélectionné.
   * MOMS : on pari sur le littéral le plus présent, parmi les clauses non 
-        satisfaites de taille minimale.
-        La taille d'une clause est ici son nombre de littéraux non satisfaits.
+           satisfaites de taille minimale.
+           La taille d'une clause est ici son nombre de littéraux non satisfaits.
   * DLIS : pour un littéral x non affecté dans une clause c non satisfaite, on 
-        défini pt_c(x) = 2^(-s) avec s la taille de la clause (définie ci 
-        dessus).
-          On défini ensuite Pt(x) comme la somme des pt_c(x), pour toute clause 
-          c non satisfaite.
-          On pari alors sur le littéral de somme Pt(x) maximale.
+           défini pt_c(x) = 2^(-s) avec s la taille de la clause (définie ci 
+           dessus).
+           On défini ensuite Pt(x) comme la somme des pt_c(x), pour toute clause 
+           c non satisfaite.
+           On pari alors sur le littéral de somme Pt(x) maximale.
 
 
 Comparaison des performances
