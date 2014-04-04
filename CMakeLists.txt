@@ -102,7 +102,7 @@ target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL Ext
 # Benchmarks
 ###########################################
 
-file(GLOB HelperFiles ${CMAKE_SOURCE_DIR}/benchmarks/* ${CMAKE_SOURCE_DIR}/check_result.py)
+file(GLOB HelperFiles ${CMAKE_SOURCE_DIR}/benchmarks*/* ${CMAKE_SOURCE_DIR}/check_result.py)
 
 add_custom_target(Helpers SOURCES ${HelperFile})
 foreach(HelperFile ${HelperFiles})
@@ -111,11 +111,11 @@ foreach(HelperFile ${HelperFiles})
 endforeach()
 
 add_custom_target(generator ALL
-    COMMAND ocamlopt ${CMAKE_SOURCE_DIR}/generator.ml -o ${CMAKE_CURRENT_BINARY_DIR}/generator
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/generator.ml ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ocamlopt ${CMAKE_CURRENT_BINARY_DIR}/generator.ml -o ${CMAKE_CURRENT_BINARY_DIR}/generator
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     SOURCES ${CMAKE_SOURCE_DIR}/generator.ml)
-set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generator)
-
+set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_CURRENT_BINARY_DIR}/generator;${CMAKE_CURRENT_BINARY_DIR}/generator.cmi;${CMAKE_CURRENT_BINARY_DIR}/generator.cmo;${CMAKE_CURRENT_BINARY_DIR}/generator.cmx;${CMAKE_CURRENT_BINARY_DIR}/generator.o")
 add_custom_target(Benchmarks ALL
                   DEPENDS Helpers resol colorie tseitin generator)
 
