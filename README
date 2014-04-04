@@ -21,7 +21,7 @@ Ils peuvent tous prendre les paramètres suivants (qui doivent être avant
 les autres paramètres) :
 
 * -verbose pour activer le mode verbeux
-* -WL pour activer les litéraux surveillés
+* -WL pour activer les littéraux surveillés
 * -rand, -moms, ou -dlis (mutuellement exclusifs) pour activer les heuristiques
   du même nom
 
@@ -39,7 +39,7 @@ est utilisée).
 
 Les fichiers en entrée de `resol` et `colorie` sont respectivement aux
 formats `cnf` et `edge` du DIMACS. Celui de `tseitin` est une formule
-telle que définite dans le cours.
+telle que définie dans le cours.
 
 
 Remarque : vu que la sortie de `colorie` est le format d’entrée de `dot`,
@@ -54,7 +54,7 @@ Tests
 
 Les tests unitaires ne sont compilés *que* si la bibliothèque CppUnit est
 installée (libcppunit-dev sous Debian/Ubuntu).
-Ils sont compilés en même tempsque les autres exécutables, et sont lancés
+Ils sont compilés en même temps que les autres exécutables, et sont lancés
 par l’exécutable `testrunner`.
 
 
@@ -64,7 +64,7 @@ Implémentation
 Organisation du code
 --------------------
 
-Les structures de données sont chacunes implémentées dans une paire de
+Les structures de données sont toutes implémentées dans une paire de
 fichiers situés dans src/structures/.
 La majorité des opérations effectuables sur ces structures sont
 implémentées directement en tant que méthodes de ces objets, ce qui
@@ -81,7 +81,7 @@ ils peuvent être analysés par un simple automate fini,
 implémenté dans src/parsers/{abstract,sat,graph}.cpp.
 
 Le format pour les formules étant plus complexe, il faut au moins un
-automate à pile pour le reconnaitre, ce qui est fait en utilisant
+automate à pile pour le reconnaître, ce qui est fait en utilisant
 Flex et Bison, dans src/parsers/extended_formula.*.
 
 
@@ -128,37 +128,56 @@ On crée alors des formules :
 
 Il ne reste alors plus qu’à effectuer une transformation de Tseitin sur
 la formule, résoudre le problème SAT, et retrouver l’affectation des
-variables de la formule à partir des « litéraux de SAT ».
+variables de la formule à partir des « littéraux de SAT ».
 
 
 
 Heuristiques
 =============
 Quatre heuristiques sont implémentées pour le moment.
-	- DUMB : on pari sur les littéraux 1,2,...,n dans cet ordre.
-	- RAND : on choisi avec une probabilité uniforme un littéral parmi toutes les instances de littéraux non affectés dans des clauses non satisfaites.
-				Ainsi, un littéral apparaissant plus souvent a plus de chances d'être sélectionné.
-				Un littéral présent seulement dans des clauses satisfaites (ou totalement absent) ne sera jamais sélectionné.
-	- MOMS : on pari sur le littéral le plus présent, parmi les clauses non satisfaites de taille minimale.
-				La taille d'une clause est ici son nombre de littéraux non satisfaits.
-	- DLIS : pour un littéral x non affecté dans une clause c non satisfaite, on défini pt_c(x) = 2^(-s) avec s la taille de la clause (définie ci dessus).
-					On défini ensuite Pt(x) comme la somme des pt_c(x), pour toute clause c non satisfaite.
-					On pari alors sur le littéral de somme Pt(x) maximale.
+  * DUMB : on pari sur les littéraux 1,2,...,n dans cet ordre.
+  * RAND : on choisi avec une probabilité uniforme un littéral parmi toutes les 
+    instances de littéraux non affectés dans des clauses non satisfaites.
+        Ainsi, un littéral apparaissant plus souvent a plus de chances d'être 
+        sélectionné.
+        Un littéral présent seulement dans des clauses satisfaites (ou 
+        totalement absent) ne sera jamais sélectionné.
+  * MOMS : on pari sur le littéral le plus présent, parmi les clauses non 
+        satisfaites de taille minimale.
+        La taille d'une clause est ici son nombre de littéraux non satisfaits.
+  * DLIS : pour un littéral x non affecté dans une clause c non satisfaite, on 
+        défini pt_c(x) = 2^(-s) avec s la taille de la clause (définie ci 
+        dessus).
+          On défini ensuite Pt(x) comme la somme des pt_c(x), pour toute clause 
+          c non satisfaite.
+          On pari alors sur le littéral de somme Pt(x) maximale.
 
 
 Comparaison des performances
 ============================
-Nous avons implémenté un programme en OCaml, permettant de générer aléatoirement un ensemble de clause, une formule de logique propositionnelle, ou un graphe.
-Compilation : ocamlopt -o generator generator.ml
-Génération d'un ensemble de 10 clauses de taille 3, pour 5 variables : 	./generator -nvar 5 -nclause 10 -sclause 3
-Génération d'une formule de profondeur 3, pour 5 variables : 						./generator -nvar 5 -depth 3
-Génération d'un graphe de 5 noeuds, et 10 arêtes : 											./generator -nvar 5 -nedge 10
-Ces commandes écriront l'objet voulu sur la sortie standard. Pour l'écrire dans un fichier "abc.txt", on peut rajouter l'option "-o abc.txt".
-Nous avons remarqué, un peu tard, que notre générateur est trop lent pour générer de grands ensembles de clauses.
+Nous avons implémenté un programme en OCaml, permettant de générer aléatoirement 
+un ensemble de clauses, une formule de logique propositionnelle, ou un graphe.
+  * Compilation : 
+    ocamlopt -o generator generator.ml
+  * Génération d'un ensemble de 10 clauses de taille 3, pour 5 variables :   
+    ./generator -nvar 5 -nclause 10 -sclause 3
+  * Génération d'une formule de profondeur 3, pour 5 variables :             
+    ./generator -nvar 5 -depth 3
+  * Génération d'un graphe de 5 noeuds, et 10 arêtes :                       
+    ./generator -nvar 5 -nedge 10
+Ces commandes écriront l'objet voulu sur la sortie standard. Pour l'écrire dans 
+un fichier "abc.txt", on peut rajouter l'option "-o abc.txt".
+Nous avons remarqué, un peu tard, que notre générateur est trop lent pour 
+générer de grands ensembles de clauses.
 
-Chaque résultat présenté a été calculé en faisant 100 tests, sur des objets générés aléatoirement avec les même paramètres, puis en prenant la moyenne des temps d'exécution.
-Chaque courbe a comme axe des abcisses le paramètre que nous testons, et comme axe des ordonnées le temps d'exécution moyen (une échelle logarithmique est utilisée).
-Nous avons testé à chaque fois les quatre heuristiques, avec et sans watched literals (donc 8 courbes par jeu de test).
+Chaque résultat présenté a été calculé en faisant 100 tests, sur des objets 
+générés aléatoirement avec les même paramètres, puis en prenant la moyenne des 
+temps d'exécution.
+Chaque courbe a comme axe des abscisses le paramètre que nous testons, et comme 
+axe des ordonnées le temps d'exécution moyen (une échelle logarithmique est 
+utilisée).
+Nous avons testé à chaque fois les quatre heuristiques, avec et sans watched 
+literals (donc 8 courbes par jeu de test).
 
 Formules de logique propositionnelle
 ------------------------------------
@@ -166,49 +185,70 @@ Nous avons généré des formules de 5 variables, en faisant varier la profondeu
 La profondeur est défini de manière récursive, pour f1 et f2 des formules :
 Profondeur(var) = 0
 Profondeur(~f1) = 1+Profondeur(f1)
-Profondeur(f1/\f2) = Profondeur(f1\/f2) = Profondeur(f1=>f2) = 1 + max(Profondeur(f1),Profondeur(f2))
-Comme nous pouvions nous y attendre, le temps d'exécution augmente de manière exponentielle par rapport à la profondeur.
+Profondeur(f1/\f2)   = Profondeur(f1\/f2) = Profondeur(f1=>f2) 
+= 1 + max(Profondeur(f1),Profondeur(f2))
+Comme nous pouvions nous y attendre, le temps d'exécution augmente de manière 
+exponentielle par rapport à la profondeur.
 De plus, en temps d'exécution moyen, on a :
 DUMB_WL > DUMB > RAND > MOMS = DLIS > RAND_WL > MOMS_WL = DLIS_WL
 Pour des formules de plus petite profondeur, DUMB > DUMB_WL
-Ainsi, DLIS et MOMS semblent meilleures que les autres heuristiques. De plus, les watched literals apportent un gain significatif.
+Ainsi, DLIS et MOMS semblent meilleures que les autres heuristiques. De plus, 
+les watched literals apportent un gain significatif.
 
 Ensembles de clauses 3SAT
 -------------------------
-Nous avons généré des ensembles de clauses de taille 3, en faisant varier le nombre N de variables, et en prenant ceil(4.26*N) clauses.
-D'après ce que nous avons pu lire sur internet, c'est ainsi qu'on obteint les ensembles de clauses 3SAT les plus complexes à résoudre.
-De plus, chaque clause contient le littéral N ou le littéral -N, ce qui nous semble être un cas pathologique pour l'heuristique DUMB.
+Nous avons généré des ensembles de clauses de taille 3, en faisant varier le 
+nombre N de variables, et en prenant ceil(4.26*N) clauses.
+D'après ce que nous avons pu lire sur internet, c'est ainsi que l'on obtient les 
+ensembles de clauses 3SAT les plus complexes à résoudre.
+De plus, chaque clause contient le littéral N ou le littéral -N, ce qui nous 
+semble être un cas pathologique pour l'heuristique DUMB.
 On observe clairement ceci, en temps d'exécution :
 DUMB > DUMB_WL > RAND > RAND_WL > MOMS >= DLIS > MOMS_WL = DLIS_WL
-Ainsi, DLIS et MOMS sont plus performantes, et les watched literals apportent de nouveau un gain significatif.
+Ainsi, DLIS et MOMS sont plus performantes, et les watched literals apportent de 
+nouveau un gain significatif.
 
 Ensembles de clauses 5SAT
 -------------------------
-Nous avons généré des ensembles de clauses de taille 5, en faisant varier le nombre N de variables, et en prenant 21*N clauses.
-Nous n'avons pas trouvé d'informations claires à ce sujet, donc nous avons obtenu le facteur 21 de manière expérimentale.
-Pour ce faire, on fixe N, on fait varier le nombre M de clauses. Pour M donné, on fait 100 tests. Le nombre d'ensembles satisfiables diminue quand M augmente.
+Nous avons généré des ensembles de clauses de taille 5, en faisant varier le 
+nombre N de variables, et en prenant 21*N clauses.
+Nous n'avons pas trouvé d'informations claires à ce sujet, donc nous avons 
+obtenu le facteur 21 de manière expérimentale.
+Pour ce faire, on fixe N, on fait varier le nombre M de clauses. Pour M donné, 
+on fait 100 tests. Le nombre d'ensembles satisfiables diminue quand M augmente.
 Il semble qu'environ 50% des ensembles soient satisfiables pour M=21*N.
-De plus, chaque clause contient le littéral N ou le littéral -N, ce qui nous semble être un cas pathologique pour l'heuristique DUMB.
+De plus, chaque clause contient le littéral N ou le littéral -N, ce qui nous 
+semble être un cas pathologique pour l'heuristique DUMB.
 On observe clairement ceci, en temps d'exécution :
 DUMB > DUMB_WL > RAND > RAND_WL > DLIS > MOMS > DLIS_WL > MOMS_WL
-Ainsi, MOMS est l'heuristique la plus performante, suivie de DLIS, et les watched literals apportent de nouveau un gain significatif.
-Le gain apporté par les watched literals semble plus important, ce qui parraît logique en prenant des clauses de plus grandes tailles.
+Ainsi, MOMS est l'heuristique la plus performante, suivie de DLIS, et les 
+watched literals apportent de nouveau un gain significatif.
+Le gain apporté par les watched literals semble plus important, ce qui parait 
+logique en prenant des clauses de plus grandes tailles.
 
 Graphes
 -------
-Nous avons généré des graphes de N noeuds, et ceil(0.35*N*(N-1)/2) arêtes, et nous essayons de les colorier avec 4 couleurs.
-On obtient ainsi des graphes de densité environ 0.35 (la densité étant le nombre d'arêtes divisé par le nombre maximal d'arête, soit N*(N-1)/2).
-La densité 0.35 a été obtenue expérimentalement, c'est ce qui semblait garantir environ 50% de graphes 4-coloriables.
+Nous avons généré des graphes de N noeuds, et ceil(0.35*N*(N-1)/2) arêtes, et 
+nous essayons de les colorier avec 4 couleurs.
+On obtient ainsi des graphes de densité environ 0.35 (la densité étant le nombre 
+d'arêtes divisé par le nombre maximal d'arête, soit N*(N-1)/2).
+La densité 0.35 a été obtenue expérimentalement, c'est ce qui semblait garantir 
+environ 50% de graphes 4-coloriables.
 On observe ceci en temps d'exécution :
 DUMB > DUMB_WL >= RAND > RAND_WL > MOMS > MOMS_WL > DLIS > DLIS_WL
-Ainsi, DLIS est l'heuristique la plus performante, suivie de MOMS. Les watched literals apportent de nouveau un grain significatif.
+Ainsi, DLIS est l'heuristique la plus performante, suivie de MOMS. Les watched 
+literals apportent de nouveau un grain significatif.
 
 Conclusion
 ----------
-Les watched literals semblent ne jamais entraîner de temps d'exécution plus important. Au contraire, le temps d'exécution est dans une majorité de cas strictement inférieur.
-De plus, les heuristiques MOMS et DLIS sont largement plus performantes que les heuristiques DUMB et RAND.
+Les watched literals semblent ne jamais entraîner de temps d'exécution plus 
+important. Au contraire, le temps d'exécution est dans une majorité de cas 
+strictement inférieur.
+De plus, les heuristiques MOMS et DLIS sont largement plus performantes que les 
+heuristiques DUMB et RAND.
 L'heuristique RAND est meilleure que l'heuristique DUMB dans une majorité de cas.
-Il est difficile de départager l'heuristique MOMS de l'heuristique DLIS, l'une étant meilleure que l'autre en fonction des expériences menées.
+Il est difficile de départager l'heuristique MOMS de l'heuristique DLIS, l'une 
+étant meilleure que l'autre en fonction des expériences menées.
 
 
 
