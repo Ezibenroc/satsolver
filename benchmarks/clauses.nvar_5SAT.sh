@@ -9,13 +9,13 @@ fi
 NB_TEST=$1								# number of tests to perform for each configuration
 DIRECTORY=/tmp						# working directory where files will be saved
 EXEC="./resol"						# executable
-OUTPUT=clauses.nvar.dat
+OUTPUT=clauses.nvar_5SAT.dat
 
 rm -f $OUTPUT
 rm -f $DIRECTORY/output.txt
 echo "Variable_number DUMB RAND MOMS DLIS DUMB_WL RAND_WL MOMS_WL DLIS_WL" >> $OUTPUT
 
-for nb in `seq 5 200`; do
+for nb in `seq 10 200`; do
 	TIME_DUMB=0
 	TIME_RAND=0
 	TIME_MOMS=0
@@ -83,7 +83,7 @@ for nb in `seq 5 200`; do
 	TIME_RAND_WL=$(echo "scale=3; $TIME_RAND_WL / $NB_TEST" | bc)	
 	TIME_MOMS_WL=$(echo "scale=3; $TIME_MOMS_WL / $NB_TEST" | bc)	
 	TIME_DLIS_WL=$(echo "scale=3; $TIME_DLIS_WL / $NB_TEST" | bc)	
-	echo $nb x x $TIME_MOMS $TIME_DLIS x x $TIME_MOMS_WL $TIME_DLIS_WL >> $OUTPUT
+	echo $nb $TIME_DUMB $TIME_RAND $TIME_MOMS $TIME_DLIS $TIME_DUMB_WL $TIME_RAND_WL $TIME_MOMS_WL $TIME_DLIS_WL >> $OUTPUT
 # fin de la boucle
 done
 

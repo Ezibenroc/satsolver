@@ -9,13 +9,13 @@ fi
 NB_TEST=$1								# nombre de tests pour chaque configuration
 DIRECTORY=/tmp						# endroit de sauvegarde des fichiers temporaires
 EXEC="./resol"						# executable
-OUTPUT=clauses.nvar.dat
+OUTPUT=clauses.nvar_3SAT.dat
 
 rm -f $OUTPUT
 rm -f $DIRECTORY/output.txt
 echo "Variable_number DUMB RAND MOMS DLIS DUMB_WL RAND_WL MOMS_WL DLIS_WL" >> $OUTPUT
 
-for nb in `seq 5 200`; do
+for nb in `seq 10 200`; do
 	TIME_DUMB=0
 	TIME_RAND=0
 	TIME_MOMS=0
