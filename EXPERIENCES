@@ -32,6 +32,17 @@ L'entier passé en argument est le nombre de tests à exécuter pour chaque
 configuration.
 Ces différents benchmarks sont détaillés plus bas.
 
+Après avoir compilé nos programmes comme il se doit (voir README), se placer
+dans le répertoire build.
+Les fichiers d'extensions .dat sont les résultats expérimentaux que nous avons
+obtenus. Les courbes correspondantes sont dans le fichier courbes.pdf (situé 
+dans le répertoire racine de ce projet).
+Pour générer de nouveaux résultats, il suffit d'exécuter les scripts mentionnés
+plus haut. Attention : cela écrasera les résultats expérimentaux présents dans
+le répertoire build, il faut penser à les sauvegarder.
+Pour génerer un nouveau fichier courbes.pdf, lancer : "gnuplot script-plot.p".
+
+
 Chaque résultat présenté a été calculé en faisant 100 tests, sur des objets 
 générés aléatoirement avec les même paramètres, puis en prenant la moyenne des 
 temps d'exécution.
