@@ -12,6 +12,7 @@
 
 bool VERBOSE = false;
 bool WITH_WL = false;
+bool CL_INTERACT = false;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
 int main(void)

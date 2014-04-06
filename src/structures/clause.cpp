@@ -126,6 +126,20 @@ std::string Clause::to_string2()  {
     return oss.str() ;
 }
 
+std::set<int> Clause::whole_to_set() const {
+    std::set<int> s = std::set<int>() ;
+    for(auto l : this->literals)
+        s.insert(l) ;
+    return s;
+}
+
+std::set<unsigned int> Clause::variables_to_set() const {
+    std::set<unsigned int> s = std::set<unsigned int>() ;
+    for(auto l : this->literals)
+        s.insert(abs(l)) ;
+    return s;
+}
+
 std::set<int> Clause::to_set() const {
     std::set<int> s = std::set<int>() ;
     for(auto l : this->literals) {

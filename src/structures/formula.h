@@ -41,7 +41,7 @@ class Formula {
         // Les clauses ne contiendront que des littéraux indeterminés
         std::set<std::set<int> > to_set() ;
         std::set<Clause*> to_clauses_set() ;
-        std::vector<Clause*> to_clauses_vector() ;
+        std::vector<std::shared_ptr<Clause>>& to_clauses_vector() ;
 
         // Déduction de l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
@@ -61,7 +61,7 @@ class Formula {
         int monome(unsigned int *clause_id) ;
 
         // Renvoie un litéral isolé de la formule (0 si inexistant)
-        int isolated_literal() ;
+        int isolated_literal(unsigned int *clause_id) ;
 
         // Renvoie vrai ssi la formule ne contient pas de clauses
         bool is_empty() const;

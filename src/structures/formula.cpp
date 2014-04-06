@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <map>
 
 #include "config.h"
 
@@ -109,12 +110,8 @@ std::set<Clause*> Formula::to_clauses_set() {
     return set ;
 }
 
-std::vector<Clause*> Formula::to_clauses_vector() {
-    std::vector<Clause*> vector;
-    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-        vector.push_back(new Clause(*this->clauses[i].get())) ;
-    }
-    return vector ;
+std::vector<std::shared_ptr<Clause>>& Formula::to_clauses_vector() {
+    return this->clauses;
 }
 
 
@@ -216,8 +213,11 @@ int Formula::monome(unsigned int *clause_id) {
     return 0 ;
 }
 
-int Formula::isolated_literal() {
+int Formula::isolated_literal(unsigned int *clause_id) {
+    int i;
     int *l ;
+    std::vector<std::shared_ptr<Clause>> clauses = this->to_clauses_vector();
+    std::map<int, unsigned int> literal_to_clause_id;
     l = (int*) malloc((this->nb_variables+1)*sizeof(int)) ;
     /* l[i] = 0 si i est inconnu et n'existe pas dans les clauses
          l[i] = 1 si i est inconnu et seulement positif
@@ -225,29 +225,37 @@ int Formula::isolated_literal() {
          l[i] = 3 si i est inconnu et positif et négatif
     */
     memset(l,0,(this->nb_variables+1)*sizeof(int)) ;
-    for(auto c : this->to_set()) {
-        for(auto i : c) {
-            if(i>0) {
-                if(l[i] == 0 || l[i] == 1)
-                    l[i] = 1 ;
+    for (i=0; i<(int)clauses.size(); i++) {
+        if(clauses.at(i)->is_evaluated_to_true())
+            continue;
+        for(auto j : clauses.at(i)->to_set()) {
+            if(j>0) {
+                if(l[j] == 0 || l[j] == 1)
+                    l[j] = 1 ;
                 else
-                    l[i] = 3 ;
+                    l[j] = 3 ;
             }
             else {
-                if(l[-i] == 0 || l[-i] == 2)
-                    l[-i] = 2 ;
+                if(l[-j] == 0 || l[-j] == 2)
+                    l[-j] = 2 ;
                 else
-                    l[-i] = 3 ;
+                    l[-j] = 3 ;
             }
+            if (clause_id && l[abs(j)] != 0)
+                literal_to_clause_id[j] = i;
         }
     }
     for(int i = 1 ; i <= this->nb_variables ; i++) {
         if(l[i] == 1) {
             free(l);
+            if (clause_id)
+                *clause_id = literal_to_clause_id[i];
             return i ;
         }
         else if(l[i] == 2) {
             free(l);
+            if (clause_id)
+                *clause_id = literal_to_clause_id[i];
             return -i ;
         }
     }

@@ -181,7 +181,7 @@ void StructuresTests::testFormula() {
 
     Formula *f2 = new Formula(f) ;
     CPPUNIT_ASSERT(f2->to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
-    CPPUNIT_ASSERT(f2->isolated_literal() == 2) ;
+    CPPUNIT_ASSERT(f2->isolated_literal(NULL) == 2) ;
     CPPUNIT_ASSERT(f2->bet_true(-1, NULL)) ;
     CPPUNIT_ASSERT(!f2->contains_false_clause(NULL));
 

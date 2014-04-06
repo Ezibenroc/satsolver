@@ -49,8 +49,14 @@ class Clause {
         std::string to_string() ;
         std::string to_string2() ;
 
-        // Renvoie un ensemble contenant tous les entiers de la clause.
+        // Renvoie un ensemble contenant tous les entiers de la clause qui ne sont pas vrais.
         std::set<int> to_set() const;
+
+        // Renvoie un ensemble contenant tous les entiers de la clause.
+        std::set<int> whole_to_set() const;
+
+        // Renvoie un ensemble contenant toutes les variables de la clause.
+        std::set<unsigned int> variables_to_set() const;
 
 
        // Renvoie vrai si la clause est vide
