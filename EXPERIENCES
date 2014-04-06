@@ -1,9 +1,10 @@
 Comparaison des performances
 ============================
+
 Nous avons implémenté un programme en OCaml, permettant de générer aléatoirement 
 un ensemble de clauses, une formule de logique propositionnelle, ou un graphe.
-  * Compilation : 
-    ocamlopt -o generator generator.ml
+  * Compilation :
+    make generator (ou simplement « make », qui compile tout le projet)
   * Génération d'un ensemble de 10 clauses de taille 3, pour 5 variables :   
     ./generator -nvar 5 -nclause 10 -sclause 3
   * Génération d'une formule de profondeur 3, pour 5 variables :             
@@ -54,6 +55,7 @@ literals (donc 8 courbes par jeu de test).
 
 Formules de logique propositionnelle
 ------------------------------------
+
 Nous avons généré des formules de 5 variables, en faisant varier la profondeur.
 La profondeur est défini de manière récursive, pour f1 et f2 des formules :
 Profondeur(var) = 0
@@ -70,6 +72,7 @@ les watched literals apportent un gain significatif.
 
 Ensembles de clauses 3SAT
 -------------------------
+
 Nous avons généré des ensembles de clauses de taille 3, en faisant varier le 
 nombre N de variables, et en prenant ceil(4.26*N) clauses.
 D'après ce que nous avons pu lire sur internet, c'est ainsi que l'on obtient les 
@@ -83,6 +86,7 @@ nouveau un gain significatif.
 
 Ensembles de clauses 5SAT
 -------------------------
+
 Nous avons généré des ensembles de clauses de taille 5, en faisant varier le 
 nombre N de variables, et en prenant 21*N clauses.
 Nous n'avons pas trouvé d'informations claires à ce sujet, donc nous avons 
@@ -101,10 +105,11 @@ logique en prenant des clauses de plus grandes tailles.
 
 Graphes
 -------
+
 Nous avons généré des graphes de N noeuds, et ceil(0.35*N*(N-1)/2) arêtes, et 
 nous essayons de les colorier avec 4 couleurs.
 On obtient ainsi des graphes de densité environ 0.35 (la densité étant le nombre 
-d'arêtes divisé par le nombre maximal d'arête, soit N*(N-1)/2).
+d'arêtes divisé par le nombre maximal d'arêtes, soit N*(N-1)/2).
 La densité 0.35 a été obtenue expérimentalement, c'est ce qui semblait garantir 
 environ 50% de graphes 4-coloriables.
 On observe ceci en temps d'exécution :
@@ -114,6 +119,7 @@ literals apportent de nouveau un grain significatif.
 
 Conclusion
 ----------
+
 Les watched literals semblent ne jamais entraîner de temps d'exécution plus 
 important. Au contraire, le temps d'exécution est dans une majorité de cas 
 strictement inférieur.
