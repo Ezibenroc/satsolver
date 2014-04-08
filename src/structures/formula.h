@@ -41,8 +41,8 @@ class Formula {
         // Une clause fausse sera un ensemble vide
         // Les clauses ne contiendront que des littéraux indeterminés
         std::set<std::set<int> > to_set() ;
-        std::set<Clause*> to_clauses_set() ;
-        std::vector<std::shared_ptr<Clause>>& to_clauses_vector() ;
+        std::set<Clause*> to_clauses_set() const;
+        std::vector<std::shared_ptr<Clause>>& to_clauses_vector();
 
         // Déduction de l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit

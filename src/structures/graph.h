@@ -20,8 +20,8 @@ class Graph {
         void set_value(int node_id, int value);
         void add_edge(int first, int second);
 
-        int get_nodes_count();
-        std::set<int>* get_lower_adjacent_nodes(int node_id);
+        int get_nodes_count() const;
+        std::set<int>* get_lower_adjacent_nodes(int node_id) const;
 
 };
 

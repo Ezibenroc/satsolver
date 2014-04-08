@@ -99,7 +99,7 @@ std::set<std::set<int> > Formula::to_set() {
     return set ;
 }
 
-std::set<Clause*> Formula::to_clauses_set() {
+std::set<Clause*> Formula::to_clauses_set() const {
     std::set<Clause*> set;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
         set.insert(new Clause(*this->clauses[i].get())) ;

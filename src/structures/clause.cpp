@@ -73,7 +73,7 @@ bool Clause::is_tautology() const {
 }
 
 
-std::string Clause::to_string()  {
+std::string Clause::to_string() const {
     std::ostringstream oss;
     bool flag = false ;
     oss << "{" ;
@@ -97,7 +97,7 @@ std::string Clause::to_string()  {
 }
 
 
-std::string Clause::to_string2()  {
+std::string Clause::to_string2() const {
     std::ostringstream oss;
     for(int i = 1 ; i <= this->nb_variables ; i++) {
         if(this->contains_literal(-i)) {

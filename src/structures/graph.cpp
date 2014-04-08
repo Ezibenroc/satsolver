@@ -65,11 +65,11 @@ void Graph::add_edge(int first, int second) {
         this->adjacency[second]->insert(first);
 }
 
-int Graph::get_nodes_count() {
+int Graph::get_nodes_count() const {
     return this->nodes_count;
 }
 
-std::set<int>* Graph::get_lower_adjacent_nodes(int node_id) {
+std::set<int>* Graph::get_lower_adjacent_nodes(int node_id) const {
     assert(node_id < this->nodes_count);
     return this->adjacency[node_id];
 }
