@@ -30,6 +30,7 @@ add_library(Clause src/structures/clause.cpp)
 add_library(Formula src/structures/formula.cpp)
 target_link_libraries(Formula Clause Affectation)
 add_library(ExtendedFormula src/structures/extended_formula.cpp)
+add_library(ColorAffectation src/structures/color_affectation.cpp)
 add_library(Graph src/structures/graph.cpp)
 
 add_library(CommandLineParser src/parsers/cli.cpp)
@@ -40,7 +41,7 @@ target_link_libraries(SatParser AbstractParser Clause Formula)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp "")
 add_library(Structures ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
-target_link_libraries(Structures Formula Clause Affectation Graph ExtendedFormula)
+target_link_libraries(Structures Formula Clause Affectation ColorAffectation Graph ExtendedFormula)
 set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
 
 
@@ -79,7 +80,7 @@ add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Affectation Clause Formula)
 
 add_library(GraphColorSolver src/solvers/graphcolor.cpp)
-target_link_libraries(GraphColorSolver Graph ExtendedFormula Formula DPLL)
+target_link_libraries(GraphColorSolver Structures DPLL)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp "")
 add_library(Solvers ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp)
