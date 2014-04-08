@@ -21,7 +21,7 @@ class AbstractParser {
                 syntaxerror() : msg("<unknown error>") {}
                 syntaxerror(const syntaxerror &other) : msg(other.msg) {}
                 syntaxerror& operator=(const syntaxerror &other) { this->msg = other.msg; return *this; }
-                ~syntaxerror() {}
+                ~syntaxerror() throw () {}
                 virtual const char* what() const throw() {
                     std::cout << std::string(this->msg);
                     std::cout << std::endl;

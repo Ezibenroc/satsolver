@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <exception>
+#include <stdexcept>
 
 #include "structures/affectation.h"
 #include "structures/formula.h"

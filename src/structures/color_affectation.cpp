@@ -1,4 +1,5 @@
 #include <sstream>
+#include <stdexcept>
 #include "structures/color_affectation.h"
 
 graphsolver::ColorAffectation::ColorAffectation(int nb_nodes, int *colors) : nb_nodes(nb_nodes), colors(colors) {

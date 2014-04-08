@@ -4,7 +4,7 @@
 
 using namespace graphsolver;
 
-GraphParser::GraphParser(std::istream &stream) : AbstractParser(stream), current_node_id(-1), nodes_count(0), edges_count(0), graph((Graph*) NULL) {
+GraphParser::GraphParser(std::istream &stream) : AbstractParser(stream), current_node_id(-1), nodes_count(0), edges_count(0), graph(static_cast<Graph*>(NULL)) {
 }
 GraphParser::GraphParser(const GraphParser &that) : AbstractParser(that), current_node_id(that.current_node_id), nodes_count(that.nodes_count), edges_count(that.edges_count), graph(new Graph(*that.graph)) {
 }
