@@ -73,7 +73,7 @@ SPEF get_color_limitation_formula(int nb_nodes, int nb_colors, int nb_bits) {
 
 // Returns an extended formula from a graph coloration problem.
 int reduce_graph_coloration_to_extended_formula(graphsolver::Graph *graph, int nb_colors, SPEF *formula) {
-    int nb_bits = (int) ceil(log2(nb_colors));
+    int nb_bits = static_cast<int>(ceil(log2(nb_colors)));
     int nodes_count = graph->get_nodes_count();
     int i;
     std::set<int> *adjacent_nodes;

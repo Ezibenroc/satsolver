@@ -41,8 +41,8 @@ Clause::~Clause() {
 
 }
 
-int Clause::get_size() const {
-    return (int) this->literals.size() ;
+long unsigned int Clause::get_size() const {
+    return this->literals.size() ;
 }
 
 bool Clause::is_empty() const {

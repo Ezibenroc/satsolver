@@ -71,7 +71,7 @@ class Formula {
         int get_nb_variables() const;
 
         // Renvoie la taille de la formule ;
-        int get_size() const ;
+        long unsigned int get_size() const ;
 
         // Renvoie vrai ssi la formule contient une clause vide
         bool contains_empty_clause() const;

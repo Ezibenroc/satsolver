@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     int i;
     std::set<int>* nodes;
     int *colors, color;
-    srand((unsigned int) time(NULL));
+    srand(static_cast<unsigned int>(time(NULL)));
 
     /*********************
      * Get input
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
      * Display solution
      ********************/
     std::cout << "graph G {\n";
-    colors = (int*) malloc(sizeof(int)*nb_colors);
+    colors = static_cast<int*>(malloc(sizeof(int)*nb_colors));
     memset(colors, 0, sizeof(int)*nb_colors);
     for (i=0; i<graph->get_nodes_count(); i++) {
         color = colors[solution->colors[i]];

@@ -3,6 +3,8 @@
 
 #include "structures/affectation.h"
 
+#define get_variable_of_node_bit(node_id, bit_id) (std::to_string(node_id) + " " + std::to_string(bit_id))
+
 namespace graphsolver {
 
 class ColorAffectation {

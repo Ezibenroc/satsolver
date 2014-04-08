@@ -1,8 +1,6 @@
 #include <sstream>
 #include "structures/color_affectation.h"
 
-#define get_variable_of_node_bit(node_id, bit_id) (std::to_string(node_id) + " " + std::to_string(bit_id))
-
 graphsolver::ColorAffectation::ColorAffectation(int nb_nodes, int *colors) : nb_nodes(nb_nodes), colors(colors) {
 }
 graphsolver::ColorAffectation::ColorAffectation(const graphsolver::ColorAffectation &that) : nb_nodes(that.nb_nodes), colors(that.colors) {
@@ -29,7 +27,7 @@ std::string graphsolver::ColorAffectation::to_string() const {
 
 // Get the graph coloration from the SAT solution.
 std::shared_ptr<graphsolver::ColorAffectation> graphsolver::ColorAffectation::from_sat_solution(satsolver::Affectation *affectation, std::shared_ptr<std::map<std::string, int>> name_to_variable, int nb_nodes, int nb_bits) {
-    int *colors = (int*) malloc(sizeof(int)*nb_nodes);
+    int *colors = static_cast<int*>(malloc(sizeof(int)*nb_nodes));
     int i, j;
     int variable_id;
     for (i=0; i<nb_nodes; i++) {

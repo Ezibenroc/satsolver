@@ -41,7 +41,7 @@ class Clause {
         bool is_tautology() const;
 
         // Renvoie le nombre de littéraux
-        int get_size() const;
+        long unsigned int get_size() const;
 
 
 

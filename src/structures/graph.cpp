@@ -6,14 +6,14 @@
 
 using namespace graphsolver;
 
-Graph::Graph(int nodes_count, int default_value) : nodes_count(nodes_count), values((int*) malloc(sizeof(int)*nodes_count)), adjacency((std::set<int>**) malloc(sizeof(std::set<int>*)*nodes_count)) {
+Graph::Graph(int nodes_count, int default_value) : nodes_count(nodes_count), values(static_cast<int*>(malloc(sizeof(int)*nodes_count))), adjacency(static_cast<std::set<int>**>(malloc(sizeof(std::set<int>*)*nodes_count))) {
     int i;
     memset(values, default_value, nodes_count);
     for (i=0; i<nodes_count; i++) {
         this->adjacency[i] = new std::set<int>();
     }
 }
-graphsolver::Graph::Graph(const graphsolver::Graph &that) : nodes_count(that.nodes_count), values((int*) malloc(sizeof(int)*that.nodes_count)), adjacency((std::set<int>**) malloc(sizeof(std::set<int>*)*nodes_count)) {
+graphsolver::Graph::Graph(const graphsolver::Graph &that) : nodes_count(that.nodes_count), values(static_cast<int*>(malloc(sizeof(int)*nodes_count))), adjacency(static_cast<std::set<int>**>(malloc(sizeof(std::set<int>*)*nodes_count))) {
     int i;
     memcpy(values, that.values, nodes_count);
     for (i=0; i<nodes_count; i++) {
@@ -30,8 +30,8 @@ graphsolver::Graph& graphsolver::Graph::operator=(const graphsolver::Graph &that
     free(this->adjacency);
 
     this->nodes_count = that.nodes_count;
-    values = (int*) malloc(sizeof(int)*that.nodes_count);
-    adjacency = (std::set<int>**) malloc(sizeof(std::set<int>*)*nodes_count);
+    values = static_cast<int*>(malloc(sizeof(int)*that.nodes_count));
+    adjacency = static_cast<std::set<int>**>(malloc(sizeof(std::set<int>*)*nodes_count));
     memcpy(values, that.values, nodes_count);
     for (i=0; i<nodes_count; i++) {
         this->adjacency[i] = new std::set<int>(*that.adjacency[i]);

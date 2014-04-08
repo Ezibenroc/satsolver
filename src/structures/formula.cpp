@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
+#include <climits>
 #include <math.h>
 #include <time.h>
 #include <map>
@@ -17,7 +18,7 @@ using namespace satsolver;
 int depth_stack = 0 ; // used only for verbosity mode
 
 void print_space() {
-		std::cout << "TIME : " << ((float) clock())/CLOCKS_PER_SEC << "\t" ;
+		std::cout << "TIME : " << (static_cast<float>(clock()))/CLOCKS_PER_SEC << "\t" ;
     for(int i = 0 ; i < depth_stack ; i++)
         std::cout << "\t" ;
 }
@@ -210,18 +211,18 @@ int Formula::monome(unsigned int *clause_id) {
 }
 
 int Formula::isolated_literal(unsigned int *clause_id) {
-    int i;
+    unsigned int i;
     int *l ;
     std::vector<std::shared_ptr<Clause>> clauses = this->to_clauses_vector();
     std::map<int, unsigned int> literal_to_clause_id;
-    l = (int*) malloc((this->nb_variables+1)*sizeof(int)) ;
+    l = static_cast<int*>(malloc((this->nb_variables+1)*sizeof(int)));
     /* l[i] = 0 si i est inconnu et n'existe pas dans les clauses
          l[i] = 1 si i est inconnu et seulement positif
          l[i] = 2 si i est inconnu et seulement négatif
          l[i] = 3 si i est inconnu et positif et négatif
     */
-    memset(l,0,(this->nb_variables+1)*sizeof(int)) ;
-    for (i=0; i<(int)clauses.size(); i++) {
+    memset(l, 0, (this->nb_variables+1)*sizeof(int)) ;
+    for (i=0; i<clauses.size(); i++) {
         if(clauses.at(i)->is_evaluated_to_true())
             continue;
         for(auto j : clauses.at(i)->to_set()) {
@@ -263,8 +264,8 @@ int Formula::isolated_literal(unsigned int *clause_id) {
 bool Formula::is_empty() const {
     return (this->clauses.size() == 0);
 }
-int Formula::get_size() const {
-    return (int) this->clauses.size() ;
+long unsigned int Formula::get_size() const {
+    return this->clauses.size() ;
 }
 int Formula::get_nb_variables() const {
     return this->nb_variables;
@@ -384,15 +385,15 @@ int Formula::choose_literal_random() const {
 
 int Formula::choose_literal_moms() const {
 	bool there_is_literals = false ;
-	unsigned min_clause_size = 999999999 ;
+	long unsigned min_clause_size = ULONG_MAX;
 	std::vector<int> v = std::vector<int>() ;
-	int *count = (int*) malloc((2*this->nb_variables+1)*sizeof(int)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
+	int *count = static_cast<int*>(malloc((2*this->nb_variables+1)*sizeof(int))); // count[i] = nombre d'apparitions du littéral i-nb_variables
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
 		v.clear() ;
 		this->clauses[i]->add_literals_to_vector(v) ;
 		there_is_literals = there_is_literals || v.size() > 0 ;
 		if(v.size() < min_clause_size && v.size() > 0) { // trouvé une clause plus petite, on remet tout à zéro
-			min_clause_size = (unsigned) v.size() ;
+			min_clause_size = v.size() ;
 			memset(count,0,(2*this->nb_variables+1)*sizeof(int)) ;
 		}
 		if(v.size() == min_clause_size) { // on incrémente le compteur de tous les littéraux de v
@@ -426,7 +427,7 @@ int Formula::choose_literal_dlis() const {
 		v.clear() ;
 		this->clauses[i]->add_literals_to_vector(v) ;
 		there_is_literals = there_is_literals || v.size() > 0 ;
-		point = (double) pow(2,-(double)v.size()) ;
+		point = pow(2,-static_cast<double>(v.size()));
 		for(unsigned j = 0 ; j < v.size() ; j ++) {
 			count[v[j]+this->nb_variables] += point ;
 		}

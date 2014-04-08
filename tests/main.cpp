@@ -16,9 +16,8 @@ bool CL_INTERACT = false;
 bool WITH_CL = false;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
-int main(void)
-{
-		srand((int)time(NULL)) ;
+int main(void) {
+    srand(static_cast<unsigned int>(time(NULL)));
     CppUnit::TextUi::TestRunner runner;
     runner.addTest(StructuresTests::suite());
     runner.addTest(HeuristicsTests::suite());
