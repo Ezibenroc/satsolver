@@ -7,19 +7,12 @@
 
 using namespace satsolver;
 
-Affectation::Affectation(int nb_var) {
-    std::vector<int> t ;
-    this->nb_aff = 0 ;
-    this->nb_unknown = nb_var ;
-    this->aff = t ;
+Affectation::Affectation(int nb_var) : aff(std::vector<int>()), nb_aff(0), nb_unknown(nb_var) {
     for(int i = 0 ; i < nb_var ; i++)
         this->aff.push_back(0) ;
 }
 
-Affectation::Affectation(Affectation *a) {
-    this->aff = std::vector<int>(a->aff) ;
-    this->nb_aff = a->nb_aff ;
-    this->nb_unknown = a->nb_unknown ;
+Affectation::Affectation(Affectation *a) : aff(std::vector<int>(a->aff)), nb_aff(a->nb_aff), nb_unknown(a->nb_unknown) {
 }
 
 bool Affectation::is_true(int x) const {

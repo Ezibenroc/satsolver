@@ -16,6 +16,13 @@
 
 graphsolver::ColorAffectation::ColorAffectation(int nb_nodes, int *colors) : nb_nodes(nb_nodes), colors(colors) {
 }
+graphsolver::ColorAffectation::ColorAffectation(const graphsolver::ColorAffectation &that) : nb_nodes(that.nb_nodes), colors(that.colors) {
+}
+graphsolver::ColorAffectation& graphsolver::ColorAffectation::operator=(const graphsolver::ColorAffectation &that) {
+    nb_nodes = that.nb_nodes;
+    colors = that.colors;
+    return *this;
+}
 graphsolver::ColorAffectation::~ColorAffectation() {
     free(this->colors);
 }

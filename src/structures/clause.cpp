@@ -12,35 +12,20 @@
 using namespace satsolver;
 
 
-Clause::Clause(int nb_var, std::shared_ptr<std::vector<int>> literals) {
-    this->literals = std::unordered_set<int>() ;
-    this->nb_variables = nb_var;
+Clause::Clause(int nb_var, std::shared_ptr<std::vector<int>> literals) : literals(std::unordered_set<int>()), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
     for(std::vector<int>::iterator it = literals->begin(); it != literals->end(); ++it) {
         assert(*it != 0 && abs(*it) <= nb_var);
         this->literals.insert(*it) ;
     }
-    if (WITH_WL)
-        this->watched = std::pair<int,int>(0,0) ;
-    this->aff = NULL ;
 }
-Clause::Clause(int nb_var, std::vector<int> literals) {
-    this->literals = std::unordered_set<int>() ;
-    this->nb_variables = nb_var;
+Clause::Clause(int nb_var, std::vector<int> literals) : literals(std::unordered_set<int>()), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
     for(std::vector<int>::iterator it = literals.begin(); it != literals.end(); ++it) {
         assert(*it != 0 && abs(*it) <= nb_var);
         this->literals.insert(*it) ;
     }
-    if (WITH_WL)
-        this->watched = std::pair<int,int>(0,0) ;
-    this->aff = NULL ;
 }
 
-Clause::Clause(const Clause &c){
-    this->literals = std::unordered_set<int>(c.literals) ;
-    this->nb_variables = c.nb_variables ;
-    if (WITH_WL)
-        this->watched = std::pair<int,int>(c.watched) ;
-    this->aff = c.aff ;
+Clause::Clause(const Clause &c) : literals(std::unordered_set<int>(c.literals)), nb_variables(c.nb_variables), watched(std::pair<int,int>(c.watched)), aff(c.aff) {
 }
 
 Clause& Clause::operator=(const Clause &that) {

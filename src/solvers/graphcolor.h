@@ -12,6 +12,8 @@ class ColorAffectation {
         int nb_nodes, *colors;
 
         ColorAffectation(int nb_nodes, int *colors);
+        ColorAffectation(const ColorAffectation &that);
+        ColorAffectation& operator=(const ColorAffectation &that);
         ~ColorAffectation();
         std::string to_string() const;
 

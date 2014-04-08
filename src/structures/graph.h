@@ -13,6 +13,8 @@ class Graph {
         
     public:
         Graph(int nodes_count, int default_value);
+        Graph(const Graph&);
+        Graph& operator=(const Graph&);
         ~Graph();
 
         void set_value(int node_id, int value);

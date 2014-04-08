@@ -22,10 +22,7 @@ void print_space() {
         std::cout << "\t" ;
 }
 
-Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : clauses(v), nb_variables(nb_variables) {
-    this->aff = new Affectation(nb_variables) ;
-    this->mem = std::stack<std::pair<int,bool>>() ;
-    this->to_do = std::set<int>() ;
+Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do() {
     for(auto c : this->clauses) {
         c->set_affectation(this->aff) ;
     }
@@ -37,18 +34,17 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : cla
       }
 }
 
-Formula::Formula(satsolver::Formula *f) {
-    this->nb_variables = f->nb_variables;
+Formula::Formula(satsolver::Formula *f) : aff(new Affectation(f->aff)), clauses(), nb_variables(f->nb_variables), mem(), to_do() {
     this->clauses.reserve(f->clauses.size()) ;
     for(unsigned int i = 0 ; i < f->clauses.size() ; i++) {
         this->clauses.push_back(std::shared_ptr<Clause>(new Clause(*f->clauses[i].get())));
     }
-    this->aff = new Affectation(f->aff) ;
     for(auto c : this->clauses) {
         c->set_affectation(aff) ;
     }
-    this->mem = std::stack<std::pair<int,bool>>(f->mem) ;
-    this->to_do = std::set<int>(f->to_do) ;
+}
+
+satsolver::Formula::Formula(const satsolver::Formula &that) : aff(that.aff), clauses(), nb_variables(that.nb_variables), mem(), to_do() {
 }
 
 Formula::~Formula() {

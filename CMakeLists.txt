@@ -11,7 +11,7 @@ find_package(BISON)
 find_package(FLEX)
 
 add_definitions(-std=c++0x -O2)
-add_definitions(-g -Wall -Wextra -pedantic  -Wcast-qual -Wcast-align -Wconversion -Wdouble-promotion -Wfloat-equal -Wpointer-arith -fmax-errors=2)
+add_definitions(-g -Wall -Wextra -Werror -pedantic  -Wcast-qual -Wcast-align -Wconversion -Wdouble-promotion -Wfloat-equal -Wpointer-arith -Woverloaded-virtual -Weffc++ -fmax-errors=2)
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")

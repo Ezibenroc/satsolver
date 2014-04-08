@@ -7,7 +7,7 @@
 bool CL_INTERACT = false;
 bool WITH_CL = false;
 
-CommandLineParser::CommandLineParser(int argc, char *argv[], std::unordered_set<std::string> extra_args, std::string extra_syntax) : extra_syntax(extra_syntax) {
+CommandLineParser::CommandLineParser(int argc, char *argv[], std::unordered_set<std::string> extra_args, std::string extra_syntax) : nb_parsed_args(0), extra_args(), extra_syntax(extra_syntax) {
     int i;
     for (auto arg : extra_args)
         this->extra_args.insert(std::pair<std::string, bool>(arg, false));
