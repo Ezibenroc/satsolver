@@ -114,6 +114,10 @@ std::vector<std::shared_ptr<Clause>>& Formula::to_clauses_vector() {
     return this->clauses;
 }
 
+void Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
+    this->clauses.push_back(clause);
+}
+
 
 bool Formula::set_true(int x, unsigned int *clause_id) {
     int literal ;

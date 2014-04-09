@@ -35,7 +35,7 @@ class SatParser : public AbstractParser {
 
         std::vector<std::shared_ptr<Clause>> clauses;
         int variables_count, clauses_count;
-        std::vector<int> literals;
+        std::set<int> literals;
         Formula *formula;
 
         enum State transition(enum State);

@@ -25,8 +25,7 @@
 using namespace satsolver;
 
 void StructuresTests::testClauseCreation() {
-    std::vector<int> v(2);
-    v = {3, -2};
+    std::set<int> v({3, -2});
     satsolver::Clause *clause = new Clause(5, v);
     CPPUNIT_ASSERT(!clause->contains_literal(-5));
     CPPUNIT_ASSERT(!clause->contains_literal(-4));
@@ -60,8 +59,7 @@ void StructuresTests::testClauseCreation() {
 }
 
 void StructuresTests::testBasicUsage() {
-    std::vector <int> v = {1,2,-3,4,} ;
-    Clause *c = new Clause(4,v) ;
+    Clause *c = new Clause(4,{1,2,-3,4,}) ;
     Affectation *aff = new Affectation(4) ;
     c->set_affectation(aff) ;
     CPPUNIT_ASSERT(c->to_set() == std::set<int>({1,2,-3,4}));
@@ -123,8 +121,7 @@ void StructuresTests::testAffectationCreationUsage(){
 
 void StructuresTests::testSetTrueClause() {
     WITH_WL = true;
-    std::vector <int> v = {1,2,-3,4,} ;
-    Clause *c = new Clause(4,v) ;
+    Clause *c = new Clause(4, {1,2,-3,4,}) ;
     satsolver::Affectation *aff = new satsolver::Affectation(4) ;
     c->set_affectation(aff) ;
     c->init_WL() ;
@@ -147,8 +144,7 @@ void StructuresTests::testSetTrueClause() {
     delete aff ;
     delete c ;
 
-    v = {1,2,3} ;
-    c = new Clause(3,v) ;
+    c = new Clause(3, {1,2,3}) ;
     aff = new satsolver::Affectation(3) ;
     c->set_affectation(aff) ;
     c->init_WL() ;
@@ -162,16 +158,11 @@ void StructuresTests::testSetTrueClause() {
 void StructuresTests::testFormula() {
     unsigned int clause_id;
     std::vector<std::shared_ptr<Clause>> g ;
-    std::vector <int> v = {1,2,-3} ;
-    g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
-    v = {-1,2} ;
-    g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
-    v = {-1,-2,-3} ;
-    g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
-    v = {-3} ;
-    g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
-    v = {1,2,3} ;
-    g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(3, {1,2,-3}))) ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(3, {-1,2}))) ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(3, {-1,-2,-3}))) ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(3, {-3}))) ;
+    g.push_back(std::shared_ptr<Clause>(new Clause(3, {1,2,3}))) ;
     Formula f(g,3) ;
     CPPUNIT_ASSERT(f.to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
     std::vector<std::pair<int,bool>> st = f.get_mem() ;

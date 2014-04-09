@@ -72,7 +72,7 @@ enum SatParser::State SatParser::transition(enum SatParser::State state) {
             else if (str == "" || str == "\n")
                 return WAITING_FOR_CLAUSE;
             try {
-                this->literals.push_back(std::stoi(str));
+                this->literals.insert(std::stoi(str));
             }
             catch (std::exception &e) {
                 throw SatParser::syntaxerror(std::string() + "Expected integer, got '" + str + "'.");
@@ -82,7 +82,7 @@ enum SatParser::State SatParser::transition(enum SatParser::State state) {
         case PARSING_CLAUSE: // In a clause. At least one literal has been read.
             this->stream >> literal;
             if (literal) {
-                this->literals.push_back(literal);
+                this->literals.insert(literal);
                 return PARSING_CLAUSE;
             }
             else {

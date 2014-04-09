@@ -2,6 +2,7 @@
 #include <map>
 #include <iostream>
 #include <cassert>
+#include <memory>
 
 #include <exception>
 #include <stdexcept>
@@ -120,6 +121,34 @@ unsigned int cl_interact(const std::map<int, std::set<int>> &deductions, const A
     }
 }
 
+std::shared_ptr<Clause> learn_clause(const std::map<int, std::set<int>> &deductions, const std::vector<std::pair<int, bool>> &mem, const Affectation &aff, int nb_variables, int literal) {
+    (void) aff;
+    long unsigned int mem_top = mem.size()-1;
+    std::cout << literal << std::endl;
+    std::set<int> clause(deductions.at(literal)), clause2;
+    assert(clause.find(-literal) != clause.end());
+    mem_top--;
+    while (mem.at(mem_top).second) {
+        literal = mem.at(mem_top).first;
+        assert(mem.at(mem_top).first == literal);
+        try {
+            clause2 = deductions.at(literal);
+        }
+        catch (std::out_of_range) {
+            break;
+        }
+        if (clause.find(-literal) == clause.end())
+            break;
+        assert(clause2.find(literal) != clause.end());
+        clause.erase(clause.find(-literal));
+        clause2.erase(clause2.find(literal));
+        clause.insert(clause2.begin(), clause2.end());
+        mem_top--;
+    }
+    std::cout << Clause(nb_variables, clause).to_string() << std::endl;
+    return std::shared_ptr<Clause>(new Clause(nb_variables, clause));
+}
+
 Affectation* satsolver::solve(Formula *formula) {
     int literal;
     unsigned int clause_id;
@@ -158,6 +187,8 @@ Affectation* satsolver::solve(Formula *formula) {
                 assert(last_bet);
                 skip_conflicts = cl_interact(deductions, formula->get_aff(), last_bet, literal);
             }
+            if (WITH_CL)
+                learn_clause(deductions, formula->get_mem(), formula->get_aff(), formula->get_nb_variables(), literal);
             literal = formula->back() ;
             last_bet = -last_bet;
             if(literal == 0)

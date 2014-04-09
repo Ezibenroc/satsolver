@@ -22,7 +22,7 @@ class Clause {
     public:
 
         Clause(int nb_variables, std::shared_ptr<std::vector<int>> literals);
-        Clause(int nb_variables, std::vector<int> literals);
+        Clause(int nb_variables, std::set<int> literals);
         Clause(const satsolver::Clause &c) ; // initialise une nouvelle clause, copie de la clause donnée
         Clause& operator=(const Clause &that);
         ~Clause();
