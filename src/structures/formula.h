@@ -15,7 +15,7 @@ class Formula {
         Affectation *aff ;
         std::vector<std::shared_ptr<satsolver::Clause>> clauses ;
         int nb_variables ;
-        std::stack<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
+        std::vector<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
         std::set<int> to_do ; // littéraux déduits pas encore affectés (d’autres opérations sont « en cours »)
 
         // Affectation d'un litéral x
@@ -89,7 +89,7 @@ class Formula {
 
         // Renvoie la pile d'affectations
         // Ne pas utiliser en dehors des tests unitaires
-        std::stack<std::pair<int,bool>> get_mem() ;
+        std::vector<std::pair<int,bool>> get_mem() ;
 
         // Renvoie l'affectation
         // Ne pas utiliser en dehors des tests unitaires, ou de la fin de DPLL

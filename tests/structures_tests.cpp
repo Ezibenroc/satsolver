@@ -174,8 +174,8 @@ void StructuresTests::testFormula() {
     g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
     Formula f(g,3) ;
     CPPUNIT_ASSERT(f.to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
-    std::stack<std::pair<int,bool>> st = f.get_mem() ;
-    CPPUNIT_ASSERT(st.size() == 1 && (st.top() == std::pair<int,bool>(-3,true))) ;
+    std::vector<std::pair<int,bool>> st = f.get_mem() ;
+    CPPUNIT_ASSERT(st.size() == 1 && (st.back() == std::pair<int,bool>(-3,true))) ;
     CPPUNIT_ASSERT(f.get_aff()->is_true(-3)) ;
     CPPUNIT_ASSERT(f.get_aff()->get_nb_unknown() == 2) ;
 
