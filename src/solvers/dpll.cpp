@@ -16,7 +16,7 @@
 
 using namespace satsolver;
 
-#define AS_AFF(a, l) (aff.is_true(l) ? l : -l)
+#define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
 void handle_literal(FILE *graph_file, const std::map<int, std::set<int>> &deductions, std::set<int> *handled, std::set<int> &to_be_handled, const Affectation &aff, std::map<int, std::set<int>> &reversed_deductions, int literal) {
     if (deductions.find(literal) == deductions.end())
