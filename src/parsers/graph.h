@@ -50,6 +50,8 @@ class GraphParser : public AbstractParser {
 
     public:
         GraphParser(std::istream &stream);
+        GraphParser(const GraphParser &that);
+        GraphParser& operator=(const GraphParser &that);
         virtual ~GraphParser();
         virtual void parse();
 

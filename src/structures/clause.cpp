@@ -12,35 +12,20 @@
 using namespace satsolver;
 
 
-Clause::Clause(int nb_var, std::shared_ptr<std::vector<int>> literals) {
-    this->literals = std::unordered_set<int>() ;
-    this->nb_variables = nb_var;
+Clause::Clause(int nb_var, std::shared_ptr<std::vector<int>> literals) : literals(std::unordered_set<int>()), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
     for(std::vector<int>::iterator it = literals->begin(); it != literals->end(); ++it) {
         assert(*it != 0 && abs(*it) <= nb_var);
         this->literals.insert(*it) ;
     }
-    if (WITH_WL)
-        this->watched = std::pair<int,int>(0,0) ;
-    this->aff = NULL ;
 }
-Clause::Clause(int nb_var, std::vector<int> literals) {
-    this->literals = std::unordered_set<int>() ;
-    this->nb_variables = nb_var;
+Clause::Clause(int nb_var, std::vector<int> literals) : literals(std::unordered_set<int>()), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
     for(std::vector<int>::iterator it = literals.begin(); it != literals.end(); ++it) {
         assert(*it != 0 && abs(*it) <= nb_var);
         this->literals.insert(*it) ;
     }
-    if (WITH_WL)
-        this->watched = std::pair<int,int>(0,0) ;
-    this->aff = NULL ;
 }
 
-Clause::Clause(const Clause &c){
-    this->literals = std::unordered_set<int>(c.literals) ;
-    this->nb_variables = c.nb_variables ;
-    if (WITH_WL)
-        this->watched = std::pair<int,int>(c.watched) ;
-    this->aff = c.aff ;
+Clause::Clause(const Clause &c) : literals(std::unordered_set<int>(c.literals)), nb_variables(c.nb_variables), watched(std::pair<int,int>(c.watched)), aff(c.aff) {
 }
 
 Clause& Clause::operator=(const Clause &that) {
@@ -56,8 +41,8 @@ Clause::~Clause() {
 
 }
 
-int Clause::get_size() const {
-    return (int) this->literals.size() ;
+long unsigned int Clause::get_size() const {
+    return this->literals.size() ;
 }
 
 bool Clause::is_empty() const {
@@ -88,7 +73,7 @@ bool Clause::is_tautology() const {
 }
 
 
-std::string Clause::to_string()  {
+std::string Clause::to_string() const {
     std::ostringstream oss;
     bool flag = false ;
     oss << "{" ;
@@ -112,7 +97,7 @@ std::string Clause::to_string()  {
 }
 
 
-std::string Clause::to_string2()  {
+std::string Clause::to_string2() const {
     std::ostringstream oss;
     for(int i = 1 ; i <= this->nb_variables ; i++) {
         if(this->contains_literal(-i)) {
@@ -124,6 +109,20 @@ std::string Clause::to_string2()  {
     }
     oss << "0" ;
     return oss.str() ;
+}
+
+std::set<int> Clause::whole_to_set() const {
+    std::set<int> s = std::set<int>() ;
+    for(auto l : this->literals)
+        s.insert(l) ;
+    return s;
+}
+
+std::set<unsigned int> Clause::variables_to_set() const {
+    std::set<unsigned int> s = std::set<unsigned int>() ;
+    for(auto l : this->literals)
+        s.insert(abs(l)) ;
+    return s;
 }
 
 std::set<int> Clause::to_set() const {

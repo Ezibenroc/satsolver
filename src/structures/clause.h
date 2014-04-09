@@ -41,16 +41,22 @@ class Clause {
         bool is_tautology() const;
 
         // Renvoie le nombre de littéraux
-        int get_size() const;
+        long unsigned int get_size() const;
 
 
 
         // Renvoie la représentation textuelle de la clause
-        std::string to_string() ;
-        std::string to_string2() ;
+        std::string to_string() const;
+        std::string to_string2() const;
+
+        // Renvoie un ensemble contenant tous les entiers de la clause qui ne sont pas vrais.
+        std::set<int> to_set() const;
 
         // Renvoie un ensemble contenant tous les entiers de la clause.
-        std::set<int> to_set() const;
+        std::set<int> whole_to_set() const;
+
+        // Renvoie un ensemble contenant toutes les variables de la clause.
+        std::set<unsigned int> variables_to_set() const;
 
 
        // Renvoie vrai si la clause est vide

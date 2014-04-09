@@ -11,5 +11,7 @@ enum Heuristic {
 extern bool VERBOSE;
 extern bool WITH_WL;
 extern satsolver::Heuristic HEURISTIC;
+extern bool WITH_CL;
+extern bool CL_INTERACT;
 
 #endif

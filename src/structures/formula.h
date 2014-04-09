@@ -20,11 +20,12 @@ class Formula {
 
         // Affectation d'un litéral x
         // Si WITH_WL, renvoie faux ssi un conflit est généré
-        bool set_true(int x) ;
+        bool set_true(int x, unsigned int *clause_id) ;
 
 
     public :
         Formula(std::vector<std::shared_ptr<satsolver::Clause>> v, int nb_variables) ;
+        Formula(const Formula&);
         Formula& operator=(const Formula &that);
         Formula(satsolver::Formula *f) ;
         ~Formula() ;
@@ -32,7 +33,7 @@ class Formula {
 
         // Renvoie la représentation textuelle de la formule
         std::string to_string() ;
-                std::string to_string2() ;
+        std::string to_string2() ;
 
         // Renvoie un ensemble d'ensembles d'entiers, selon l'affectation
         // Chaque ensemble de cet ensemble représente une clause
@@ -40,27 +41,28 @@ class Formula {
         // Une clause fausse sera un ensemble vide
         // Les clauses ne contiendront que des littéraux indeterminés
         std::set<std::set<int> > to_set() ;
-        std::set<Clause*> to_clauses_set() ;
+        std::set<Clause*> to_clauses_set() const;
+        std::vector<std::shared_ptr<Clause>>& to_clauses_vector();
 
         // Déduction de l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
-        bool deduce_true(int x) ;
-        bool deduce_false(int x) ;
+        bool deduce_true(int x, unsigned int *clause_id) ;
+        bool deduce_false(int x, unsigned int *clause_id) ;
 
         // Pari sur l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
-        bool bet_true(int x) ;
-        bool bet_false(int x) ;
+        bool bet_true(int x, unsigned int *clause_id) ;
+        bool bet_false(int x, unsigned int *clause_id) ;
 
         // Retourne en arrière jusqu'au dernier pari
         // Renvoie le dernier littéral parié (0 si inexistant)
         int back() ;
 
         // Renvoie un monome de la formule (0 si inexistant)
-        int monome() ;
+        int monome(unsigned int *clause_id) ;
 
         // Renvoie un litéral isolé de la formule (0 si inexistant)
-        int isolated_literal() ;
+        int isolated_literal(unsigned int *clause_id) ;
 
         // Renvoie vrai ssi la formule ne contient pas de clauses
         bool is_empty() const;
@@ -69,16 +71,16 @@ class Formula {
         int get_nb_variables() const;
 
         // Renvoie la taille de la formule ;
-        int get_size() const ;
+        long unsigned int get_size() const ;
 
         // Renvoie vrai ssi la formule contient une clause vide
         bool contains_empty_clause() const;
 
         // Determines whether one of the clauses is evaluated to false.
-        bool contains_false_clause() const;
+        bool contains_false_clause(unsigned int *clause_id) const;
         
         // Determines whether all the clauses are evaluated to true.
-        bool only_true_clauses() const;
+        bool only_true_clauses(unsigned int *clause_id) const;
 
         // Supprime toute les clauses contenant d'autres clauses
         // Affecte tous les monomes
@@ -95,7 +97,7 @@ class Formula {
         Affectation *get_aff() ;
         
         // Renvoie un vecteur de littéraux inconnus
-        std::vector<int> get_unknown_literals(void) const ;
+        std::vector<int> get_unknown_literals (void) const ;
 
         // Renvoie un littéral de la formule
         // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide

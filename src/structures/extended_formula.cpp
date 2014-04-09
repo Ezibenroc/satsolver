@@ -14,22 +14,22 @@ using namespace satsolver;
 
 int EF::last_id = 0;
 
-EF::EF(const EF *that) : type(that->type), f1(that->f1), f2(that->f2), literal(that->literal), id(++this->last_id) {
+EF::EF(const EF *that) : type(that->type), f1(that->f1), f2(that->f2), translation(), literal(that->literal), id(++this->last_id) {
 }
 
-EF::EF(EF::Type type) : type (type), id(++this->last_id) {
+EF::EF(EF::Type type) : type (type), f1(), f2(), translation(), literal(), id(++this->last_id) {
     assert(type == EF::TRUE || type == EF::FALSE);
 }
 
-EF::EF(EF::Type type, std::string literal) : type (type), literal(literal), id(++this->last_id) {
+EF::EF(EF::Type type, std::string literal) : type (type), f1(), f2(), translation(), literal(literal), id(++this->last_id) {
     assert(type == EF::LITERAL);
 }
 
-EF::EF(EF::Type type, SPEF f) : type (type), f1(f), id(++this->last_id) {
+EF::EF(EF::Type type, SPEF f) : type (type), f1(f), f2(), translation(), literal(), id(++this->last_id) {
     assert(type == EF::NOT);;
 }
 
-EF::EF(EF::Type type, SPEF f1, SPEF f2) : type (type), f1(f1), f2(f2), id(++this->last_id) {
+EF::EF(EF::Type type, SPEF f1, SPEF f2) : type (type), f1(f1), f2(f2), translation(), literal(), id(++this->last_id) {
     assert(type != EF::TRUE);
     assert(type != EF::FALSE);
     assert(type != EF::LITERAL);

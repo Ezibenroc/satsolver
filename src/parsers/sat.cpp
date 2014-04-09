@@ -4,7 +4,20 @@
 
 using namespace satsolver;
 
-SatParser::SatParser(std::istream &stream) : AbstractParser::AbstractParser(stream){}
+SatParser::SatParser(std::istream &stream) : AbstractParser::AbstractParser(stream), clauses(), variables_count(0), clauses_count(0), literals(), formula(NULL) {
+}
+
+satsolver::SatParser::SatParser(const satsolver::SatParser &that) : AbstractParser::AbstractParser(that), clauses(), variables_count(0), clauses_count(0), literals(), formula(that.formula) {
+}
+
+satsolver::SatParser& satsolver::SatParser::operator=(const satsolver::SatParser &that) {
+    this->clauses = that.clauses;
+    this->variables_count = that.variables_count;
+    this->clauses_count = that.clauses_count;
+    this->literals = that.literals;
+    this->formula = formula;
+    return *this;
+}
 
 SatParser::~SatParser() {
 }

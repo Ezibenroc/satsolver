@@ -6,14 +6,37 @@
 
 using namespace graphsolver;
 
-Graph::Graph(int nodes_count, int default_value) : nodes_count(nodes_count) {
+Graph::Graph(int nodes_count, int default_value) : nodes_count(nodes_count), values(static_cast<int*>(malloc(sizeof(int)*nodes_count))), adjacency(static_cast<std::set<int>**>(malloc(sizeof(std::set<int>*)*nodes_count))) {
     int i;
-    this->values = (int*) malloc(sizeof(int)*nodes_count);
-    this->adjacency = (std::set<int>**) malloc(sizeof(std::set<int>*)*nodes_count);
     memset(values, default_value, nodes_count);
     for (i=0; i<nodes_count; i++) {
         this->adjacency[i] = new std::set<int>();
     }
+}
+graphsolver::Graph::Graph(const graphsolver::Graph &that) : nodes_count(that.nodes_count), values(static_cast<int*>(malloc(sizeof(int)*nodes_count))), adjacency(static_cast<std::set<int>**>(malloc(sizeof(std::set<int>*)*nodes_count))) {
+    int i;
+    memcpy(values, that.values, nodes_count);
+    for (i=0; i<nodes_count; i++) {
+        this->adjacency[i] = new std::set<int>(*that.adjacency[i]);
+    }
+}
+
+graphsolver::Graph& graphsolver::Graph::operator=(const graphsolver::Graph &that) {
+    int i;
+    free(this->values);
+    for (i=0; i<this->nodes_count; i++) {
+        delete this->adjacency[i];
+    }
+    free(this->adjacency);
+
+    this->nodes_count = that.nodes_count;
+    values = static_cast<int*>(malloc(sizeof(int)*that.nodes_count));
+    adjacency = static_cast<std::set<int>**>(malloc(sizeof(std::set<int>*)*nodes_count));
+    memcpy(values, that.values, nodes_count);
+    for (i=0; i<nodes_count; i++) {
+        this->adjacency[i] = new std::set<int>(*that.adjacency[i]);
+    }
+    return *this;
 }
 
 Graph::~Graph() {
@@ -42,11 +65,11 @@ void Graph::add_edge(int first, int second) {
         this->adjacency[second]->insert(first);
 }
 
-int Graph::get_nodes_count() {
+int Graph::get_nodes_count() const {
     return this->nodes_count;
 }
 
-std::set<int>* Graph::get_lower_adjacent_nodes(int node_id) {
+std::set<int>* Graph::get_lower_adjacent_nodes(int node_id) const {
     assert(node_id < this->nodes_count);
     return this->adjacency[node_id];
 }

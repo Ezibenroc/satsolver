@@ -18,7 +18,7 @@ bool WITH_WL = false;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
 int main(int argc, char *argv[]) {
-    srand((unsigned int) time(NULL)) ;
+    srand(static_cast<unsigned int>(time(NULL)));
     satsolver::SatParser *parser;
     satsolver::Formula *formula;
     satsolver::Affectation *solution;

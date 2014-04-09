@@ -5,8 +5,10 @@
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
+#include <climits>
 #include <math.h>
 #include <time.h>
+#include <map>
 
 #include "config.h"
 
@@ -16,15 +18,12 @@ using namespace satsolver;
 int depth_stack = 0 ; // used only for verbosity mode
 
 void print_space() {
-		std::cout << "TIME : " << ((float) clock())/CLOCKS_PER_SEC << "\t" ;
+		std::cout << "TIME : " << (static_cast<float>(clock()))/CLOCKS_PER_SEC << "\t" ;
     for(int i = 0 ; i < depth_stack ; i++)
         std::cout << "\t" ;
 }
 
-Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : clauses(v), nb_variables(nb_variables) {
-    this->aff = new Affectation(nb_variables) ;
-    this->mem = std::stack<std::pair<int,bool>>() ;
-    this->to_do = std::set<int>() ;
+Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do() {
     for(auto c : this->clauses) {
         c->set_affectation(this->aff) ;
     }
@@ -36,18 +35,17 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : cla
       }
 }
 
-Formula::Formula(satsolver::Formula *f) {
-    this->nb_variables = f->nb_variables;
+Formula::Formula(satsolver::Formula *f) : aff(new Affectation(f->aff)), clauses(), nb_variables(f->nb_variables), mem(), to_do() {
     this->clauses.reserve(f->clauses.size()) ;
     for(unsigned int i = 0 ; i < f->clauses.size() ; i++) {
         this->clauses.push_back(std::shared_ptr<Clause>(new Clause(*f->clauses[i].get())));
     }
-    this->aff = new Affectation(f->aff) ;
     for(auto c : this->clauses) {
         c->set_affectation(aff) ;
     }
-    this->mem = std::stack<std::pair<int,bool>>(f->mem) ;
-    this->to_do = std::set<int>(f->to_do) ;
+}
+
+satsolver::Formula::Formula(const satsolver::Formula &that) : aff(that.aff), clauses(), nb_variables(that.nb_variables), mem(), to_do() {
 }
 
 Formula::~Formula() {
@@ -101,7 +99,7 @@ std::set<std::set<int> > Formula::to_set() {
     return set ;
 }
 
-std::set<Clause*> Formula::to_clauses_set() {
+std::set<Clause*> Formula::to_clauses_set() const {
     std::set<Clause*> set;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
         set.insert(new Clause(*this->clauses[i].get())) ;
@@ -109,12 +107,16 @@ std::set<Clause*> Formula::to_clauses_set() {
     return set ;
 }
 
+std::vector<std::shared_ptr<Clause>>& Formula::to_clauses_vector() {
+    return this->clauses;
+}
 
-bool Formula::set_true(int x) {
+
+bool Formula::set_true(int x, unsigned int *clause_id) {
     int literal ;
     if(WITH_WL) {
-        for(auto c : this->clauses) {
-            literal = c->set_true(x) ;
+        for(unsigned int i=0; i<this->clauses.size(); i++) {
+            literal = this->clauses[i]->set_true(x) ;
             if(literal){// on a engendré un monome
                 if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
                     this->to_do.clear();
@@ -122,6 +124,8 @@ bool Formula::set_true(int x) {
                         print_space() ;
                         std::cout << "[Watched Literals] Detected a conflict : " << literal << std::endl ;
                     }
+                    if (clause_id)
+                        *clause_id = i;
                     return false ;
                 }
                 this->to_do.insert(literal) ;
@@ -132,28 +136,28 @@ bool Formula::set_true(int x) {
     if(!this->to_do.empty()) { // on doit affecter ces littéraux
         literal = *this->to_do.begin() ;
         this->to_do.erase(literal) ;
-        return deduce_true(literal) ;
+        return deduce_true(literal, clause_id) ;
     }
     return true ;
 }
 
-bool Formula::deduce_true(int x) {
+bool Formula::deduce_true(int x, unsigned int *clause_id) {
     if(VERBOSE) {
         print_space() ;
         std::cout << "Deduce " << x << std::endl ;
     }
     if(this->aff->is_unknown(x)) {
         this->mem.push(std::pair<int,bool>(x,true)) ;
-        return this->set_true(x) ;
+        return this->set_true(x, clause_id) ;
     }
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::deduce_false(int x) {
-    return deduce_true(-x) ;
+bool Formula::deduce_false(int x, unsigned int *clause_id) {
+    return deduce_true(-x, clause_id) ;
 }
 
-bool Formula::bet_true(int x) {
+bool Formula::bet_true(int x, unsigned int *clause_id) {
     if(VERBOSE) {
         print_space() ;
         std::cout << "Bet " << x << std::endl ;
@@ -161,13 +165,13 @@ bool Formula::bet_true(int x) {
     depth_stack ++ ;
     if(this->aff->is_unknown(x)) {
         this->mem.push(std::pair<int,bool>(x,false)) ;
-        return this->set_true(x) ;
+        return this->set_true(x, clause_id) ;
     }
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::bet_false(int x) {
-    return bet_true(-x) ;
+bool Formula::bet_false(int x, unsigned int *clause_id) {
+    return bet_true(-x, clause_id) ;
 }
 
 int Formula::back() {
@@ -193,48 +197,62 @@ int Formula::back() {
     return 0 ;
 }
 
-int Formula::monome() {
+int Formula::monome(unsigned int *clause_id) {
     int literal ;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
         literal = this->clauses[i]->monome() ;
-        if(literal)
+        if(literal) {
+            if (clause_id)
+                *clause_id = i;
             return literal ;
+        }
     }
     return 0 ;
 }
 
-int Formula::isolated_literal() {
+int Formula::isolated_literal(unsigned int *clause_id) {
+    unsigned int i;
     int *l ;
-    l = (int*) malloc((this->nb_variables+1)*sizeof(int)) ;
+    std::vector<std::shared_ptr<Clause>> clauses = this->to_clauses_vector();
+    std::map<int, unsigned int> literal_to_clause_id;
+    l = static_cast<int*>(malloc((this->nb_variables+1)*sizeof(int)));
     /* l[i] = 0 si i est inconnu et n'existe pas dans les clauses
          l[i] = 1 si i est inconnu et seulement positif
          l[i] = 2 si i est inconnu et seulement négatif
          l[i] = 3 si i est inconnu et positif et négatif
     */
-    memset(l,0,(this->nb_variables+1)*sizeof(int)) ;
-    for(auto c : this->to_set()) {
-        for(auto i : c) {
-            if(i>0) {
-                if(l[i] == 0 || l[i] == 1)
-                    l[i] = 1 ;
+    memset(l, 0, (this->nb_variables+1)*sizeof(int)) ;
+    for (i=0; i<clauses.size(); i++) {
+        if(clauses.at(i)->is_evaluated_to_true())
+            continue;
+        for(auto j : clauses.at(i)->to_set()) {
+            if(j>0) {
+                if(l[j] == 0 || l[j] == 1)
+                    l[j] = 1 ;
                 else
-                    l[i] = 3 ;
+                    l[j] = 3 ;
             }
             else {
-                if(l[-i] == 0 || l[-i] == 2)
-                    l[-i] = 2 ;
+                if(l[-j] == 0 || l[-j] == 2)
+                    l[-j] = 2 ;
                 else
-                    l[-i] = 3 ;
+                    l[-j] = 3 ;
             }
+            if (clause_id && l[abs(j)] != 0)
+                literal_to_clause_id[j] = i;
         }
     }
     for(int i = 1 ; i <= this->nb_variables ; i++) {
         if(l[i] == 1) {
             free(l);
+            if (clause_id)
+                *clause_id = literal_to_clause_id[i];
             return i ;
         }
         else if(l[i] == 2) {
             free(l);
+            if (clause_id)
+                *clause_id = literal_to_clause_id[i];
             return -i ;
         }
     }
@@ -246,23 +264,29 @@ int Formula::isolated_literal() {
 bool Formula::is_empty() const {
     return (this->clauses.size() == 0);
 }
-int Formula::get_size() const {
-    return (int) this->clauses.size() ;
+long unsigned int Formula::get_size() const {
+    return this->clauses.size() ;
 }
 int Formula::get_nb_variables() const {
     return this->nb_variables;
 }
-bool Formula::contains_false_clause() const {
+bool Formula::contains_false_clause(unsigned int *clause_id) const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
-        if (this->clauses[i]->is_evaluated_to_false())
+        if (this->clauses[i]->is_evaluated_to_false()) {
+            if (clause_id)
+                *clause_id = i;
             return true;
+        }
     }
     return false;
 }
-bool Formula::only_true_clauses() const {
+bool Formula::only_true_clauses(unsigned int *clause_id) const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
-        if (!this->clauses[i]->is_evaluated_to_true())
+        if (!this->clauses[i]->is_evaluated_to_true()) {
+            if (clause_id)
+                *clause_id = i;
             return false;
+        }
     }
     return true;
 }
@@ -361,15 +385,15 @@ int Formula::choose_literal_random() const {
 
 int Formula::choose_literal_moms() const {
 	bool there_is_literals = false ;
-	unsigned min_clause_size = 999999999 ;
+	long unsigned min_clause_size = ULONG_MAX;
 	std::vector<int> v = std::vector<int>() ;
-	int *count = (int*) malloc((2*this->nb_variables+1)*sizeof(int)) ; // count[i] = nombre d'apparitions du littéral i-nb_variables
+	int *count = static_cast<int*>(malloc((2*this->nb_variables+1)*sizeof(int))); // count[i] = nombre d'apparitions du littéral i-nb_variables
 	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
 		v.clear() ;
 		this->clauses[i]->add_literals_to_vector(v) ;
 		there_is_literals = there_is_literals || v.size() > 0 ;
 		if(v.size() < min_clause_size && v.size() > 0) { // trouvé une clause plus petite, on remet tout à zéro
-			min_clause_size = (unsigned) v.size() ;
+			min_clause_size = v.size() ;
 			memset(count,0,(2*this->nb_variables+1)*sizeof(int)) ;
 		}
 		if(v.size() == min_clause_size) { // on incrémente le compteur de tous les littéraux de v
@@ -402,7 +426,7 @@ int Formula::choose_literal_dlis() const {
 		v.clear() ;
 		this->clauses[i]->add_literals_to_vector(v) ;
 		there_is_literals = there_is_literals || v.size() > 0 ;
-		point = (double) pow(2,-(double)v.size()) ;
+		point = pow(2,-static_cast<double>(v.size()));
 		for(unsigned j = 0 ; j < v.size() ; j ++) {
 			count[v[j]+this->nb_variables] += point ;
 		}
