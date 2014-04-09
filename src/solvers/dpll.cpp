@@ -159,6 +159,7 @@ Affectation* satsolver::solve(Formula *formula) {
                 skip_conflicts = cl_interact(deductions, formula->get_aff(), last_bet, literal);
             }
             literal = formula->back() ;
+            last_bet = -last_bet;
             if(literal == 0)
                 throw Conflict() ;
             if (WITH_WL)
