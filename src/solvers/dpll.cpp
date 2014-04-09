@@ -18,7 +18,7 @@ using namespace satsolver;
 
 #define AS_AFF(a, l) (aff.is_true(l) ? l : -l)
 
-void handle_literal(FILE *graph_file, std::map<int, std::set<int>> deductions, std::set<int> *handled, std::set<int> &to_be_handled, Affectation &aff, std::map<int, std::set<int>> &reversed_deductions, int literal) {
+void handle_literal(FILE *graph_file, const std::map<int, std::set<int>> &deductions, std::set<int> *handled, std::set<int> &to_be_handled, const Affectation &aff, std::map<int, std::set<int>> &reversed_deductions, int literal) {
     if (deductions.find(literal) == deductions.end())
         return;
     for (auto it : deductions.at(literal)) {
@@ -39,7 +39,7 @@ void handle_literal(FILE *graph_file, std::map<int, std::set<int>> deductions, s
 }
 
 
-void conflict_graph_BFS(std::map<int, std::set<int>> &reversed_deductions, int root, std::set<int> &unique_implication_points, std::set<int> &deduced_literals) {
+void conflict_graph_BFS(const std::map<int, std::set<int>> &reversed_deductions, int root, std::set<int> &unique_implication_points, std::set<int> &deduced_literals) {
     std::set<int> current_depth, next_depth({root});
     while (next_depth.size()) {
         current_depth.clear();
@@ -59,7 +59,7 @@ void conflict_graph_BFS(std::map<int, std::set<int>> &reversed_deductions, int r
     }
 }
 
-std::set<int>* make_conflict_graph(std::map<int, std::set<int>> deductions, Affectation &aff, int root, int literal, bool write) {
+std::set<int>* make_conflict_graph(const std::map<int, std::set<int>> deductions, const Affectation &aff, int root, int literal, bool write) {
     FILE *graph_file = NULL;
     int literal2;
     std::set<int> *handled = new std::set<int>(), to_be_handled({literal});
@@ -94,7 +94,7 @@ std::set<int>* make_conflict_graph(std::map<int, std::set<int>> deductions, Affe
     return handled;
 }
 
-unsigned int cl_interact(std::map<int, std::set<int>> deductions, Affectation aff, int last_bet, int literal) {
+unsigned int cl_interact(const std::map<int, std::set<int>> &deductions, const Affectation &aff, int last_bet, int literal) {
     char mode;
     unsigned int steps;
     assert(deductions.find(literal) != deductions.end() || deductions.find(-literal) != deductions.end());
