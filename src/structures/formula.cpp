@@ -28,24 +28,27 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff
         c->set_affectation(this->aff) ;
     }
     this->clean() ;
-      for(auto c : this->clauses) {
-          if(c->get_size() == 0)
-              throw Conflict() ;
-          if(WITH_WL) c->init_WL() ;
-      }
+    for(auto c : this->clauses) {
+        if(c->get_size() == 0)
+            throw Conflict() ;
+        if(WITH_WL)
+            c->init_WL() ;
+    }
 }
 
-Formula::Formula(satsolver::Formula *f) : aff(new Affectation(f->aff)), clauses(), nb_variables(f->nb_variables), mem(), to_do() {
-    this->clauses.reserve(f->clauses.size()) ;
-    for(unsigned int i = 0 ; i < f->clauses.size() ; i++) {
-        this->clauses.push_back(std::shared_ptr<Clause>(new Clause(*f->clauses[i].get())));
+satsolver::Formula::Formula(const satsolver::Formula &that) : aff(new Affectation(that.aff)), clauses(), nb_variables(that.nb_variables), mem(that.mem), to_do(that.to_do) {
+    this->clauses.reserve(that.clauses.size());
+    std::shared_ptr<Clause> c2;
+    for(auto c : that.clauses) {
+        c2 = std::shared_ptr<Clause>(new Clause(*c));
+        this->clauses.push_back(c2);
+        c2->set_affectation(this->aff) ;
     }
     for(auto c : this->clauses) {
-        c->set_affectation(aff) ;
+        assert(c->get_size() != 0);
+        if(WITH_WL)
+            c->init_WL() ;
     }
-}
-
-satsolver::Formula::Formula(const satsolver::Formula &that) : aff(that.aff), clauses(), nb_variables(that.nb_variables), mem(), to_do() {
 }
 
 Formula::~Formula() {

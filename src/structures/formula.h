@@ -27,7 +27,6 @@ class Formula {
         Formula(std::vector<std::shared_ptr<satsolver::Clause>> v, int nb_variables) ;
         Formula(const Formula&);
         Formula& operator=(const Formula &that);
-        Formula(satsolver::Formula *f) ;
         ~Formula() ;
 
 
