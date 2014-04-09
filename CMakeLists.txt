@@ -15,8 +15,7 @@ add_definitions(-g -Wall -Wextra -Werror -pedantic
     -Wcast-qual -Wcast-align -Wconversion -Wdouble-promotion -Wfloat-equal
     -Wpointer-arith -Woverloaded-virtual -Weffc++ -Wold-style-cast -Wunused
     -Wstrict-aliasing -Wstrict-overflow -Wunsafe-loop-optimizations
-    -Wconversion -Wlogical-op -Wno-aggressive-loop-optimizations
-    -Wdisabled-optimization
+    -Wconversion -Wlogical-op -Wdisabled-optimization
     -fmax-errors=2)
 #add_definitions(-Wsuggest-attribute=const -Wsuggest-attribute=noreturn -Wsuggest-attribute=pure -Wsign-conversion -Winline)
 
