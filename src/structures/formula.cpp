@@ -150,7 +150,7 @@ bool Formula::deduce_true(int x, unsigned int *clause_id) {
         std::cout << "Deduce " << x << std::endl ;
     }
     if(this->aff->is_unknown(x)) {
-        this->mem.push(std::pair<int,bool>(x,true)) ;
+        this->mem.push_back(std::pair<int,bool>(x,true)) ;
         return this->set_true(x, clause_id) ;
     }
     else
@@ -167,7 +167,7 @@ bool Formula::bet_true(int x, unsigned int *clause_id) {
     }
     depth_stack ++ ;
     if(this->aff->is_unknown(x)) {
-        this->mem.push(std::pair<int,bool>(x,false)) ;
+        this->mem.push_back(std::pair<int,bool>(x,false)) ;
         return this->set_true(x, clause_id) ;
     }
     else
@@ -185,10 +185,10 @@ int Formula::back() {
     }
     std::pair<int,bool> p ;
     while(!this->mem.empty()) {
-        p = this->mem.top() ;
+        p = this->mem.back() ;
         if(VERBOSE) std::cout << p.first << " " ;
         this->aff->set_unknown(p.first) ;
-        this->mem.pop() ;
+        this->mem.pop_back() ;
         if(!p.second) {// on est arrivé au pari
             if(VERBOSE)
                 std::cout << std::endl ;
@@ -317,7 +317,7 @@ void Formula::clean() {
         }
         if(literal) {
             this->aff->set_true(literal) ;
-            this->mem.push(std::pair<int,bool>(literal,true)) ;
+            this->mem.push_back(std::pair<int,bool>(literal,true)) ;
             literals_to_delete.insert(literal) ;
             for(auto c : this->clauses) {
                 c->remove(-literal) ;
@@ -354,8 +354,8 @@ void Formula::clean() {
 }
 
 
-std::stack<std::pair<int,bool>> Formula::get_mem() {
-    return std::stack<std::pair<int,bool>>(this->mem) ;
+std::vector<std::pair<int,bool>> Formula::get_mem() {
+    return std::vector<std::pair<int,bool>>(this->mem) ;
 }
 
 Affectation *Formula::get_aff() {
