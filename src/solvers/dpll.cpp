@@ -201,7 +201,7 @@ Affectation* satsolver::solve(Formula *formula) {
             last_bet = literal;
         }
         while(contains_false_clause) {
-            // We set the clause identified by “claused_it” as the one which
+            // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
             deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
             if (CL_INTERACT && --skip_conflicts == 0) {
