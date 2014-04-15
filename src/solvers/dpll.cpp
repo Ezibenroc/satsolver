@@ -201,9 +201,6 @@ Affectation* satsolver::solve(Formula *formula) {
             // We set the clause identified by “claused_it” as the one which
             // made us deduce the value of the literal.
             deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
-            assert(!formula->get_aff()->is_unknown(abs(literal)));
-            for (auto it : deductions[literal])
-                assert(!formula->get_aff()->is_unknown(abs(it)));
             if (CL_INTERACT && --skip_conflicts == 0) {
                 assert(last_bet);
                 skip_conflicts = cl_interact(deductions, formula->get_aff(), last_bet, literal);
