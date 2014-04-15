@@ -5,6 +5,7 @@
 #include <istream>
 #include <vector>
 #include <string>
+#include <unordered_set>
 #include <exception>
 
 #include "structures/clause.h"
@@ -35,7 +36,7 @@ class SatParser : public AbstractParser {
 
         std::vector<std::shared_ptr<Clause>> clauses;
         int variables_count, clauses_count;
-        std::set<int> literals;
+        std::unordered_set<int> literals;
         Formula *formula;
 
         enum State transition(enum State);

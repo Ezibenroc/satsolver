@@ -26,7 +26,7 @@ using namespace satsolver;
 
 void HeuristicsTests::testRandom() {
     std::vector<std::shared_ptr<Clause>> g ;
-    std::set <int> v = {1,2,-3} ;
+    std::unordered_set <int> v = {1,2,-3} ;
     g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
     v = {-1,2} ;
     g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;

@@ -39,10 +39,11 @@ add_library(ExtendedFormula src/structures/extended_formula.cpp)
 add_library(ColorAffectation src/structures/color_affectation.cpp)
 add_library(Graph src/structures/graph.cpp)
 add_library(CLProof src/structures/CL_proof.cpp)
+add_library(Deductions src/structures/deductions.cpp)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp "")
 add_library(Structures ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
-target_link_libraries(Structures Formula Clause Affectation ColorAffectation Graph ExtendedFormula CLProof)
+target_link_libraries(Structures Formula Clause Affectation ColorAffectation Graph ExtendedFormula CLProof Deductions)
 set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
 
 

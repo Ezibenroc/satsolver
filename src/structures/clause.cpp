@@ -12,16 +12,22 @@
 using namespace satsolver;
 
 
-Clause::Clause(int nb_var, std::shared_ptr<std::vector<int>> literals) : literals(std::unordered_set<int>()), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
+Clause::Clause(int nb_var, std::shared_ptr<std::vector<int>> literals) : literals(), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
     for(std::vector<int>::iterator it = literals->begin(); it != literals->end(); ++it) {
         assert(*it != 0 && abs(*it) <= nb_var);
         this->literals.insert(*it) ;
     }
-}
-Clause::Clause(int nb_var, std::set<int> literals) : literals(std::unordered_set<int>()), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
-    for(std::set<int>::iterator it = literals.begin(); it != literals.end(); ++it) {
-        assert(*it != 0 && abs(*it) <= nb_var);
-        this->literals.insert(*it) ;
+}/*
+Clause::Clause(int nb_var, std::set<int> literals) : literals(), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
+    for (auto it : literals) {
+        assert(it != 0 && abs(it) <= nb_var);
+        this->literals.insert(it) ;
+    }
+}*/
+Clause::Clause(int nb_var, std::unordered_set<int> literals) : literals(), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
+    for (auto it : literals) {
+        assert(it != 0 && abs(it) <= nb_var);
+        this->literals.insert(it) ;
     }
 }
 

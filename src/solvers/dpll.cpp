@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include "structures/affectation.h"
+#include "structures/deductions.h"
 #include "structures/CL_proof.h"
 #include "structures/formula.h"
 #include "structures/clause.h"
@@ -21,29 +22,26 @@ using namespace satsolver;
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
-void handle_literal(FILE *graph_file, const std::map<int, std::set<int>> &deductions, std::set<int> *handled, std::set<int> &to_be_handled, const Affectation &aff, std::map<int, std::set<int>> &reversed_deductions, int literal) {
-    // Add a literal to all reversed_deductions[i] sets if i was used to deduce the literal
-    if (deductions.find(literal) == deductions.end())
+void handle_literal(FILE *graph_file, const Deductions &deductions, std::set<int> *handled, std::set<int> &to_be_handled, const Affectation &aff, int literal) {
+    // XXX
+    if (!deductions.has_literal(literal))
         return;
-    for (auto it : deductions.at(literal)) { // Iterate the literals which made us deduce the literal
+    std::cout << "foo" << std::endl;
+    for (auto it : deductions.get_deduced_from(literal)) { // Iterate the literals which made us deduce the literal
+        std::cout << "bar" << std::endl;
         if (it == literal || it == -literal)
             continue;
-        try {
-            reversed_deductions[-it].insert(literal);
-        }
-        catch (std::out_of_range) {
-            reversed_deductions[-it] = std::set<int>({literal});
-        }
         to_be_handled.insert(it);
         if (handled->find(it) != handled->end() || handled->find(-it) != handled->end())
             continue;
         if (graph_file)
             fprintf(graph_file, "\t\"%d\" -> \"%d\";\n", AS_AFF(aff, it), AS_AFF(aff, literal));
     }
+    std::cout << "baz" << std::endl;
 }
 
 
-void conflict_graph_BFS(const std::map<int, std::set<int>> &reversed_deductions, int root, std::set<int> &unique_implication_points, std::set<int> &deduced_literals) {
+void conflict_graph_BFS(const Deductions &deductions, int root, std::set<int> &unique_implication_points, std::set<int> &deduced_literals) {
     // We will browse the graph layer after layer from the root.
     // If a layer is a singleton, this element is a unique implication point.
     std::set<int> current_depth, next_depth({root});
@@ -55,7 +53,7 @@ void conflict_graph_BFS(const std::map<int, std::set<int>> &reversed_deductions,
         for (auto it : current_depth) {
             deduced_literals.insert(it);
             try {
-                for (auto it2 : reversed_deductions.at(it))
+                for (auto it2 : deductions.get_deductions(it))
                     next_depth.insert(it2);
             }
             catch (std::out_of_range) {
@@ -65,12 +63,11 @@ void conflict_graph_BFS(const std::map<int, std::set<int>> &reversed_deductions,
     }
 }
 
-std::set<int>* make_conflict_graph(const std::map<int, std::set<int>> deductions, const Affectation &aff, int root, int literal, bool write) {
+std::set<int>* make_conflict_graph(const Deductions &deductions, const Affectation &aff, int root, int literal, bool write) {
     FILE *graph_file = NULL;
     int literal2;
     std::set<int> *handled = new std::set<int>(), // The list of literals which have already been added to the graph
                   to_be_handled({literal}); // The list of literals in that will have to be added to the graph
-    std::map<int, std::set<int>> reversed_deductions;
     std::set<int> unique_implication_points, deduced_literals;
     if (write) {
         graph_file = fopen(CONFLICT_GRAPH_FILE_NAME, "w");
@@ -86,12 +83,12 @@ std::set<int>* make_conflict_graph(const std::map<int, std::set<int>> deductions
             continue;
 
         // The two following lines fill reversed_deductions and append items in to_be_handled.
-        handle_literal(graph_file, deductions, handled, to_be_handled, aff, reversed_deductions, literal2);
-        handle_literal(graph_file, deductions, handled, to_be_handled, aff, reversed_deductions, -literal2);
+        handle_literal(graph_file, deductions, handled, to_be_handled, aff, literal2);
+        handle_literal(graph_file, deductions, handled, to_be_handled, aff, -literal2);
     }
     if (write) {
         // Fills unique_implication_points and deduced_literals
-        conflict_graph_BFS(reversed_deductions, root, unique_implication_points, deduced_literals);
+        conflict_graph_BFS(deductions, root, unique_implication_points, deduced_literals);
         for (auto it : deduced_literals)
             if (aff.is_true(it))
                 fprintf(graph_file, "\t%d [color = \"blue\"];\n", it);
@@ -107,10 +104,10 @@ std::set<int>* make_conflict_graph(const std::map<int, std::set<int>> deductions
     return handled;
 }
 
-unsigned int cl_interact(const std::map<int, std::set<int>> &deductions, const Affectation &aff, int last_bet, int literal, bool *with_proof) {
+unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, int last_bet, int literal, bool *with_proof) {
     char mode;
     unsigned int steps;
-    assert(deductions.find(literal) != deductions.end() || deductions.find(-literal) != deductions.end());
+    assert(deductions.has_variable(abs(literal)));
     std::cout << "Conflict on literal " << literal << ". Action? [g/r/c/s/t] ";
     assert(with_proof);
     *with_proof = false;
@@ -142,17 +139,17 @@ unsigned int cl_interact(const std::map<int, std::set<int>> &deductions, const A
     }
 }
 
-std::shared_ptr<Clause> learn_clause(const std::map<int, std::set<int>> &deductions, const std::vector<std::pair<int, bool>> &mem, const Affectation &aff, int nb_variables, int literal, CLProof *proof) {
+std::shared_ptr<Clause> learn_clause(const Deductions &deductions, const std::vector<std::pair<int, bool>> &mem, const Affectation &aff, int nb_variables, int literal, CLProof *proof) {
     (void) aff;
     long unsigned int mem_top = mem.size()-1; // The index in the memory “stack” of the literal we are making the resolution on.
-    std::set<int> clause(deductions.at(literal)), clause2;
+    std::unordered_set<int> clause(deductions.get_deduced_from(literal)), clause2;
     assert(clause.find(-literal) != clause.end());
     mem_top--;
     while (mem.at(mem_top).second) {
         literal = mem.at(mem_top).first;
         assert(mem.at(mem_top).first == literal);
         try {
-            clause2 = deductions.at(literal); // This is the clause we will make the resolution with
+            clause2 = deductions.get_deduced_from(literal); // This is the clause we will make the resolution with
         }
         catch (std::out_of_range) {
             break;
@@ -179,21 +176,21 @@ Affectation* satsolver::solve(Formula *formula) {
     CLProof *proof;
     unsigned int clause_id;
     bool contains_false_clause;
-    std::map<int, std::set<int>> deductions;
+    Deductions deductions;
     unsigned int skip_conflicts = 1; // Number of conflicts we will skip before showing another prompt
     int last_bet = 0; // Used for generating the graph.
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
             // We set the clause identified by “claused_it” as the one which
             // made us deduce the value of the literal.
-            deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
+            deductions.add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set());
             formula->deduce_true(literal, NULL); // Return value ignored, WITH_WL is false
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }
         else if((literal = formula->isolated_literal(&clause_id))) {
             // We set the clause identified by “claused_it” as the one which
             // made us deduce the value of the literal.
-            deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
+            deductions.add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set());
             if (WITH_WL)
                 contains_false_clause = !formula->deduce_true(literal, &clause_id);
             else {
@@ -214,7 +211,7 @@ Affectation* satsolver::solve(Formula *formula) {
         while(contains_false_clause) {
             // We set the clause identified by “claused_it” as the one which
             // made us deduce the value of the literal.
-            deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
+            deductions.add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set());
             if (CL_INTERACT && --skip_conflicts == 0) {
                 assert(last_bet);
                 skip_conflicts = cl_interact(deductions, formula->get_aff(), last_bet, literal, &with_proof);

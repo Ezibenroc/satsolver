@@ -25,7 +25,7 @@
 using namespace satsolver;
 
 void StructuresTests::testClauseCreation() {
-    std::set<int> v({3, -2});
+    std::unordered_set<int> v({3, -2});
     satsolver::Clause *clause = new Clause(5, v);
     CPPUNIT_ASSERT(!clause->contains_literal(-5));
     CPPUNIT_ASSERT(!clause->contains_literal(-4));
