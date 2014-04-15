@@ -15,23 +15,11 @@ bool Deductions::has_variable(int var) const  {
 }
 
 std::unordered_set<int> Deductions::get_deduced_from(int literal) const {
-    try {
-        return this->deduced_to_known.at(literal);
-    }
-    catch (std::out_of_range &e) {
-        std::cout << "Error: Deductions::get_deduced_from with undefined literal." << std::endl;
-        throw e;
-    }
+    return this->deduced_to_known.at(literal);
 }
 
 std::unordered_set<int> Deductions::get_deductions(int literal) const {
-    try {
-        return this->known_to_deduced.at(literal);
-    }
-    catch (std::out_of_range &e) {
-        std::cout << "Error: Deductions::get_deductions with undefined literal." << std::endl;
-        throw e;
-    }
+    return this->known_to_deduced.at(literal);
 }
 
 void Deductions::add_deduction(int literal, std::unordered_set<int> &clause) {
