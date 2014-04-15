@@ -23,12 +23,9 @@ using namespace satsolver;
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
 void handle_literal(FILE *graph_file, const Deductions &deductions, std::set<int> *handled, std::set<int> &to_be_handled, const Affectation &aff, int literal) {
-    // XXX
     if (!deductions.has_literal(literal))
         return;
-    std::cout << "foo" << std::endl;
     for (auto it : deductions.get_deduced_from(literal)) { // Iterate the literals which made us deduce the literal
-        std::cout << "bar" << std::endl;
         if (it == literal || it == -literal)
             continue;
         to_be_handled.insert(it);
@@ -37,7 +34,6 @@ void handle_literal(FILE *graph_file, const Deductions &deductions, std::set<int
         if (graph_file)
             fprintf(graph_file, "\t\"%d\" -> \"%d\";\n", AS_AFF(aff, it), AS_AFF(aff, literal));
     }
-    std::cout << "baz" << std::endl;
 }
 
 
@@ -53,8 +49,9 @@ void conflict_graph_BFS(const Deductions &deductions, int root, std::set<int> &u
         for (auto it : current_depth) {
             deduced_literals.insert(it);
             try {
-                for (auto it2 : deductions.get_deductions(it))
-                    next_depth.insert(it2);
+                for (auto it2 : deductions.get_deductions(-it))
+                    if (it2 != it)
+                        next_depth.insert(it2);
             }
             catch (std::out_of_range) {
                 // We reached a leaf.
