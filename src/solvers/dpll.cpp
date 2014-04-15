@@ -170,22 +170,25 @@ Affectation* satsolver::solve(Formula *formula) {
     int last_bet = 0; // Used for generating the graph.
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
-            // We set the clause identified by “claused_it” as the one which
+            // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
             deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
             formula->deduce_true(literal, NULL); // Return value ignored, WITH_WL is false
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }
         else if((literal = formula->isolated_literal(&clause_id))) {
-            // We set the clause identified by “claused_it” as the one which
+            // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
             deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
-            if (WITH_WL)
+/* // On ne créé pas de fausse clause en affectant un littéral isolé
+	          if (WITH_WL)
                 contains_false_clause = !formula->deduce_true(literal, &clause_id);
             else {
                 formula->deduce_true(literal, NULL);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
+*/
+						formula->deduce_true(literal,NULL) ;
         }
         else {
             literal = formula->choose_literal(HEURISTIC) ;
