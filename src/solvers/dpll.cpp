@@ -80,7 +80,8 @@ std::set<int>* make_conflict_graph(const std::map<int, std::set<int>> deductions
         if (handled->find(literal2) != handled->end() || handled->find(-literal2) != handled->end())
             continue;
         handled->insert(literal2);
-        assert(!aff.is_unknown(abs(literal2)));
+        if (aff.is_unknown(abs(literal2)))
+            continue;
 
         // The two following lines fill reversed_deductions and append items in to_be_handled.
         handle_literal(graph_file, deductions, handled, to_be_handled, aff, reversed_deductions, literal2);
@@ -90,11 +91,13 @@ std::set<int>* make_conflict_graph(const std::map<int, std::set<int>> deductions
         // Fills unique_implication_points and deduced_literals
         conflict_graph_BFS(reversed_deductions, root, unique_implication_points, deduced_literals);
         for (auto it : deduced_literals)
-            fprintf(graph_file, "\t%d [color = \"blue\"];\n", it);
+            if (aff.is_true(it))
+                fprintf(graph_file, "\t%d [color = \"blue\"];\n", it);
         // Note that UIPs are also deduced, so be both blue and yellow. Thanksfully,
         // dot deterministically chooses a color (the last one).
         for (auto it : unique_implication_points)
-            fprintf(graph_file, "\t%d [color = \"yellow\"];\n", it);
+            if (aff.is_true(it))
+                fprintf(graph_file, "\t%d [color = \"yellow\"];\n", it);
         fprintf(graph_file, "\t%d [color = \"red\"];\n", literal);
         fprintf(graph_file, "}\n");
         fclose(graph_file);
@@ -155,7 +158,6 @@ std::shared_ptr<Clause> learn_clause(const std::map<int, std::set<int>> &deducti
 
         mem_top--;
     }
-    std::cout << Clause(nb_variables, clause).to_string() << std::endl;
     return std::shared_ptr<Clause>(new Clause(nb_variables, clause));
 }
 
@@ -199,6 +201,9 @@ Affectation* satsolver::solve(Formula *formula) {
             // We set the clause identified by “claused_it” as the one which
             // made us deduce the value of the literal.
             deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
+            assert(!formula->get_aff()->is_unknown(abs(literal)));
+            for (auto it : deductions[literal])
+                assert(!formula->get_aff()->is_unknown(abs(it)));
             if (CL_INTERACT && --skip_conflicts == 0) {
                 assert(last_bet);
                 skip_conflicts = cl_interact(deductions, formula->get_aff(), last_bet, literal);
