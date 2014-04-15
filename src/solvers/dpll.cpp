@@ -8,12 +8,14 @@
 #include <stdexcept>
 
 #include "structures/affectation.h"
+#include "structures/CL_proof.h"
 #include "structures/formula.h"
 #include "structures/clause.h"
 #include "solvers/dpll.h"
 #include "config.h"
 
 #define CONFLICT_GRAPH_FILE_NAME "/tmp/conflict_graph.dot"
+#define CL_PROOF_FILE_NAME "/tmp/CL_proof.tex"
 
 using namespace satsolver;
 
@@ -105,17 +107,26 @@ std::set<int>* make_conflict_graph(const std::map<int, std::set<int>> deductions
     return handled;
 }
 
-unsigned int cl_interact(const std::map<int, std::set<int>> &deductions, const Affectation &aff, int last_bet, int literal) {
+unsigned int cl_interact(const std::map<int, std::set<int>> &deductions, const Affectation &aff, int last_bet, int literal, bool *with_proof) {
     char mode;
     unsigned int steps;
     assert(deductions.find(literal) != deductions.end() || deductions.find(-literal) != deductions.end());
-    std::cout << "Conflict on literal " << literal << ". Action? [g/c/s/t] ";
+    std::cout << "Conflict on literal " << literal << ". Action? [g/r/c/s/t] ";
+    assert(with_proof);
+    *with_proof = false;
     while (true) {
         std::cin >> mode;
         switch (mode) {
             case 'g':
                 delete make_conflict_graph(deductions, aff, last_bet, literal, true);
                 return 1;
+            case 'r':
+                if (!WITH_CL) {
+                    std::cout << "Clause learning is not enabled. Use -CL. [g/r/c/s/t]. " << std::endl;
+                    continue;
+                }
+                *with_proof = true;
+                return 0;
             case 'c':
                 return 1;
             case 's':
@@ -125,13 +136,13 @@ unsigned int cl_interact(const std::map<int, std::set<int>> &deductions, const A
                 CL_INTERACT = false;
                 return 0;
             default:
-                std::cout << "Invalid character [g/c/s/t]. ";
+                std::cout << "Invalid character [g/r/c/s/t]. ";
                 continue;
         }
     }
 }
 
-std::shared_ptr<Clause> learn_clause(const std::map<int, std::set<int>> &deductions, const std::vector<std::pair<int, bool>> &mem, const Affectation &aff, int nb_variables, int literal) {
+std::shared_ptr<Clause> learn_clause(const std::map<int, std::set<int>> &deductions, const std::vector<std::pair<int, bool>> &mem, const Affectation &aff, int nb_variables, int literal, CLProof *proof) {
     (void) aff;
     long unsigned int mem_top = mem.size()-1; // The index in the memory “stack” of the literal we are making the resolution on.
     std::set<int> clause(deductions.at(literal)), clause2;
@@ -152,6 +163,7 @@ std::shared_ptr<Clause> learn_clause(const std::map<int, std::set<int>> &deducti
         assert(clause2.find(literal) != clause.end());
 
         // Resolution
+        proof->insert_top(Clause(nb_variables, clause), Clause(nb_variables, clause2));
         clause.erase(clause.find(-literal));
         clause2.erase(clause2.find(literal));
         clause.insert(clause2.begin(), clause2.end());
@@ -163,6 +175,8 @@ std::shared_ptr<Clause> learn_clause(const std::map<int, std::set<int>> &deducti
 
 Affectation* satsolver::solve(Formula *formula) {
     int literal;
+    bool with_proof;
+    CLProof *proof;
     unsigned int clause_id;
     bool contains_false_clause;
     std::map<int, std::set<int>> deductions;
@@ -203,10 +217,15 @@ Affectation* satsolver::solve(Formula *formula) {
             deductions[literal] = formula->to_clauses_vector()[clause_id]->whole_to_set();
             if (CL_INTERACT && --skip_conflicts == 0) {
                 assert(last_bet);
-                skip_conflicts = cl_interact(deductions, formula->get_aff(), last_bet, literal);
+                skip_conflicts = cl_interact(deductions, formula->get_aff(), last_bet, literal, &with_proof);
             }
-            if (WITH_CL)
-                learn_clause(deductions, formula->get_mem(), formula->get_aff(), formula->get_nb_variables(), literal);
+            if (WITH_CL) {
+                proof = new CLProof(formula->to_clauses_vector()[clause_id]);
+                learn_clause(deductions, formula->get_mem(), formula->get_aff(), formula->get_nb_variables(), literal, proof);
+                if (with_proof)
+                    proof->to_latex_file(CL_PROOF_FILE_NAME);
+                delete proof;
+            }
             literal = formula->back() ;
             last_bet = -last_bet;
             if(literal == 0)

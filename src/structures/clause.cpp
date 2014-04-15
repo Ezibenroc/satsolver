@@ -111,6 +111,26 @@ std::string Clause::to_string2() const {
     return oss.str() ;
 }
 
+std::string Clause::to_latex_string() const {
+    bool flag = false;
+    std::ostringstream oss;
+    for(int i = 1 ; i <= this->nb_variables ; i++) {
+        if(this->contains_literal(-i)) {
+            if (flag)
+                oss << "\\lor ";
+            oss << "\\varf{" << -i << "} ";
+            flag = true;
+        }
+        if(this->contains_literal(i)) {
+            if (flag)
+                oss << "\\lor ";
+            oss << "\\vart{" << i << "} ";
+            flag = true;
+        }
+    }
+    return oss.str() ;
+}
+
 std::set<int> Clause::whole_to_set() const {
     std::set<int> s = std::set<int>() ;
     for(auto l : this->literals)

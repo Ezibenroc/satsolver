@@ -48,6 +48,7 @@ class Clause {
         // Renvoie la représentation textuelle de la clause
         std::string to_string() const;
         std::string to_string2() const;
+        std::string to_latex_string() const;
 
         // Renvoie un ensemble contenant tous les entiers de la clause qui ne sont pas vrais.
         std::set<int> to_set() const;
