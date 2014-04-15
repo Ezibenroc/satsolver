@@ -47,6 +47,8 @@ void Deductions::add_deduction(int literal, std::unordered_set<int> &clause) {
         }
     }
     for (auto it : clause) {
+        if (it == literal)
+            continue;
         try {
             this->known_to_deduced.at(it).insert(literal);
         }
