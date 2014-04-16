@@ -20,5 +20,5 @@ class Deductions {
         void add_deduction(int literal, std::set<int> clause);
         void remove_unknown(satsolver::Affectation &aff);
 	
-				void print() ;
+        void print() const;
 };
