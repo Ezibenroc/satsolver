@@ -62,3 +62,14 @@ void Deductions::remove_unknown(satsolver::Affectation &aff) {
         }
     }
 }
+
+
+void Deductions::print() {
+	for(auto it : this->deduced_to_known) {
+		std::cout << it.first << " deduced with " ;
+		for(auto l : it.second) {
+			std::cout << l << " " ;
+		}
+		std::cout << std::endl ;
+	}
+}
