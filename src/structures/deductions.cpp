@@ -47,3 +47,18 @@ void Deductions::add_deduction(int literal, std::set<int> clause) {
     std::unordered_set<int> clause2(clause.begin(), clause.end());
     this->add_deduction(literal, clause2);
 }
+
+void Deductions::remove_unknown(satsolver::Affectation &aff) {
+    std::unordered_set<int> to_remove;
+    for (auto pos=this->known_to_deduced.begin(); pos != this->known_to_deduced.end(); pos++) {
+        if (aff.is_unknown(pos->first)) {
+            to_remove.insert(pos->first);
+        }
+    }
+    for (auto it : to_remove) {
+        this->known_to_deduced.erase(it);
+        for (auto it2 : this->deduced_to_known) {
+            it2.second.erase(it);
+        }
+    }
+}

@@ -2,6 +2,8 @@
 #include <set>
 #include <unordered_set>
 
+#include "structures/affectation.h"
+
 class Deductions {
     private:
         std::map<int, std::unordered_set<int>> known_to_deduced;
@@ -16,5 +18,6 @@ class Deductions {
         std::unordered_set<int> get_deductions(int literal) const;
         void add_deduction(int literal, std::unordered_set<int> &clause);
         void add_deduction(int literal, std::set<int> clause);
+        void remove_unknown(satsolver::Affectation &aff);
 
 };

@@ -216,6 +216,7 @@ Affectation* satsolver::solve(Formula *formula) {
                 delete proof;
             }
             literal = formula->back() ;
+            deductions.remove_unknown(*formula->get_aff());
             last_bet = -last_bet;
             if(literal == 0)
                 throw Conflict() ;
