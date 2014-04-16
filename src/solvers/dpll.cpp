@@ -188,15 +188,6 @@ Affectation* satsolver::solve(Formula *formula) {
             // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
             deductions.add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set());
-/* // On ne créé pas de fausse clause en affectant un littéral isolé
-	          if (WITH_WL)
->>>>>>> 38cc9ece1cfa7e0a568db76fc4ce67793f92537b
-                contains_false_clause = !formula->deduce_true(literal, &clause_id);
-            else {
-                formula->deduce_true(literal, NULL);
-                contains_false_clause = formula->contains_false_clause(&clause_id);
-            }
-*/
 						formula->deduce_true(literal,NULL) ;
         }
         else {
