@@ -117,20 +117,28 @@ std::string Clause::to_string2() const {
     return oss.str() ;
 }
 
-std::string Clause::to_latex_string() const {
+std::string Clause::to_latex_string(int highlighted_var) const {
     bool flag = false;
     std::ostringstream oss;
     for(int i = 1 ; i <= this->nb_variables ; i++) {
         if(this->contains_literal(-i)) {
             if (flag)
                 oss << "\\lor ";
-            oss << "\\varf{" << -i << "} ";
+            if (abs(i) == abs(highlighted_var))
+                oss << "\\mathbf{";
+            oss << "\\varf{" << i << "} ";
+            if (abs(i) == abs(highlighted_var))
+                oss << "}";
             flag = true;
         }
         if(this->contains_literal(i)) {
             if (flag)
                 oss << "\\lor ";
+            if (abs(i) == abs(highlighted_var))
+                oss << "\\mathbf{";
             oss << "\\vart{" << i << "} ";
+            if (abs(i) == abs(highlighted_var))
+                oss << "}";
             flag = true;
         }
     }

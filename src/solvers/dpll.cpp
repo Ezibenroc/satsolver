@@ -151,7 +151,8 @@ std::shared_ptr<Clause> learn_clause(const Deductions &deductions, const std::ve
         assert(clause2.find(literal) != clause.end());
 
         // Resolution
-        proof->insert_top(Clause(nb_variables, clause), Clause(nb_variables, clause2));
+        // TODO: Replace 0 with the clause id.
+        proof->insert_top(literal, std::make_pair(0, Clause(nb_variables, clause)), std::make_pair(0, Clause(nb_variables, clause2)));
         clause.erase(clause.find(-literal));
         clause2.erase(clause2.find(literal));
         clause.insert(clause2.begin(), clause2.end());
