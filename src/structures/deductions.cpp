@@ -1,3 +1,4 @@
+#include <cassert>
 #include <utility>
 #include <iostream>
 #include <stdexcept>
@@ -35,12 +36,11 @@ void Deductions::add_deduction(int literal, std::unordered_set<int> &clause) {
         }
     }
     for (auto it : clause) {
-        try {
+        auto pos = this->known_to_deduced.find(it);
+        if (pos != this->known_to_deduced.end())
             this->known_to_deduced.at(it).insert(literal);
-        }
-        catch (std::out_of_range) {
+        else
             this->known_to_deduced.insert(std::make_pair(it, std::unordered_set<int>({literal})));
-        }
     }
 }
 void Deductions::add_deduction(int literal, std::set<int> clause) {
@@ -64,12 +64,12 @@ void Deductions::remove_unknown(satsolver::Affectation &aff) {
 }
 
 
-void Deductions::print() {
-	for(auto it : this->deduced_to_known) {
-		std::cout << it.first << " deduced with " ;
-		for(auto l : it.second) {
-			std::cout << l << " " ;
-		}
-		std::cout << std::endl ;
-	}
+void Deductions::print() const {
+    for(auto it : this->deduced_to_known) {
+        std::cout << it.first << " deduced with " ;
+        for(auto l : it.second) {
+            std::cout << l << " " ;
+        }
+        std::cout << std::endl ;
+    }
 }
