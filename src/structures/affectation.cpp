@@ -104,3 +104,6 @@ int Affectation::get_nb_unknown() {
 	return this->nb_unknown ;
 }
 
+unsigned Affectation::get_nb_var() const{
+    return static_cast<int> (this->aff.size()) ;
+}

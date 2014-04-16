@@ -59,40 +59,29 @@ void conflict_graph_BFS(const Deductions &deductions, int root, std::set<int> &u
     }
 }
 
-void make_conflict_graph(const Deductions &deductions, const Affectation &aff, int root, int literal, bool write) {
+void make_conflict_graph(const Deductions &deductions, const Affectation &aff, int root, int literal) {
     FILE *graph_file = NULL;
-    int literal2;
+    //int literal2;
     std::set<int> to_be_handled({literal}); // The list of literals in that will have to be added to the graph
     std::set<int> unique_implication_points, deduced_literals;
-    if (write) {
-        graph_file = fopen(CONFLICT_GRAPH_FILE_NAME, "w");
-        fprintf(graph_file, "digraph G {\n");
-    }
-    while (to_be_handled.size()) {
-        literal2 = *to_be_handled.begin();
-        to_be_handled.erase(to_be_handled.begin());
-        if (aff.is_unknown(abs(literal2)))
-            continue;
-
-        // The two following lines fill reversed_deductions and append items in to_be_handled.
-        handle_literal(graph_file, deductions, to_be_handled, aff, literal2);
-        handle_literal(graph_file, deductions, to_be_handled, aff, -literal2);
-    }
-    if (write) {
-        // Fills unique_implication_points and deduced_literals
-        conflict_graph_BFS(deductions, root, unique_implication_points, deduced_literals);
-        for (auto it : deduced_literals)
-            if (aff.is_true(it))
-                fprintf(graph_file, "\t%d [color = \"blue\"];\n", it);
-        // Note that UIPs are also deduced, so be both blue and yellow. Thanksfully,
-        // dot deterministically chooses a color (the last one).
-        for (auto it : unique_implication_points)
-            if (aff.is_true(it))
-                fprintf(graph_file, "\t%d [color = \"yellow\"];\n", it);
-        fprintf(graph_file, "\t%d [color = \"red\"];\n", literal);
-        fprintf(graph_file, "}\n");
-        fclose(graph_file);
-    }
+    
+    graph_file = fopen(CONFLICT_GRAPH_FILE_NAME, "w");
+    fprintf(graph_file, "digraph G {\n");
+    
+    // Arêtes
+    deductions.print_edges(graph_file,aff) ;
+    
+    // Fills unique_implication_points and deduced_literals
+    conflict_graph_BFS(deductions, root, unique_implication_points, deduced_literals);
+    for (auto it : deduced_literals)
+        if (aff.is_true(it))
+            fprintf(graph_file, "\t%d [color = \"blue\"];\n", it);
+    
+    // Noeuds
+    deductions.print_UIP(graph_file,aff,root,literal) ;
+    fprintf(graph_file, "\t%d [color = \"red\"];\n", literal);
+    fprintf(graph_file, "}\n");
+    fclose(graph_file);
 }
 
 unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, int last_bet, int literal, bool *with_proof) {
@@ -106,7 +95,7 @@ unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, i
         std::cin >> mode;
         switch (mode) {
             case 'g':
-                make_conflict_graph(deductions, aff, last_bet, literal, true);
+                make_conflict_graph(deductions, aff, last_bet, literal);
                 return 1;
             case 'r':
                 if (!WITH_CL) {
@@ -171,7 +160,6 @@ Affectation* satsolver::solve(Formula *formula) {
     unsigned int skip_conflicts = 1; // Number of conflicts we will skip before showing another prompt
     int last_bet = 0; // Used for generating the graph.
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
-    		deductions.print() ;
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
             // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
