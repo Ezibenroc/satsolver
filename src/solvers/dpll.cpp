@@ -22,24 +22,17 @@ using namespace satsolver;
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
-void handle_literal(FILE *graph_file, const Deductions &deductions, std::set<int> *handled, std::set<int> &to_be_handled, const Affectation &aff, int literal) {
-		if(abs(literal)==19)
-			std::cout << literal << " HANDLED.-------------------------------------\n";
+void handle_literal(FILE *graph_file, const Deductions &deductions, std::set<int> &to_be_handled, const Affectation &aff, int literal) {
     if (!deductions.has_literal(literal)) {
-    		std::cout << "Deduction do not have " << literal << std::endl ;
         return;
    	}
     for (auto it : deductions.get_deduced_from(literal)) { // Iterate the literals which made us deduce the literal
-    		if(literal==-19)
-    			std::cout << it << "(for -19) " << std::endl ;
         if (it == literal || it == -literal)
             continue;
         to_be_handled.insert(it);
         if (graph_file)
             fprintf(graph_file, "\t\"%d\" -> \"%d\";\n", AS_AFF(aff, it), AS_AFF(aff, literal));
     }
-		if(abs(literal)==19)
-			std::cout << "END HANDLING " << literal << ".-------------------------------------\n";
 }
 
 
@@ -66,11 +59,10 @@ void conflict_graph_BFS(const Deductions &deductions, int root, std::set<int> &u
     }
 }
 
-std::set<int>* make_conflict_graph(const Deductions &deductions, const Affectation &aff, int root, int literal, bool write) {
+void make_conflict_graph(const Deductions &deductions, const Affectation &aff, int root, int literal, bool write) {
     FILE *graph_file = NULL;
     int literal2;
-    std::set<int> *handled = new std::set<int>(), // The list of literals which have already been added to the graph
-                  to_be_handled({literal}); // The list of literals in that will have to be added to the graph
+    std::set<int> to_be_handled({literal}); // The list of literals in that will have to be added to the graph
     std::set<int> unique_implication_points, deduced_literals;
     if (write) {
         graph_file = fopen(CONFLICT_GRAPH_FILE_NAME, "w");
@@ -79,15 +71,12 @@ std::set<int>* make_conflict_graph(const Deductions &deductions, const Affectati
     while (to_be_handled.size()) {
         literal2 = *to_be_handled.begin();
         to_be_handled.erase(to_be_handled.begin());
-        if (handled->find(literal2) != handled->end() || handled->find(-literal2) != handled->end())
-            continue;
-        handled->insert(literal2);
         if (aff.is_unknown(abs(literal2)))
             continue;
 
         // The two following lines fill reversed_deductions and append items in to_be_handled.
-        handle_literal(graph_file, deductions, handled, to_be_handled, aff, literal2);
-        handle_literal(graph_file, deductions, handled, to_be_handled, aff, -literal2);
+        handle_literal(graph_file, deductions, to_be_handled, aff, literal2);
+        handle_literal(graph_file, deductions, to_be_handled, aff, -literal2);
     }
     if (write) {
         // Fills unique_implication_points and deduced_literals
@@ -104,7 +93,6 @@ std::set<int>* make_conflict_graph(const Deductions &deductions, const Affectati
         fprintf(graph_file, "}\n");
         fclose(graph_file);
     }
-    return handled;
 }
 
 unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, int last_bet, int literal, bool *with_proof) {
@@ -118,7 +106,7 @@ unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, i
         std::cin >> mode;
         switch (mode) {
             case 'g':
-                delete make_conflict_graph(deductions, aff, last_bet, literal, true);
+                make_conflict_graph(deductions, aff, last_bet, literal, true);
                 return 1;
             case 'r':
                 if (!WITH_CL) {
