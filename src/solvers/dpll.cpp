@@ -23,17 +23,23 @@ using namespace satsolver;
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
 void handle_literal(FILE *graph_file, const Deductions &deductions, std::set<int> *handled, std::set<int> &to_be_handled, const Affectation &aff, int literal) {
-    if (!deductions.has_literal(literal))
+		if(abs(literal)==19)
+			std::cout << literal << " HANDLED.-------------------------------------\n";
+    if (!deductions.has_literal(literal)) {
+    		std::cout << "Deduction do not have " << literal << std::endl ;
         return;
+   	}
     for (auto it : deductions.get_deduced_from(literal)) { // Iterate the literals which made us deduce the literal
+    		if(literal==-19)
+    			std::cout << it << "(for -19) " << std::endl ;
         if (it == literal || it == -literal)
             continue;
         to_be_handled.insert(it);
-        if (handled->find(it) != handled->end() || handled->find(-it) != handled->end())
-            continue;
         if (graph_file)
             fprintf(graph_file, "\t\"%d\" -> \"%d\";\n", AS_AFF(aff, it), AS_AFF(aff, literal));
     }
+		if(abs(literal)==19)
+			std::cout << "END HANDLING " << literal << ".-------------------------------------\n";
 }
 
 
@@ -177,6 +183,7 @@ Affectation* satsolver::solve(Formula *formula) {
     unsigned int skip_conflicts = 1; // Number of conflicts we will skip before showing another prompt
     int last_bet = 0; // Used for generating the graph.
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
+    		deductions.print() ;
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
             // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
