@@ -15,6 +15,9 @@
 Deductions::Deductions() : known_to_deduced(), deduced_to_known() {
 }
 
+Deductions::Deductions(Deductions *that) : known_to_deduced(that->known_to_deduced),deduced_to_known(that->deduced_to_known) {
+}
+
 bool Deductions::has_literal(int literal) const  {
     return this->deduced_to_known.find(literal) != deduced_to_known.end();
 }
@@ -55,11 +58,26 @@ void Deductions::add_deduction(int literal, const std::set<int> &clause) {
     this->add_deduction(literal, clause2);
 }
 
+void Deductions::remove_deduction(int literal) {
+    this->known_to_deduced.erase(literal) ;
+    this->known_to_deduced.erase(-literal) ;
+    this->deduced_to_known.erase(literal) ;
+    this->deduced_to_known.erase(-literal) ;
+    for(auto pos : known_to_deduced) {
+        pos.second.erase(literal) ;
+        pos.second.erase(-literal) ;
+    }
+    for(auto pos : deduced_to_known) {
+        pos.second.erase(literal) ;
+        pos.second.erase(-literal) ;
+    }
+}
+
 void Deductions::remove_unknown(satsolver::Affectation &aff) {
     std::unordered_set<int> to_remove;
-    for (auto pos=this->known_to_deduced.begin(); pos != this->known_to_deduced.end(); pos++) {
-        if (aff.is_unknown(pos->first)) {
-            to_remove.insert(pos->first);
+    for (auto pos : known_to_deduced) {
+        if (aff.is_unknown(pos.first)) {
+            to_remove.insert(pos.first);
         }
     }
     for (auto it : to_remove) {
@@ -72,12 +90,18 @@ void Deductions::remove_unknown(satsolver::Affectation &aff) {
 
 
 void Deductions::print() const {
+    bool flag = false ;
     for(auto it : this->deduced_to_known) {
         std::cout << it.first << " deduced with " ;
         for(auto l : it.second) {
             std::cout << l << " " ;
         }
         std::cout << std::endl ;
+        flag = flag || (this->deduced_to_known.find(-it.first) != this->deduced_to_known.end()) ;
+    }
+    if(flag) {
+        std::cout << "FAILURE" << std::endl ;
+        assert(false) ;
     }
 }
 

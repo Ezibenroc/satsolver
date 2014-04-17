@@ -15,18 +15,18 @@
 
 using namespace satsolver;
 
-int depth_stack = 0 ; // used only for verbosity mode
 
 void print_space() {
 		std::cout << "TIME : " << (static_cast<float>(clock()))/CLOCKS_PER_SEC << "\t" ;
-    for(int i = 0 ; i < depth_stack ; i++)
+    for(int i = 0 ; i < ded_depth ; i++)
         std::cout << "\t" ;
 }
 
-Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do() {
+Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do(), ded(new Deductions()) {
     for(auto c : this->clauses) {
         c->set_affectation(this->aff) ;
     }
+    this->ded_depth = 0 ;
     this->clean() ;
     for(auto c : this->clauses) {
         if(c->get_size() == 0)
@@ -36,9 +36,10 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff
     }
 }
 
-satsolver::Formula::Formula(const satsolver::Formula &that) : aff(new Affectation(that.aff)), clauses(), nb_variables(that.nb_variables), mem(that.mem), to_do(that.to_do) {
+satsolver::Formula::Formula(const satsolver::Formula &that) : aff(new Affectation(that.aff)), clauses(), nb_variables(that.nb_variables), mem(that.mem), to_do(that.to_do), ded(new Deductions(that.ded)) {
     this->clauses.reserve(that.clauses.size());
     std::shared_ptr<Clause> c2;
+    this->depth = that.depth_ded ;
     for(auto c : that.clauses) {
         c2 = std::shared_ptr<Clause>(new Clause(*c));
         this->clauses.push_back(c2);
@@ -54,6 +55,7 @@ satsolver::Formula::Formula(const satsolver::Formula &that) : aff(new Affectatio
 Formula::~Formula() {
     this->clauses.clear() ;
     delete this->aff ;
+    delete this->ded ;
 }
 Formula& Formula::operator=(const Formula &that) {
     this->nb_variables = that.nb_variables;
@@ -62,6 +64,9 @@ Formula& Formula::operator=(const Formula &that) {
     this->aff = that.aff ;
     this->mem = that.mem ;
     this->to_do = that.to_do ;
+    this->ded_depth = that.ded_depth ;
+    delete this->depth ;
+    this->depth = that->depth ;
     return *this;
 }
 
@@ -169,7 +174,7 @@ bool Formula::bet_true(int x, unsigned int *clause_id) {
         print_space() ;
         std::cout << "Bet " << x << std::endl ;
     }
-    depth_stack ++ ;
+    ded_depth ++ ;
     if(this->aff->is_unknown(x)) {
         this->mem.push_back(std::pair<int,bool>(x,false)) ;
         return this->set_true(x, clause_id) ;
@@ -182,7 +187,7 @@ bool Formula::bet_false(int x, unsigned int *clause_id) {
 }
 
 int Formula::back() {
-    depth_stack -- ;
+    ded_depth -- ;
     if(VERBOSE) {
         print_space() ;
         std::cout << "Backtrack : " ;
@@ -198,6 +203,7 @@ int Formula::back() {
                 std::cout << std::endl ;
             return p.first ;
         }
+        this->ded->remove_deduction(p.first) ;
     }
     if(VERBOSE)
         std::cout << std::endl ;
@@ -364,6 +370,10 @@ std::vector<std::pair<int,bool>> Formula::get_mem() {
 
 Affectation *Formula::get_aff() {
     return (this->aff) ;
+}
+
+Deductions *Formula::get_ded() {
+    return (this->ded) ;
 }
 
 std::vector<int> Formula::get_unknown_literals(void) const {

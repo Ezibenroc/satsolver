@@ -7,6 +7,8 @@
 #include <stack>
 
 #include "structures/clause.h"
+#include "structures/affectation.h"
+#include "structures/deductions.h"
 
 namespace satsolver {
 
@@ -17,6 +19,8 @@ class Formula {
         int nb_variables ;
         std::vector<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
         std::set<int> to_do ; // littéraux déduits pas encore affectés (d’autres opérations sont « en cours »)
+        Deductions *ded ;     // graphe orienté représentant les déductions
+        int ded_depth ; // profondeur courante de l'arbre de déductions
 
         // Affectation d'un litéral x
         // Si WITH_WL, renvoie faux ssi un conflit est généré
@@ -97,6 +101,9 @@ class Formula {
         // Ne pas utiliser en dehors des tests unitaires, ou de la fin de DPLL
         Affectation *get_aff() ;
         
+        // Renvoie les déductions
+        Deductions *get_ded() ;
+                
         // Renvoie un vecteur de littéraux inconnus
         std::vector<int> get_unknown_literals (void) const ;
 
