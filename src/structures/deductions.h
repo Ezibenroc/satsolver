@@ -1,7 +1,7 @@
 #ifndef STRUCTURES_DEDUCTIONS_H
 #define STRUCTURES_DEDUCTIONS_H
 
-#include <map>
+#include <vector>
 #include <set>
 #include <unordered_set>
 
@@ -9,11 +9,16 @@
 
 class Deductions {
     private:
-        std::map<int, std::unordered_set<int>> known_to_deduced;
-        std::map<int, std::unordered_set<int>> deduced_to_known;
+        // known_to_deduced[i] = ensemble des variables déduits grâce à i
+        // deduced_to_known[i] = ensemble des variables ayant permi de déduire i
+        // known_to_deduced[0] et deduced_to_known[0] inutilisés
+        // On stock les variables et non les littéraux (valeurs absolues)
+        std::vector<std::unordered_set<int>> known_to_deduced;
+        std::vector<std::unordered_set<int>> deduced_to_known;
 
     public:
-        Deductions();
+        // Initialisation
+        Deductions(int nb_var);
         Deductions(Deductions *that);
 
         bool has_variable(int var) const;
@@ -23,7 +28,6 @@ class Deductions {
         void add_deduction(int literal, const std::unordered_set<int> &clause);
         void add_deduction(int literal, const std::set<int> &clause);
         void remove_deduction(int literal) ;
-        void remove_unknown(satsolver::Affectation &aff);
 	
         void print() const;
         void print_edges(FILE *graph_file, const satsolver::Affectation &aff) const ;

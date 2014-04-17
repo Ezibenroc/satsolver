@@ -16,17 +16,16 @@
 using namespace satsolver;
 
 
-void print_space() {
-		std::cout << "TIME : " << (static_cast<float>(clock()))/CLOCKS_PER_SEC << "\t" ;
-    for(int i = 0 ; i < ded_depth ; i++)
+void print_space(int depth) {
+	std::cout << "TIME : " << (static_cast<float>(clock()))/CLOCKS_PER_SEC << "\t" ;
+    for(int i = 0 ; i < depth ; i++)
         std::cout << "\t" ;
 }
 
-Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do(), ded(new Deductions()) {
+Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do(), ded(new Deductions(nb_variables)),ded_depth(0) {
     for(auto c : this->clauses) {
         c->set_affectation(this->aff) ;
     }
-    this->ded_depth = 0 ;
     this->clean() ;
     for(auto c : this->clauses) {
         if(c->get_size() == 0)
@@ -36,10 +35,9 @@ Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff
     }
 }
 
-satsolver::Formula::Formula(const satsolver::Formula &that) : aff(new Affectation(that.aff)), clauses(), nb_variables(that.nb_variables), mem(that.mem), to_do(that.to_do), ded(new Deductions(that.ded)) {
+satsolver::Formula::Formula(const satsolver::Formula &that) : aff(new Affectation(that.aff)), clauses(), nb_variables(that.nb_variables), mem(that.mem), to_do(that.to_do), ded(new Deductions(that.ded)), ded_depth(that.ded_depth)  {
     this->clauses.reserve(that.clauses.size());
     std::shared_ptr<Clause> c2;
-    this->depth = that.depth_ded ;
     for(auto c : that.clauses) {
         c2 = std::shared_ptr<Clause>(new Clause(*c));
         this->clauses.push_back(c2);
@@ -65,8 +63,8 @@ Formula& Formula::operator=(const Formula &that) {
     this->mem = that.mem ;
     this->to_do = that.to_do ;
     this->ded_depth = that.ded_depth ;
-    delete this->depth ;
-    this->depth = that->depth ;
+    delete this->ded ;
+    this->ded = that.ded ;
     return *this;
 }
 
@@ -133,7 +131,7 @@ bool Formula::set_true(int x, unsigned int *clause_id) {
                 if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
                     this->to_do.clear();
                     if(VERBOSE) {
-                        print_space() ;
+                        print_space(ded_depth) ;
                         std::cout << "[Watched Literals] Detected a conflict : " << literal << std::endl ;
                     }
                     if (clause_id)
@@ -155,7 +153,7 @@ bool Formula::set_true(int x, unsigned int *clause_id) {
 
 bool Formula::deduce_true(int x, unsigned int *clause_id) {
     if(VERBOSE) {
-        print_space() ;
+        print_space(ded_depth) ;
         std::cout << "Deduce " << x << std::endl ;
     }
     if(this->aff->is_unknown(x)) {
@@ -171,7 +169,7 @@ bool Formula::deduce_false(int x, unsigned int *clause_id) {
 
 bool Formula::bet_true(int x, unsigned int *clause_id) {
     if(VERBOSE) {
-        print_space() ;
+        print_space(ded_depth) ;
         std::cout << "Bet " << x << std::endl ;
     }
     ded_depth ++ ;
@@ -189,7 +187,7 @@ bool Formula::bet_false(int x, unsigned int *clause_id) {
 int Formula::back() {
     ded_depth -- ;
     if(VERBOSE) {
-        print_space() ;
+        print_space(ded_depth) ;
         std::cout << "Backtrack : " ;
     }
     std::pair<int,bool> p ;
@@ -198,12 +196,12 @@ int Formula::back() {
         if(VERBOSE) std::cout << p.first << " " ;
         this->aff->set_unknown(p.first) ;
         this->mem.pop_back() ;
+        this->ded->remove_deduction(p.first) ;
         if(!p.second) {// on est arrivé au pari
             if(VERBOSE)
                 std::cout << std::endl ;
             return p.first ;
         }
-        this->ded->remove_deduction(p.first) ;
     }
     if(VERBOSE)
         std::cout << std::endl ;

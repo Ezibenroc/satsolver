@@ -12,45 +12,34 @@
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
-Deductions::Deductions() : known_to_deduced(), deduced_to_known() {
+// Case 0 inutilisée
+Deductions::Deductions(int nb_var) : known_to_deduced(nb_var+1,std::unordered_set<int>()), deduced_to_known(nb_var+1,std::unordered_set<int>()) {
 }
 
 Deductions::Deductions(Deductions *that) : known_to_deduced(that->known_to_deduced),deduced_to_known(that->deduced_to_known) {
 }
 
 bool Deductions::has_literal(int literal) const  {
-    return this->deduced_to_known.find(literal) != deduced_to_known.end();
+    return this->deduced_to_known[literal].size() != 0 ;
 }
 bool Deductions::has_variable(int var) const  {
-    return this->deduced_to_known.find(var) != deduced_to_known.end() || deduced_to_known.find(-var) != deduced_to_known.end();
+    return this->has_literal(var) || this->has_literal(-var) ;
 }
 
 std::unordered_set<int> Deductions::get_deduced_from(int literal) const {
-    return this->deduced_to_known.at(literal);
+    return this->deduced_to_known[abs(literal)];
 }
 
 std::unordered_set<int> Deductions::get_deductions(int literal) const {
-    return this->known_to_deduced.at(literal);
+    return this->known_to_deduced[abs(literal)];
 }
 
 void Deductions::add_deduction(int literal, const std::unordered_set<int> &clause) {
-    this->deduced_to_known[literal] = clause;
-    for (auto it : this->known_to_deduced) {
-        auto pos = it.second.find(literal);
-        if (pos != it.second.end())
-            it.second.erase(pos);
-        else {
-            pos = it.second.find(-literal);
-            if (pos != it.second.end())
-                it.second.erase(pos);
-        }
-    }
-    for (auto it : clause) {
-        auto pos = this->known_to_deduced.find(it);
-        if (pos != this->known_to_deduced.end())
-            this->known_to_deduced.at(it).insert(literal);
-        else
-            this->known_to_deduced.insert(std::make_pair(it, std::unordered_set<int>({literal})));
+    for(auto l : clause) {
+        if(abs(l)==abs(literal))
+            continue ;
+        this->deduced_to_known[abs(literal)].insert(abs(l)) ;
+        this->known_to_deduced[abs(l)].insert(abs(literal)) ;
     }
 }
 void Deductions::add_deduction(int literal, const std::set<int> &clause) {
@@ -59,57 +48,43 @@ void Deductions::add_deduction(int literal, const std::set<int> &clause) {
 }
 
 void Deductions::remove_deduction(int literal) {
-    this->known_to_deduced.erase(literal) ;
-    this->known_to_deduced.erase(-literal) ;
-    this->deduced_to_known.erase(literal) ;
-    this->deduced_to_known.erase(-literal) ;
-    for(auto pos : known_to_deduced) {
-        pos.second.erase(literal) ;
-        pos.second.erase(-literal) ;
-    }
-    for(auto pos : deduced_to_known) {
-        pos.second.erase(literal) ;
-        pos.second.erase(-literal) ;
-    }
-}
-
-void Deductions::remove_unknown(satsolver::Affectation &aff) {
-    std::unordered_set<int> to_remove;
-    for (auto pos : known_to_deduced) {
-        if (aff.is_unknown(pos.first)) {
-            to_remove.insert(pos.first);
-        }
-    }
-    for (auto it : to_remove) {
-        this->known_to_deduced.erase(it);
-        for (auto it2 : this->deduced_to_known) {
-            it2.second.erase(it);
-        }
+    this->deduced_to_known[abs(literal)].clear() ;
+    this->known_to_deduced[abs(literal)].clear() ;
+    for(unsigned i = 1 ; i < deduced_to_known.size() ; i++) {
+        deduced_to_known[i].erase(abs(literal)) ;
+        known_to_deduced[i].erase(abs(literal)) ;
     }
 }
 
 
 void Deductions::print() const {
-    bool flag = false ;
-    for(auto it : this->deduced_to_known) {
-        std::cout << it.first << " deduced with " ;
-        for(auto l : it.second) {
-            std::cout << l << " " ;
+    std::cout << "############################" << std::endl ;
+    for(unsigned i = 1 ; i < deduced_to_known.size() ; i++) {
+        if(deduced_to_known[i].size() > 0) {
+            std::cout << "# " << i << " deduced with " ;
+            for(auto l : deduced_to_known[i]) {
+                std::cout << l << " " ;
+            }
+            std::cout << std::endl ;
         }
-        std::cout << std::endl ;
-        flag = flag || (this->deduced_to_known.find(-it.first) != this->deduced_to_known.end()) ;
     }
-    if(flag) {
-        std::cout << "FAILURE" << std::endl ;
-        assert(false) ;
+    std::cout << "###" << std::endl ;
+    for(unsigned i = 1 ; i < known_to_deduced.size() ; i++) {
+        if(known_to_deduced[i].size() > 0) {
+            std::cout << "# " << i << " implied " ;
+            for(auto l : known_to_deduced[i]) {
+                std::cout << l << " " ;
+            }
+            std::cout << std::endl ;
+        }
     }
+    std::cout << "############################" << std::endl ;
 }
 
 void Deductions::print_edges(FILE *graph_file, const satsolver::Affectation &aff) const {
-    for(auto it : this->known_to_deduced) {
-        for(auto l : it.second) {
-            if(abs(l)!=abs(it.first))
-                fprintf(graph_file, "\t\"%d\" -> \"%d\";\n", AS_AFF(aff, it.first), AS_AFF(aff, l));
+    for(unsigned i = 1 ; i < deduced_to_known.size() ; i++) {
+        for(auto l : deduced_to_known[i]) {
+            fprintf(graph_file, "\t\"%d\" -> \"%d\";\n", AS_AFF(aff, l), AS_AFF(aff, i));
         }
     }
 }
@@ -118,44 +93,48 @@ void Deductions::print_edges(FILE *graph_file, const satsolver::Affectation &aff
 void Deductions::print_UIP(FILE *graph_file, const satsolver::Affectation &aff, int bet, int conflict) const {
     std::set<int> candidates_UIP ;
     std::set<int> nodes_in_path ;
+    std::set<int> nodes_in_level ;
     std::vector<int> parent = std::vector<int>(aff.get_nb_var()+1,0);
     std::stack<int> DFS ;
     int node,tmp ;
     
-    DFS.push(bet) ;
+    DFS.push(abs(bet)) ;
     parent[abs(bet)] = abs(bet) ;
     for(unsigned i = 1 ; i <= aff.get_nb_var() ; i++) {
         candidates_UIP.insert(i) ;
-        candidates_UIP.insert(-i) ;
     }
     while(!DFS.empty()) {
         node = DFS.top() ;
+        nodes_in_level.insert(node) ;
         DFS.pop() ;
-        if(node == conflict) {
+        if(node == abs(conflict)) {
             nodes_in_path.clear() ;
             tmp = parent[abs(node)] ;
+            std::cout << "Path : " << abs(node) << " " << tmp << " " ;
             while(tmp != abs(bet)) {
                 if(candidates_UIP.find(tmp)!=candidates_UIP.end())
                     nodes_in_path.insert(AS_AFF(aff,tmp)) ;
                 tmp = parent[tmp] ;
                 assert(tmp) ;
+                std::cout << tmp << " " ;
             }
-            nodes_in_path.insert(bet) ;
+            std::cout << std::endl ;
+            nodes_in_path.insert(abs(bet)) ;
             candidates_UIP.clear() ;
             candidates_UIP.swap(nodes_in_path) ;
         }   
         else {
-            node = -node ;
-            if(this->known_to_deduced.find(node)!=this->known_to_deduced.end()) {
-                for(auto l : get_deductions(node)) {
-                    if(l!=node) {
-                        DFS.push(l) ;
-                        parent[abs(l)] = abs(node) ;
-                    }   
+            if(known_to_deduced[node].size() > 0) {
+                for(auto l : known_to_deduced[node]) {
+                    DFS.push(l) ;
+                    parent[l] = node ;  
                 }
             }
         }
     }
+    for(auto l : nodes_in_level)
+        if(candidates_UIP.find(l) == candidates_UIP.end())
+            fprintf(graph_file, "\t%d [color = \"blue\"];\n", AS_AFF(aff,l));           
     for(auto l : candidates_UIP)
         fprintf(graph_file, "\t%d [color = \"yellow\"];\n", AS_AFF(aff,l));
 }

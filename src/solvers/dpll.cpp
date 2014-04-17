@@ -72,7 +72,7 @@ void make_conflict_graph(const Deductions &deductions, const Affectation &aff, i
     deductions.print_edges(graph_file,aff) ;
     
     // Fills unique_implication_points and deduced_literals
-    conflict_graph_BFS(deductions, root, unique_implication_points, deduced_literals);
+ //   conflict_graph_BFS(deductions, root, unique_implication_points, deduced_literals);
     for (auto it : deduced_literals)
         if (aff.is_true(it))
             fprintf(graph_file, "\t%d [color = \"blue\"];\n", it);
@@ -201,7 +201,6 @@ Affectation* satsolver::solve(Formula *formula) {
                 delete proof;
             }
             literal = formula->back() ;
-            deductions->remove_unknown(*formula->get_aff());
             last_bet = -last_bet;
             if(literal == 0)
                 throw Conflict() ;
