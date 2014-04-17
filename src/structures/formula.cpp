@@ -122,8 +122,9 @@ void Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
 }
 
 
-bool Formula::set_true(int x, unsigned int *clause_id) {
+bool Formula::set_true(int x) {
     int literal ;
+    int clause_id=-1 ;
     if(WITH_WL) {
         for(unsigned int i=0; i<this->clauses.size(); i++) {
             literal = this->clauses[i]->set_true(x) ;
@@ -134,8 +135,7 @@ bool Formula::set_true(int x, unsigned int *clause_id) {
                         print_space(ded_depth) ;
                         std::cout << "[Watched Literals] Detected a conflict : " << literal << std::endl ;
                     }
-                    if (clause_id)
-                        *clause_id = i;
+                    clause_id = i ;
                     return false ;
                 }
                 this->to_do.insert(literal) ;
@@ -151,23 +151,25 @@ bool Formula::set_true(int x, unsigned int *clause_id) {
     return true ;
 }
 
-bool Formula::deduce_true(int x, unsigned int *clause_id) {
+bool Formula::deduce_true(int x, int clause_id) {
     if(VERBOSE) {
         print_space(ded_depth) ;
         std::cout << "Deduce " << x << std::endl ;
     }
     if(this->aff->is_unknown(x)) {
+        if(clause_id >=0)
+            this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set());
         this->mem.push_back(std::pair<int,bool>(x,true)) ;
-        return this->set_true(x, clause_id) ;
+        return this->set_true(x) ;
     }
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::deduce_false(int x, unsigned int *clause_id) {
+bool Formula::deduce_false(int x, int clause_id) {
     return deduce_true(-x, clause_id) ;
 }
 
-bool Formula::bet_true(int x, unsigned int *clause_id) {
+bool Formula::bet_true(int x) {
     if(VERBOSE) {
         print_space(ded_depth) ;
         std::cout << "Bet " << x << std::endl ;
@@ -175,13 +177,13 @@ bool Formula::bet_true(int x, unsigned int *clause_id) {
     ded_depth ++ ;
     if(this->aff->is_unknown(x)) {
         this->mem.push_back(std::pair<int,bool>(x,false)) ;
-        return this->set_true(x, clause_id) ;
+        return this->set_true(x) ;
     }
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::bet_false(int x, unsigned int *clause_id) {
-    return bet_true(-x, clause_id) ;
+bool Formula::bet_false(int x) {
+    return bet_true(-x) ;
 }
 
 int Formula::back() {

@@ -173,12 +173,12 @@ void StructuresTests::testFormula() {
     Formula f2(f) ;
     CPPUNIT_ASSERT(f2.to_set() == std::set<std::set<int>>({{-1,2},{1,2}}));
     CPPUNIT_ASSERT(f2.isolated_literal(NULL) == 2) ;
-    CPPUNIT_ASSERT(f2.bet_true(-1, NULL)) ;
+    CPPUNIT_ASSERT(f2.bet_true(-1)) ;
     CPPUNIT_ASSERT(!f2.contains_false_clause(NULL));
 
     CPPUNIT_ASSERT(f2.monome(NULL) == 2) ;
 
-    f2.bet_false(2, NULL);
+    f2.bet_false(2);
     CPPUNIT_ASSERT(f2.contains_false_clause(&clause_id));
     CPPUNIT_ASSERT(f2.to_clauses_vector()[clause_id]->to_string() == "{1,2}");
 /*    CPPUNIT_ASSERT(f2->get_aff()->is_true(-1) && f2->get_aff()->is_true(2) && f2->get_aff()->is_true(-3)) ;

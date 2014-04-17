@@ -56,7 +56,7 @@ void DpllTests::testBasicUsage() {
 		  delete f ;
 }
 void DpllTests::testBasicUsageWithWL() {
-    WITH_WL = true;
+  //  WITH_WL = true;
     DpllTests::testBasicUsage();
     WITH_WL = false;
 }

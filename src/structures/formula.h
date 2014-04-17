@@ -24,7 +24,7 @@ class Formula {
 
         // Affectation d'un litéral x
         // Si WITH_WL, renvoie faux ssi un conflit est généré
-        bool set_true(int x, unsigned int *clause_id) ;
+        bool set_true(int x) ;
 
 
     public :
@@ -51,13 +51,15 @@ class Formula {
 
         // Déduction de l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
-        bool deduce_true(int x, unsigned int *clause_id) ;
-        bool deduce_false(int x, unsigned int *clause_id) ;
+        // claude_id est l'indice de la clause qui est l'origine de cette déduction
+        // pas de clause origine si clause_id = -1 (survient lors des déductions des littéraux isolés)
+        bool deduce_true(int x, int clause_id) ;
+        bool deduce_false(int x, int clause_id) ;
 
         // Pari sur l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
-        bool bet_true(int x, unsigned int *clause_id) ;
-        bool bet_false(int x, unsigned int *clause_id) ;
+        bool bet_true(int x) ;
+        bool bet_false(int x) ;
 
         // Retourne en arrière jusqu'au dernier pari
         // Renvoie le dernier littéral parié (0 si inexistant)
