@@ -22,60 +22,14 @@ using namespace satsolver;
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
-void handle_literal(FILE *graph_file, const Deductions &deductions, std::set<int> &to_be_handled, const Affectation &aff, int literal) {
-    if (!deductions.has_literal(literal)) {
-        return;
-   	}
-    for (auto it : deductions.get_deduced_from(literal)) { // Iterate the literals which made us deduce the literal
-        if (it == literal || it == -literal)
-            continue;
-        to_be_handled.insert(it);
-        if (graph_file)
-            fprintf(graph_file, "\t\"%d\" -> \"%d\";\n", AS_AFF(aff, it), AS_AFF(aff, literal));
-    }
-}
-
-
-void conflict_graph_BFS(const Deductions &deductions, int root, std::set<int> &unique_implication_points, std::set<int> &deduced_literals) {
-    // We will browse the graph layer after layer from the root.
-    // If a layer is a singleton, this element is a unique implication point.
-    std::set<int> current_depth, next_depth({root});
-    while (next_depth.size()) {
-        current_depth.clear();
-        current_depth.swap(next_depth);
-        if (current_depth.size() == 1)
-            unique_implication_points.insert(*current_depth.begin());
-        for (auto it : current_depth) {
-            deduced_literals.insert(it);
-            try {
-                for (auto it2 : deductions.get_deductions(-it))
-                    if (it2 != it)
-                        next_depth.insert(it2);
-            }
-            catch (std::out_of_range) {
-                // We reached a leaf.
-            }
-        }
-    }
-}
-
 void make_conflict_graph(const Deductions &deductions, const Affectation &aff, int root, int literal) {
     FILE *graph_file = NULL;
-    //int literal2;
-    std::set<int> to_be_handled({literal}); // The list of literals in that will have to be added to the graph
-    std::set<int> unique_implication_points, deduced_literals;
     
     graph_file = fopen(CONFLICT_GRAPH_FILE_NAME, "w");
     fprintf(graph_file, "digraph G {\n");
     
     // Arêtes
     deductions.print_edges(graph_file,aff) ;
-    
-    // Fills unique_implication_points and deduced_literals
- //   conflict_graph_BFS(deductions, root, unique_implication_points, deduced_literals);
-    for (auto it : deduced_literals)
-        if (aff.is_true(it))
-            fprintf(graph_file, "\t%d [color = \"blue\"];\n", it);
     
     // Noeuds
     deductions.print_UIP(graph_file,aff,root,literal) ;
