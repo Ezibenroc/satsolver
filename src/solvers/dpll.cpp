@@ -57,7 +57,7 @@ unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, i
                     continue;
                 }
                 *with_proof = true;
-                return 0;
+                return 1;
             case 'c':
                 return 1;
             case 's':
