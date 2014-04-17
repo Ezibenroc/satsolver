@@ -77,17 +77,14 @@ std::shared_ptr<Clause> learn_clause(const Deductions &deductions, const std::ve
     (void) aff;
     long unsigned int mem_top = mem.size()-1; // The index in the memory “stack” of the literal we are making the resolution on.
     std::unordered_set<int> clause(deductions.get_deduced_from(literal)), clause2;
-    assert(clause.find(-literal) != clause.end());
+    assert(clause.find(literal) != clause.end());
     mem_top--;
     while (mem.at(mem_top).second) {
         literal = mem.at(mem_top).first;
         assert(mem.at(mem_top).first == literal);
-        try {
-            clause2 = deductions.get_deduced_from(literal); // This is the clause we will make the resolution with
-        }
-        catch (std::out_of_range) {
+        clause2 = deductions.get_deduced_from(literal); // This is the clause we will make the resolution with
+        if (!clause2.size())
             break;
-        }
 
         if (clause.find(-literal) == clause.end())
             break;
@@ -134,9 +131,6 @@ Affectation* satsolver::solve(Formula *formula) {
             last_bet = literal;
         }
         while(contains_false_clause) {
-            // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
-            // Cette mise à jour sera annulée par le backtrack
-            formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set());
             if (CL_INTERACT && --skip_conflicts == 0) {
                 assert(last_bet);
                 skip_conflicts = cl_interact(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);

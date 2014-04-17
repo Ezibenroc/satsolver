@@ -38,10 +38,8 @@ std::unordered_set<int> Deductions::get_deductions(int literal) const {
 
 void Deductions::add_deduction(int literal, const std::unordered_set<int> &clause) {
     for(auto l : clause) {
-        if(abs(l)==abs(literal))
-            continue ;
-        this->deduced_to_known[abs(literal)].insert(abs(l)) ;
-        this->known_to_deduced[abs(l)].insert(abs(literal)) ;
+        this->deduced_to_known[abs(literal)].insert(l) ;
+        this->known_to_deduced[abs(l)].insert(literal) ;
     }
 }
 void Deductions::add_deduction(int literal, const std::set<int> &clause) {
@@ -53,8 +51,8 @@ void Deductions::remove_deduction(int literal) {
     this->deduced_to_known[abs(literal)].clear() ;
     this->known_to_deduced[abs(literal)].clear() ;
     for(unsigned i = 1 ; i < deduced_to_known.size() ; i++) {
-        deduced_to_known[i].erase(abs(literal)) ;
-        known_to_deduced[i].erase(abs(literal)) ;
+        deduced_to_known[i].erase(literal) ;
+        known_to_deduced[i].erase(literal) ;
     }
 }
 
