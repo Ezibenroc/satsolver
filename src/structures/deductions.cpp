@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <vector>
 
+#define DEBUG false
+
 #include "structures/deductions.h"
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
@@ -58,27 +60,27 @@ void Deductions::remove_deduction(int literal) {
 
 
 void Deductions::print() const {
-    std::cout << "############################" << std::endl ;
+    if(DEBUG) std::cout << "############################" << std::endl ;
     for(unsigned i = 1 ; i < deduced_to_known.size() ; i++) {
         if(deduced_to_known[i].size() > 0) {
-            std::cout << "# " << i << " deduced with " ;
+            if(DEBUG) std::cout << "# " << i << " deduced with " ;
             for(auto l : deduced_to_known[i]) {
-                std::cout << l << " " ;
+                if(DEBUG) std::cout << l << " " ;
             }
-            std::cout << std::endl ;
+            if(DEBUG) std::cout << std::endl ;
         }
     }
-    std::cout << "###" << std::endl ;
+    if(DEBUG) std::cout << "###" << std::endl ;
     for(unsigned i = 1 ; i < known_to_deduced.size() ; i++) {
         if(known_to_deduced[i].size() > 0) {
-            std::cout << "# " << i << " implied " ;
+            if(DEBUG) std::cout << "# " << i << " implied " ;
             for(auto l : known_to_deduced[i]) {
-                std::cout << l << " " ;
+                if(DEBUG) std::cout << l << " " ;
             }
-            std::cout << std::endl ;
+            if(DEBUG) std::cout << std::endl ;
         }
     }
-    std::cout << "############################" << std::endl ;
+    if(DEBUG) std::cout << "############################" << std::endl ;
 }
 
 void Deductions::print_edges(FILE *graph_file, const satsolver::Affectation &aff) const {
@@ -95,30 +97,33 @@ void Deductions::print_UIP(FILE *graph_file, const satsolver::Affectation &aff, 
     std::set<int> nodes_in_path ;
     std::set<int> nodes_in_level ;
     std::vector<int> parent = std::vector<int>(aff.get_nb_var()+1,0);
-    std::stack<int> DFS ;
+    std::stack<std::pair<int,int>> DFS ; // pile de (noeud,parent)
     int node,tmp ;
+    std::pair<int,int> p ;
     
-    DFS.push(abs(bet)) ;
-    parent[abs(bet)] = abs(bet) ;
+    DFS.push(std::pair<int,int>(abs(bet),abs(bet))) ;
     for(unsigned i = 1 ; i <= aff.get_nb_var() ; i++) {
         candidates_UIP.insert(i) ;
     }
     while(!DFS.empty()) {
-        node = DFS.top() ;
-        nodes_in_level.insert(node) ;
+        p = DFS.top() ;
         DFS.pop() ;
+        node = p.first ;
+        nodes_in_level.insert(node) ;
+        parent[node] = p.second ;
+        if(DEBUG) std::cout << "DFS(" << node << ")" << std::endl ;
         if(node == abs(conflict)) {
             nodes_in_path.clear() ;
-            tmp = parent[abs(node)] ;
-            std::cout << "Path : " << abs(node) << " " << tmp << " " ;
+            tmp = parent[node] ;
+            if(DEBUG) std::cout << "Path : " << abs(node) << " " << tmp << " " ;
             while(tmp != abs(bet)) {
                 if(candidates_UIP.find(tmp)!=candidates_UIP.end())
-                    nodes_in_path.insert(AS_AFF(aff,tmp)) ;
+                    nodes_in_path.insert(tmp) ;
                 tmp = parent[tmp] ;
                 assert(tmp) ;
-                std::cout << tmp << " " ;
+                if(DEBUG) std::cout << tmp << " " ;
             }
-            std::cout << std::endl ;
+            if(DEBUG) std::cout << std::endl ;
             nodes_in_path.insert(abs(bet)) ;
             candidates_UIP.clear() ;
             candidates_UIP.swap(nodes_in_path) ;
@@ -126,8 +131,7 @@ void Deductions::print_UIP(FILE *graph_file, const satsolver::Affectation &aff, 
         else {
             if(known_to_deduced[node].size() > 0) {
                 for(auto l : known_to_deduced[node]) {
-                    DFS.push(l) ;
-                    parent[l] = node ;  
+                    DFS.push(std::pair<int,int>(l,node)) ;
                 }
             }
         }
