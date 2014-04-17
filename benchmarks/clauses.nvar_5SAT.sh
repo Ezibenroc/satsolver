@@ -33,7 +33,7 @@ for nb in `seq 10 200`; do
 		echo -e "\t\tTest $test"
 		# Génération de la formule dans le fichier $DIRECTORY/formula.cnf
 		A=$(echo "scale=0; $nb * 21 / 1" | bc) # on divise par 1 afin que bc fasse l'arrondi
-		./generator -nvar $nb -nclause $A -sclause 5 -o $DIRECTORY/formula.cnf -pathologic
+		./generator -nvar $nb -nclause $A -sclause 5 -o $DIRECTORY/formula.cnf 
 
 		# Résolution de la formule (en vérifiant la correction de la solution)
 
