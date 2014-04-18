@@ -15,28 +15,11 @@
 #include "solvers/dpll.h"
 #include "config.h"
 
-#define CONFLICT_GRAPH_FILE_NAME "/tmp/conflict_graph.dot"
 #define CL_PROOF_FILE_NAME "/tmp/CL_proof.tex"
 
 using namespace satsolver;
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
-
-void make_conflict_graph(const Deductions &deductions, const Affectation &aff, int root, int literal) {
-    FILE *graph_file = NULL;
-    
-    graph_file = fopen(CONFLICT_GRAPH_FILE_NAME, "w");
-    fprintf(graph_file, "digraph G {\n");
-    
-    // Arêtes
-    deductions.print_edges(graph_file,aff) ;
-    
-    // Noeuds
-    deductions.print_UIP(graph_file,aff,root,literal) ;
-    fprintf(graph_file, "\t%d [color = \"red\"];\n", literal);
-    fprintf(graph_file, "}\n");
-    fclose(graph_file);
-}
 
 unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, int last_bet, int literal, bool *with_proof) {
     char mode;
@@ -49,7 +32,7 @@ unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, i
         std::cin >> mode;
         switch (mode) {
             case 'g':
-                make_conflict_graph(deductions, aff, last_bet, literal);
+                deductions.make_conflict_graph(aff, last_bet, literal);
                 return 1;
             case 'r':
                 if (!WITH_CL) {
@@ -76,14 +59,13 @@ unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, i
 std::shared_ptr<Clause> learn_clause(const Deductions &deductions, const std::vector<std::pair<int, bool>> &mem, const Affectation &aff, int nb_variables, int literal, CLProof *proof) {
     (void) aff;
     long unsigned int mem_top = mem.size()-1; // The index in the memory “stack” of the literal we are making the resolution on.
-    std::unordered_set<int> clause(deductions.get_deduced_from(literal)), clause2;
-    assert(clause.find(-literal) != clause.end());
+    std::unordered_set<int> clause(deductions.get_deduced_from(aff,literal)), clause2;
     mem_top--;
     while (mem.at(mem_top).second) {
         literal = mem.at(mem_top).first;
         assert(mem.at(mem_top).first == literal);
         try {
-            clause2 = deductions.get_deduced_from(literal); // This is the clause we will make the resolution with
+            clause2 = deductions.get_deduced_from(aff,literal); // This is the clause we will make the resolution with
         }
         catch (std::out_of_range) {
             break;
@@ -91,14 +73,10 @@ std::shared_ptr<Clause> learn_clause(const Deductions &deductions, const std::ve
 
         if (clause.find(-literal) == clause.end())
             break;
-        assert(clause2.find(literal) != clause.end());
         // Resolution
         // TODO: Replace 0 with the clause id.
         proof->insert_top(literal, std::make_pair(0, Clause(nb_variables, clause)), std::make_pair(0, Clause(nb_variables, clause2)));
-        clause.erase(clause.find(-literal));
-        clause2.erase(clause2.find(literal));
         clause.insert(clause2.begin(), clause2.end());
-
         mem_top--;
     }
     return std::shared_ptr<Clause>(new Clause(nb_variables, clause));

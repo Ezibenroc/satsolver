@@ -10,7 +10,10 @@
 
 #define DEBUG false
 
+#define CONFLICT_GRAPH_FILE_NAME "/tmp/conflict_graph.dot"
+
 #include "structures/deductions.h"
+#include "structures/affectation.h"
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
@@ -28,12 +31,22 @@ bool Deductions::has_variable(int var) const  {
     return this->has_literal(var) || this->has_literal(-var) ;
 }
 
-std::unordered_set<int> Deductions::get_deduced_from(int literal) const {
-    return this->deduced_to_known[abs(literal)];
+std::unordered_set<int> Deductions::get_deduced_from(const satsolver::Affectation &aff, int literal) const {
+    std::unordered_set<int> ded ;
+    assert(this->deduced_to_known.size() > 0) ;
+    for(auto l : this->deduced_to_known[abs(literal)]) {
+        ded.insert(-AS_AFF(aff,l)) ;
+    }
+    return ded ;
 }
 
-std::unordered_set<int> Deductions::get_deductions(int literal) const {
-    return this->known_to_deduced[abs(literal)];
+std::unordered_set<int> Deductions::get_deductions(const satsolver::Affectation &aff, int literal) const {
+    std::unordered_set<int> ded ;
+    assert(this->known_to_deduced.size() > 0) ;
+    for(auto l : this->known_to_deduced[abs(literal)]) {
+        ded.insert(-AS_AFF(aff,l)) ;
+    }
+    return ded ;
 }
 
 void Deductions::add_deduction(int literal, const std::unordered_set<int> &clause) {
@@ -141,4 +154,22 @@ void Deductions::print_UIP(FILE *graph_file, const satsolver::Affectation &aff, 
             fprintf(graph_file, "\t%d [color = \"blue\"];\n", AS_AFF(aff,l));           
     for(auto l : candidates_UIP)
         fprintf(graph_file, "\t%d [color = \"yellow\"];\n", AS_AFF(aff,l));
+}
+
+void Deductions::make_conflict_graph(const satsolver::Affectation &aff, int root, int literal) const{
+    FILE *graph_file = NULL;
+    
+    graph_file = fopen(CONFLICT_GRAPH_FILE_NAME, "w");
+    assert(graph_file) ;
+    
+    fprintf(graph_file, "digraph G {\n");
+    
+    // Arêtes
+    this->print_edges(graph_file,aff) ;
+    
+    // Noeuds
+    this->print_UIP(graph_file,aff,root,literal) ;
+    fprintf(graph_file, "\t%d [color = \"red\"];\n", literal);
+    fprintf(graph_file, "}\n");
+    fclose(graph_file);
 }
