@@ -152,14 +152,17 @@ bool Formula::set_true(int x) {
 
 bool Formula::deduce_true(int x, int clause_id) {
     if(VERBOSE) {
-        print_space(ded_depth) ;
+        print_space(this->ded_depth) ;
         std::cout << "Deduce " << x << std::endl ;
+        if(clause_id >= 0) {
+            print_space(ded_depth) ;
+            std::cout << this->clauses[clause_id]->to_string() << " => " << x << std::endl;
+        }
     }
     if(this->aff->is_unknown(x)) {
-        if(clause_id >=0)
+        if((WITH_CL || CL_INTERACT) && clause_id >= 0) { // si clause_id < 0, alors littéral isolé
             this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
-        else
-            this->ded->add_bet(x,ded_depth) ;
+        }
         this->mem.push_back(std::pair<int,bool>(x,true)) ;
         return this->set_true(x) ;
     }
@@ -172,7 +175,7 @@ bool Formula::deduce_false(int x, int clause_id) {
 
 bool Formula::bet_true(int x) {
     if(VERBOSE) {
-        print_space(ded_depth) ;
+        print_space(this->ded_depth) ;
         std::cout << "Bet " << x << std::endl ;
     }
     this->ded_depth ++ ;
@@ -219,7 +222,7 @@ int Formula::back(unsigned int depth) {
         std::cout << "Performing " << this->ded_depth - depth << " backtrack(s)."  << std::endl ;
     }
     assert(depth < this->ded_depth) ;
-    while(depth != ded_depth) {
+    while(depth != this->ded_depth) {
         l = this->back() ;
     }
     return l ;
@@ -495,12 +498,12 @@ int Formula::choose_literal(int choice) {
 
 
 
-int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id) {
+int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id, unsigned int *new_depth) {
     long unsigned int i_conf; // The index in the memory “stack” of the literal we are making the resolution on.
     int lit_conf;
     int clause_id1, clause_id2 ;
     int nb_same_lvl ;
-    clause_id1 = this->ded->get_clause_id(literal) ;
+    clause_id1 = *clause_id ;
     std::unordered_set<int> clause = this->clauses[clause_id1]->whole_to_set(), clause2;
     
    while (true) {
@@ -524,6 +527,15 @@ int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id) 
         } while(clause.find(-lit_conf) == clause.end() && clause.find(lit_conf) == clause.end()) ;
         clause_id2 = this->ded->get_clause_id(lit_conf) ;
         clause2 = this->clauses[clause_id2]->whole_to_set(); // Clause correspondante
+/*        std::cout << "CLAUSE1 : " ;
+        for(auto l : clause)
+            std::cout << l << " " ;
+        std::cout << std::endl ;
+        std::cout << "Literal=" << lit_conf << std::endl ;
+        std::cout << "CLAUSE2 : " ;
+        for(auto l : clause2)
+            std::cout << l << " " ;
+        std::cout << std::endl << std::endl  ;*/
         // Resolution
         proof->insert_top(literal, std::make_pair(clause_id1, Clause(nb_variables, clause)), std::make_pair(clause_id2, Clause(nb_variables, clause2)));
         clause.insert(clause2.begin(), clause2.end());
@@ -531,19 +543,31 @@ int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id) 
         clause.erase(-lit_conf);
     }
     int depth_max = -1 ;
+    lit_conf = 0 ;
     for(auto l : clause) {
         if(this->ded->get_deduction_depth(l) != static_cast<int>(this->ded_depth))
             depth_max = std::max(this->ded->get_deduction_depth(l),depth_max) ;
+        else
+            lit_conf = l ; // seul literal du niveau courant
     }
+    assert(lit_conf) ;
     this->clauses.push_back(std::shared_ptr<Clause>(new Clause(nb_variables, clause,this->aff)));
     if(VERBOSE) {
         print_space(ded_depth) ;    
         std::cout << "Learned the clause " << clauses.back()->to_string() << std::endl ;
     }
     *clause_id = static_cast<int> (this->clauses.size() - 1) ;
-    return depth_max ;
+    *new_depth = depth_max ;
+    return lit_conf ;
 }
 
 void Formula::init_WL_learned_clause() {
     this->clauses.back()->init_WL() ;
+}
+
+int Formula::last_bet() {
+    for(long unsigned i = this->mem.size() - 1 ; i > 0 ; i--)
+        if(!mem[i].second)
+            return mem[i].first ;
+     return mem[0].first ;
 }

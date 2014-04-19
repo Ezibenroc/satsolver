@@ -62,11 +62,11 @@ Affectation* satsolver::solve(Formula *formula) {
     int literal;
     bool with_proof;
     CLProof *proof;
-    unsigned int clause_id;
+    unsigned int clause_id, tmp;
     bool contains_false_clause;
     unsigned int skip_conflicts = 1; // Number of conflicts we will skip before showing another prompt
     int last_bet = 0; // Used for generating the graph.
-    int depth_back ;
+    unsigned int depth_back ;
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
         formula->get_ded()->print() ;
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
@@ -86,37 +86,39 @@ Affectation* satsolver::solve(Formula *formula) {
                 formula->bet_true(literal);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
-            last_bet = literal;
         }
         while(contains_false_clause) {
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
+            // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
+            tmp = formula->get_ded()->get_clause_id(literal) ;
             formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
+            clause_id = tmp ;
             if (CL_INTERACT && --skip_conflicts == 0) {
+                last_bet = formula->last_bet() ;
                 assert(last_bet);
                 skip_conflicts = cl_interact(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);
             }
             if (WITH_CL) {
                 proof = new CLProof(formula->to_clauses_vector()[clause_id]);
-                depth_back = formula->learn_clause(literal, proof,&clause_id);
+                literal = formula->learn_clause(literal, proof,&clause_id, &depth_back);
                 if (with_proof)
                     proof->to_latex_file(CL_PROOF_FILE_NAME);
                 delete proof;
-                literal = formula->back(depth_back);
+                formula->back(depth_back);
                 if(WITH_WL)
                     formula->init_WL_learned_clause();
             }
             else {
-                literal = formula->back() ;
+                literal = -formula->back() ;
                 clause_id = -1 ;
             }
-            last_bet = 0 ;
             if(literal == 0)
                 throw Conflict() ;
             if (WITH_WL)
-                contains_false_clause = !formula->deduce_false(literal,clause_id);
+                contains_false_clause = !formula->deduce_true(literal,clause_id);
             else {
-                formula->deduce_false(literal, clause_id);
+                formula->deduce_true(literal, clause_id);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }

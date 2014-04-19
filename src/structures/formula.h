@@ -133,12 +133,17 @@ class Formula {
         
         
         // Apprentissage d'une clause
-        // Renvoie la profondeur de déduction maximale de la clause ainsi apprise
-        // Clause_id est mis à jour avec l'indice de la nouvelle clause
-        int learn_clause(int literal, CLProof *proof, unsigned int *clause_id) ;
+        // Le littéral donné doit être en conflis dans la clause d'indice donné
+        // Clause_id est mis à jour avec l'indice de la clause apprise
+        // New_depth est mis à jour avec la profondeur vers laquelle backtracker
+        // Renvoie un littéral l que l'on doit déduire après le backtrack (sans déduire le dernier littéral backtracké)
+        int learn_clause(int literal, CLProof *proof, unsigned int *clause_id, unsigned int *new_depth) ;
         
         // Initialise les WL de la dernière clause (à utiliser après un apprentissage de clause, une fois le backtrack effectué)
         void init_WL_learned_clause() ;
+        
+        // Renvoie le dernier paris
+        int last_bet() ;
 };
 
 }

@@ -32,7 +32,7 @@ Clause::Clause(int nb_var, std::unordered_set<int> literals) : literals(), nb_va
 }
 
 Clause ::Clause(int nb_variables, std::unordered_set<int> literals, Affectation *aff) : literals(literals), nb_variables(nb_variables), watched(std::pair<int,int>(0,0)), aff(aff) {
-    
+
 }
 
 Clause::Clause(const Clause &c) : literals(std::unordered_set<int>(c.literals)), nb_variables(c.nb_variables), watched(std::pair<int,int>(c.watched)), aff(c.aff) {
