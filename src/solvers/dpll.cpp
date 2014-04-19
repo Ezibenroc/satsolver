@@ -105,7 +105,7 @@ Affectation* satsolver::solve(Formula *formula) {
             }
             if (WITH_CL) {
                 proof = new CLProof(formula->to_clauses_vector()[clause_id]);
-                literal = formula->learn_clause(literal, proof,&clause_id, &depth_back);
+                literal = formula->learn_clause(proof,&clause_id, &depth_back);
                 if (with_proof)
                     proof->to_latex_file(CL_PROOF_FILE_NAME);
                 delete proof;

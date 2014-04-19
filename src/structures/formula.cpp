@@ -499,7 +499,7 @@ int Formula::choose_literal(int choice) {
 
 
 
-int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id, unsigned int *new_depth) {
+int Formula::learn_clause(CLProof *proof, unsigned int *clause_id, unsigned int *new_depth) {
     long unsigned int i_conf; // The index in the memory “stack” of the literal we are making the resolution on.
     int lit_conf;
     int clause_id1, clause_id2 ;
@@ -539,7 +539,7 @@ int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id, 
         std::cout << std::endl << std::endl  ;
 */
         // Resolution
-        proof->insert_top(literal, std::make_pair(clause_id1, Clause(nb_variables, clause)), std::make_pair(clause_id2, Clause(nb_variables, clause2)));
+        proof->insert_top(lit_conf, std::make_pair(clause_id1, Clause(nb_variables, clause)), std::make_pair(clause_id2, Clause(nb_variables, clause2)));
         clause.insert(clause2.begin(), clause2.end());
         clause.erase(lit_conf) ;
         clause.erase(-lit_conf);
