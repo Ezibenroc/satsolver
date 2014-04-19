@@ -9,6 +9,7 @@
 #include "structures/clause.h"
 #include "structures/affectation.h"
 #include "structures/deductions.h"
+#include "structures/CL_proof.h"
 
 namespace satsolver {
 
@@ -20,7 +21,7 @@ class Formula {
         std::vector<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
         std::set<int> to_do ; // littéraux déduits pas encore affectés (d’autres opérations sont « en cours »)
         Deductions *ded ;     // graphe orienté représentant les déductions
-        int ded_depth ; // profondeur courante de l'arbre de déductions
+        unsigned int ded_depth ; // profondeur courante de l'arbre de déductions
 
         // Affectation d'un litéral x
         // Si WITH_WL, renvoie faux ssi un conflit est généré
@@ -45,7 +46,7 @@ class Formula {
         // Les clauses ne contiendront que des littéraux indeterminés
         std::set<std::set<int> > to_set() ;
         std::set<Clause*> to_clauses_set() const;
-        std::vector<std::shared_ptr<Clause>>& to_clauses_vector();
+        std::vector<std::shared_ptr<Clause>>& to_clauses_vector() ;
 
         void add_clause(std::shared_ptr<satsolver::Clause> clause);
 
@@ -64,6 +65,8 @@ class Formula {
         // Retourne en arrière jusqu'au dernier pari
         // Renvoie le dernier littéral parié (0 si inexistant)
         int back() ;
+        // Fait plusieurs backtrack, jusqu'à obtenir la profondeur de déduction donnée
+        int back(unsigned int depth) ;
 
         // Renvoie un monome de la formule (0 si inexistant)
         int monome(unsigned int *clause_id) ;
@@ -105,6 +108,8 @@ class Formula {
         
         // Renvoie les déductions
         Deductions *get_ded() ;
+        // Renvoie la profondeur de déduction
+        int get_ded_depth() ;
                 
         // Renvoie un vecteur de littéraux inconnus
         std::vector<int> get_unknown_literals (void) const ;
@@ -125,6 +130,15 @@ class Formula {
         
         // Choisis un littéral selon l'heuristique spécifiée
         int choose_literal(int choice) ;
+        
+        
+        // Apprentissage d'une clause
+        // Renvoie la profondeur de déduction maximale de la clause ainsi apprise
+        // Clause_id est mis à jour avec l'indice de la nouvelle clause
+        int learn_clause(int literal, CLProof *proof, unsigned int *clause_id) ;
+        
+        // Initialise les WL de la dernière clause (à utiliser après un apprentissage de clause, une fois le backtrack effectué)
+        void init_WL_learned_clause() ;
 };
 
 }

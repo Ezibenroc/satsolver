@@ -18,10 +18,13 @@
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
 // Case 0 inutilisée
-Deductions::Deductions(int nb_var) : known_to_deduced(nb_var+1,std::unordered_set<int>()), deduced_to_known(nb_var+1,std::unordered_set<int>()) {
+Deductions::Deductions(int nb_var) : known_to_deduced(nb_var+1,std::unordered_set<int>()), 
+                                     deduced_to_known(nb_var+1,std::unordered_set<int>()),
+                                     deduced_to_clause_id(nb_var+1,-1),
+                                     deduction_depth(nb_var+1,-1) {
 }
 
-Deductions::Deductions(Deductions *that) : known_to_deduced(that->known_to_deduced),deduced_to_known(that->deduced_to_known) {
+Deductions::Deductions(Deductions *that) : known_to_deduced(that->known_to_deduced),deduced_to_known(that->deduced_to_known),deduced_to_clause_id(that->deduced_to_clause_id),deduction_depth(that->deduction_depth)  {
 }
 
 bool Deductions::has_literal(int literal) const  {
@@ -49,17 +52,34 @@ std::unordered_set<int> Deductions::get_deductions(const satsolver::Affectation 
     return ded ;
 }
 
-void Deductions::add_deduction(int literal, const std::unordered_set<int> &clause) {
+int Deductions::get_clause_id(int literal) const {
+    assert(deduced_to_clause_id[abs(literal)]>=0) ;
+    return deduced_to_clause_id[abs(literal)] ;
+}
+
+int Deductions::get_deduction_depth(int literal) const {
+    assert(deduction_depth[abs(literal)]>=0) ;
+    return deduction_depth[abs(literal)] ;
+}
+
+void Deductions::add_deduction(int literal, const std::unordered_set<int> &clause, int clause_id, int depth) {
     for(auto l : clause) {
         if(abs(l)==abs(literal))
             continue ;
         this->deduced_to_known[abs(literal)].insert(abs(l)) ;
         this->known_to_deduced[abs(l)].insert(abs(literal)) ;
     }
+    this->deduced_to_clause_id[abs(literal)] = clause_id ;
+    this->deduction_depth[abs(literal)] = depth ;
 }
-void Deductions::add_deduction(int literal, const std::set<int> &clause) {
+void Deductions::add_deduction(int literal, const std::set<int> &clause, int clause_id, int depth) {
     std::unordered_set<int> clause2(clause.begin(), clause.end());
-    this->add_deduction(literal, clause2);
+    this->add_deduction(literal, clause2, clause_id, depth);
+}
+
+void Deductions::add_bet(int literal, int depth) {
+    assert(deduction_depth[abs(literal)] == -1) ;
+    deduction_depth[abs(literal)] = depth ;
 }
 
 void Deductions::remove_deduction(int literal) {
@@ -69,6 +89,8 @@ void Deductions::remove_deduction(int literal) {
         deduced_to_known[i].erase(abs(literal)) ;
         known_to_deduced[i].erase(abs(literal)) ;
     }
+    this->deduced_to_clause_id[abs(literal)] = -1 ;
+    this->deduction_depth[abs(literal)] = -1 ;
 }
 
 

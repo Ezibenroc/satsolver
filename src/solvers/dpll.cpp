@@ -56,31 +56,7 @@ unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, i
     }
 }
 
-std::shared_ptr<Clause> learn_clause(const Deductions &deductions, const std::vector<std::pair<int, bool>> &mem, const Affectation &aff, int nb_variables, int literal, CLProof *proof) {
-    (void) aff;
-    long unsigned int mem_top = mem.size()-1; // The index in the memory “stack” of the literal we are making the resolution on.
-    std::unordered_set<int> clause(deductions.get_deduced_from(aff,literal)), clause2;
-    mem_top--;
-    while (mem.at(mem_top).second) {
-        literal = mem.at(mem_top).first;
-        assert(mem.at(mem_top).first == literal);
-        try {
-            clause2 = deductions.get_deduced_from(aff,literal); // This is the clause we will make the resolution with
-        }
-        catch (std::out_of_range) {
-            break;
-        }
 
-        if (clause.find(-literal) == clause.end())
-            break;
-        // Resolution
-        // TODO: Replace 0 with the clause id.
-        proof->insert_top(literal, std::make_pair(0, Clause(nb_variables, clause)), std::make_pair(0, Clause(nb_variables, clause2)));
-        clause.insert(clause2.begin(), clause2.end());
-        mem_top--;
-    }
-    return std::shared_ptr<Clause>(new Clause(nb_variables, clause));
-}
 
 Affectation* satsolver::solve(Formula *formula) {
     int literal;
@@ -90,6 +66,7 @@ Affectation* satsolver::solve(Formula *formula) {
     bool contains_false_clause;
     unsigned int skip_conflicts = 1; // Number of conflicts we will skip before showing another prompt
     int last_bet = 0; // Used for generating the graph.
+    int depth_back ;
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
         formula->get_ded()->print() ;
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
@@ -114,26 +91,32 @@ Affectation* satsolver::solve(Formula *formula) {
         while(contains_false_clause) {
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
-            formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set());
+            formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
             if (CL_INTERACT && --skip_conflicts == 0) {
                 assert(last_bet);
                 skip_conflicts = cl_interact(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);
             }
             if (WITH_CL) {
                 proof = new CLProof(formula->to_clauses_vector()[clause_id]);
-                learn_clause(*formula->get_ded(), formula->get_mem(), formula->get_aff(), formula->get_nb_variables(), literal, proof);
+                depth_back = formula->learn_clause(literal, proof,&clause_id);
                 if (with_proof)
                     proof->to_latex_file(CL_PROOF_FILE_NAME);
                 delete proof;
+                literal = formula->back(depth_back);
+                if(WITH_WL)
+                    formula->init_WL_learned_clause();
             }
-            literal = formula->back() ;
-            last_bet = -last_bet;
+            else {
+                literal = formula->back() ;
+                clause_id = -1 ;
+            }
+            last_bet = 0 ;
             if(literal == 0)
                 throw Conflict() ;
             if (WITH_WL)
-                contains_false_clause = !formula->deduce_false(literal,-1);
+                contains_false_clause = !formula->deduce_false(literal,clause_id);
             else {
-                formula->deduce_false(literal, -1);
+                formula->deduce_false(literal, clause_id);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }

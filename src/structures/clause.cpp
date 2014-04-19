@@ -31,6 +31,10 @@ Clause::Clause(int nb_var, std::unordered_set<int> literals) : literals(), nb_va
     }
 }
 
+Clause ::Clause(int nb_variables, std::unordered_set<int> literals, Affectation *aff) : literals(literals), nb_variables(nb_variables), watched(std::pair<int,int>(0,0)), aff(aff) {
+    
+}
+
 Clause::Clause(const Clause &c) : literals(std::unordered_set<int>(c.literals)), nb_variables(c.nb_variables), watched(std::pair<int,int>(c.watched)), aff(c.aff) {
 }
 
@@ -145,15 +149,12 @@ std::string Clause::to_latex_string(int highlighted_var) const {
     return oss.str() ;
 }
 
-std::set<int> Clause::whole_to_set() const {
-    std::set<int> s = std::set<int>() ;
-    for(auto l : this->literals)
-        s.insert(l) ;
-    return s;
+std::unordered_set<int> Clause::whole_to_set() const {
+    return std::unordered_set<int>(this->literals);
 }
 
-std::set<unsigned int> Clause::variables_to_set() const {
-    std::set<unsigned int> s = std::set<unsigned int>() ;
+std::unordered_set<unsigned int> Clause::variables_to_set() const {
+    std::unordered_set<unsigned int> s = std::unordered_set<unsigned int>() ;
     for(auto l : this->literals)
         s.insert(abs(l)) ;
     return s;

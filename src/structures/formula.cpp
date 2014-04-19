@@ -12,7 +12,6 @@
 
 #include "config.h"
 
-
 using namespace satsolver;
 
 
@@ -158,7 +157,9 @@ bool Formula::deduce_true(int x, int clause_id) {
     }
     if(this->aff->is_unknown(x)) {
         if(clause_id >=0)
-            this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set());
+            this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
+        else
+            this->ded->add_bet(x,ded_depth) ;
         this->mem.push_back(std::pair<int,bool>(x,true)) ;
         return this->set_true(x) ;
     }
@@ -174,8 +175,9 @@ bool Formula::bet_true(int x) {
         print_space(ded_depth) ;
         std::cout << "Bet " << x << std::endl ;
     }
-    ded_depth ++ ;
+    this->ded_depth ++ ;
     if(this->aff->is_unknown(x)) {
+        this->ded->add_bet(x,this->ded_depth) ;
         this->mem.push_back(std::pair<int,bool>(x,false)) ;
         return this->set_true(x) ;
     }
@@ -190,7 +192,7 @@ int Formula::back() {
     ded_depth -- ;
     if(VERBOSE) {
         print_space(ded_depth) ;
-        std::cout << "Backtrack : " ;
+        std::cout << "Backtrack: " ;
     }
     std::pair<int,bool> p ;
     while(!this->mem.empty()) {
@@ -208,6 +210,19 @@ int Formula::back() {
     if(VERBOSE)
         std::cout << std::endl ;
     return 0 ;
+}
+
+int Formula::back(unsigned int depth) {
+    int l ;
+    if(VERBOSE) {
+        print_space(ded_depth) ;
+        std::cout << "Performing " << this->ded_depth - depth << " backtrack(s)."  << std::endl ;
+    }
+    assert(depth < this->ded_depth) ;
+    while(depth != ded_depth) {
+        l = this->back() ;
+    }
+    return l ;
 }
 
 int Formula::monome(unsigned int *clause_id) {
@@ -376,6 +391,10 @@ Deductions *Formula::get_ded() {
     return (this->ded) ;
 }
 
+int Formula::get_ded_depth() {
+    return this->ded_depth ;
+}
+
 std::vector<int> Formula::get_unknown_literals(void) const {
 	std::vector<int> v = std::vector<int>() ;
 	for(unsigned i = 0 ; i < clauses.size() ; i++) {
@@ -472,4 +491,59 @@ int Formula::choose_literal(int choice) {
 	}
 	assert(literal && this->aff->is_unknown(literal)) ;
 	return(literal) ;
+}
+
+
+
+int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id) {
+    long unsigned int i_conf; // The index in the memory “stack” of the literal we are making the resolution on.
+    int lit_conf;
+    int clause_id1, clause_id2 ;
+    int nb_same_lvl ;
+    clause_id1 = this->ded->get_clause_id(literal) ;
+    std::unordered_set<int> clause = this->clauses[clause_id1]->whole_to_set(), clause2;
+    
+   while (true) {
+        // Recherche d'un UIP (seul littéral de la clause affecté au niveau d'affectation courant)
+        nb_same_lvl = 0 ;
+        for(auto l : clause) {
+            if(this->ded->get_deduction_depth(l) == this->get_ded_depth())
+                nb_same_lvl ++ ;
+            if(nb_same_lvl > 1)
+                break ;
+        }
+        assert(nb_same_lvl) ;
+        if(nb_same_lvl == 1)
+            break ;
+        i_conf = this->mem.size()  ;
+        do { // recherche du dernier littéral affecté à faux dans la clause
+          assert(i_conf);
+          i_conf-- ;
+          assert(this->mem[i_conf].second) ;
+          lit_conf = this->mem[i_conf].first ; 
+        } while(clause.find(-lit_conf) == clause.end() && clause.find(lit_conf) == clause.end()) ;
+        clause_id2 = this->ded->get_clause_id(lit_conf) ;
+        clause2 = this->clauses[clause_id2]->whole_to_set(); // Clause correspondante
+        // Resolution
+        proof->insert_top(literal, std::make_pair(clause_id1, Clause(nb_variables, clause)), std::make_pair(clause_id2, Clause(nb_variables, clause2)));
+        clause.insert(clause2.begin(), clause2.end());
+        clause.erase(lit_conf) ;
+        clause.erase(-lit_conf);
+    }
+    int depth_max = -1 ;
+    for(auto l : clause) {
+        if(this->ded->get_deduction_depth(l) != static_cast<int>(this->ded_depth))
+            depth_max = std::max(this->ded->get_deduction_depth(l),depth_max) ;
+    }
+    this->clauses.push_back(std::shared_ptr<Clause>(new Clause(nb_variables, clause,this->aff)));
+    if(VERBOSE) {
+        print_space(ded_depth) ;    
+        std::cout << "Learned the clause " << clauses.back()->to_string() << std::endl ;
+    }
+    *clause_id = static_cast<int> (this->clauses.size() - 1) ;
+    return depth_max ;
+}
+
+void Formula::init_WL_learned_clause() {
+    this->clauses.back()->init_WL() ;
 }

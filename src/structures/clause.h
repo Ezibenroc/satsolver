@@ -1,9 +1,9 @@
 #ifndef STRUCTURES_CLAUSE_H
 #define STRUCTURES_CLAUSE_H
 
-#include <set>
 #include <memory>
 #include <unordered_set>
+#include <set>
 #include <string>
 #include <vector>
 #include "affectation.h"
@@ -23,6 +23,7 @@ class Clause {
 
         Clause(int nb_variables, std::shared_ptr<std::vector<int>> literals);
         Clause(int nb_variables, std::unordered_set<int> literals);
+        Clause(int nb_variables, std::unordered_set<int> literals, Affectation *aff);
         Clause(const satsolver::Clause &c) ; // initialise une nouvelle clause, copie de la clause donnée
         Clause& operator=(const Clause &that);
         ~Clause();
@@ -50,14 +51,14 @@ class Clause {
         std::string to_string2() const;
         std::string to_latex_string(int highlighted_var) const;
 
-        // Renvoie un ensemble contenant tous les entiers de la clause qui ne sont pas vrais.
+        // Renvoie un ensemble contenant tous les entiers de la clause qui ne sont pas faux.
         std::set<int> to_set() const;
 
         // Renvoie un ensemble contenant tous les entiers de la clause.
-        std::set<int> whole_to_set() const;
+        std::unordered_set<int> whole_to_set() const;
 
         // Renvoie un ensemble contenant toutes les variables de la clause.
-        std::set<unsigned int> variables_to_set() const;
+        std::unordered_set<unsigned int> variables_to_set() const;
 
 
        // Renvoie vrai si la clause est vide
