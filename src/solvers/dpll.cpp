@@ -91,9 +91,13 @@ Affectation* satsolver::solve(Formula *formula) {
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
             // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
-            tmp = formula->get_ded()->get_clause_id(literal) ;
-            formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
-            clause_id = tmp ;
+            if(CL_INTERACT || WITH_CL) {
+                tmp = formula->get_ded()->get_clause_id(literal) ;
+                formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
+                clause_id = tmp ;
+                if(formula->to_clauses_vector()[clause_id]->get_size() <= 1 && formula->to_clauses_vector()[tmp]->get_size() <= 1)
+                    throw Conflict() ;
+            }
             if (CL_INTERACT && --skip_conflicts == 0) {
                 last_bet = formula->last_bet() ;
                 assert(last_bet);

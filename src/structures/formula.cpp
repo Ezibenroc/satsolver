@@ -166,8 +166,9 @@ bool Formula::deduce_true(int x, int clause_id) {
         this->mem.push_back(std::pair<int,bool>(x,true)) ;
         return this->set_true(x) ;
     }
-    else
+    else {
         return this->aff->is_true(x) ;
+    }
 }
 bool Formula::deduce_false(int x, int clause_id) {
     return deduce_true(-x, clause_id) ;
@@ -216,12 +217,12 @@ int Formula::back() {
 }
 
 int Formula::back(unsigned int depth) {
-    int l ;
+    int l=0 ;
     if(VERBOSE) {
         print_space(ded_depth) ;
         std::cout << "Performing " << this->ded_depth - depth << " backtrack(s)."  << std::endl ;
     }
-    assert(depth < this->ded_depth) ;
+    assert(depth <= this->ded_depth) ;
     while(depth != this->ded_depth) {
         l = this->back() ;
     }
@@ -505,8 +506,7 @@ int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id, 
     int nb_same_lvl ;
     clause_id1 = *clause_id ;
     std::unordered_set<int> clause = this->clauses[clause_id1]->whole_to_set(), clause2;
-    
-   while (true) {
+    while (true) {
         // Recherche d'un UIP (seul littéral de la clause affecté au niveau d'affectation courant)
         nb_same_lvl = 0 ;
         for(auto l : clause) {
@@ -527,7 +527,8 @@ int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id, 
         } while(clause.find(-lit_conf) == clause.end() && clause.find(lit_conf) == clause.end()) ;
         clause_id2 = this->ded->get_clause_id(lit_conf) ;
         clause2 = this->clauses[clause_id2]->whole_to_set(); // Clause correspondante
-/*        std::cout << "CLAUSE1 : " ;
+/* 
+        std::cout << "CLAUSE1 : " ;
         for(auto l : clause)
             std::cout << l << " " ;
         std::cout << std::endl ;
@@ -535,7 +536,8 @@ int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id, 
         std::cout << "CLAUSE2 : " ;
         for(auto l : clause2)
             std::cout << l << " " ;
-        std::cout << std::endl << std::endl  ;*/
+        std::cout << std::endl << std::endl  ;
+*/
         // Resolution
         proof->insert_top(literal, std::make_pair(clause_id1, Clause(nb_variables, clause)), std::make_pair(clause_id2, Clause(nb_variables, clause2)));
         clause.insert(clause2.begin(), clause2.end());
@@ -557,7 +559,10 @@ int Formula::learn_clause(int literal, CLProof *proof, unsigned int *clause_id, 
         std::cout << "Learned the clause " << clauses.back()->to_string() << std::endl ;
     }
     *clause_id = static_cast<int> (this->clauses.size() - 1) ;
-    *new_depth = depth_max ;
+    if(depth_max == -1)
+        *new_depth = std::min(static_cast<unsigned int>(0),this->ded_depth - 1) ;
+    else
+        *new_depth = depth_max ;
     return lit_conf ;
 }
 
