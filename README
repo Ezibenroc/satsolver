@@ -118,6 +118,10 @@ Structures de données et choix d’implémentation
       des littéraux qu’un littéral a permis de déduire)
     * contient les valeurs absolues des littéraux déduits / ayant induit une
       déduction
+* Preuves :
+    * La classe CLProof contient un arbre de dérivation ayant permis
+      d’engendrer une clause apprise. Cet arbre étend en réalité un peigne,
+      on le stocke sous forme d’un vecteur de paires de clauses.
 
 
 Réduction d’un problème de coloriage en une formule
