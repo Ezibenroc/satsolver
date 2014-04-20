@@ -544,6 +544,7 @@ int Formula::learn_clause(CLProof *proof, unsigned int *clause_id, unsigned int 
         clause.erase(lit_conf) ;
         clause.erase(-lit_conf);
     }
+    proof->conclude(Clause(this->get_nb_variables(), clause));
     int depth_max = -1 ;
     lit_conf = 0 ;
     for(auto l : clause) {

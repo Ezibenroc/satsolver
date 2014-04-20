@@ -98,13 +98,14 @@ Affectation* satsolver::solve(Formula *formula) {
                 if(formula->to_clauses_vector()[clause_id]->get_size() <= 1 && formula->to_clauses_vector()[tmp]->get_size() <= 1)
                     throw Conflict() ;
             }
+            with_proof = false;
             if (CL_INTERACT && --skip_conflicts == 0) {
                 last_bet = formula->last_bet() ;
                 assert(last_bet);
                 skip_conflicts = cl_interact(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);
             }
             if (WITH_CL) {
-                proof = new CLProof(formula->to_clauses_vector()[clause_id]);
+                proof = new CLProof();
                 literal = formula->learn_clause(proof,&clause_id, &depth_back);
                 if (with_proof)
                     proof->to_latex_file(CL_PROOF_FILE_NAME);
