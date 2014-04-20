@@ -21,6 +21,8 @@ les autres paramètres) :
 * -WL pour activer les littéraux surveillés
 * -rand, -moms, ou -dlis (mutuellement exclusifs) pour activer les heuristiques
   du même nom
+* -CL pour activer l’apprentissage de clauses
+* -cl-interact pour activer le mode interactif
 
 `colorie` prend également un entier qui est le nombre de couleur maximal à
 utiliser.
@@ -110,6 +112,12 @@ Structures de données et choix d’implémentation
     * Lors de l’analyse des formules étendues (c’est-à-dire dans
       src/parsers/extended_formula.y), la priorité suivante est donnée
       aux opérateurs : NOT > AND > OR > IMPLIES
+* Déductions :
+    * deux maps, chacune étant la réciproque de l’autre (une donne l’ensemble
+      des littéraux qui ont permis d’en déduire un, l’autre donne l’ensemble
+      des littéraux qu’un littéral a permis de déduire)
+    * contient les valeurs absolues des littéraux déduits / ayant induit une
+      déduction
 
 
 Réduction d’un problème de coloriage en une formule
@@ -126,6 +134,17 @@ On crée alors des formules :
 Il ne reste alors plus qu’à effectuer une transformation de Tseitin sur
 la formule, résoudre le problème SAT, et retrouver l’affectation des
 variables de la formule à partir des « littéraux de SAT ».
+
+
+Modifications nécessaires pour le rendu 3
+-----------------------------------------
+
+Pour ajouter des clauses en cours de route :
+    trivial, il suffit d’ajouter des éléments à la fin du vecteur
+    contenant toutes les clauses
+
+Garder une trace de la raison pour laquelle un littéral a été déduit :
+    cf ci-dessus (la structure « Deductions »)
 
 
 
@@ -155,14 +174,74 @@ Quatre heuristiques sont implémentées pour le moment.
 Répartition du travail
 ======================
 
+Fonctionnalités
+---------------
+
 Tom :
 * Structures du rendu 1
 * Ajout des littéraux surveillés à l’algorithme de DPLL
 * Heuristiques
 * Tests de performances, moulinettes
+* Apprentissage de clause avec littéraux surveillés
 
 Valentin :
 * Parseur de CNF et EDGE
 * Algorithme de DPLL (sans les littéraux surveillés)
 * Classe et parseur pour les formules étendues ; réduction de Tseitin
 * Réduction problème de graphe -> formule étendue
+* Graphe de conflits
+* Apprentissage de clauses sans les littéraux surveillés, preuves
+
+Fichiers
+--------
+
+(résumé de ce qu’affiche « git shortlog » pour chacun des fichiers)
+
+benchmarks/ :
+* Tom
+
+CMakeLists.txt :
+* Valentin
+
+examples/ :
+* Internet
+
+EXPERIENCES :
+* Tom
+
+README :
+* Valentin et Tom (selon les parties concernées)
+
+src/entry_points/ :
+* Principalement Valentin (structure, …)
+* Corrections de bugs par Tom
+
+src/parsers/ :
+* Valentin
+
+src/solvers/dpll.* :
+* Principalement par Tom (algo de DPLL et littéraux surveillés)
+* éléments du rendu 3 par Valentin
+
+src/solvers/graphcolor.* :
+* Valentin
+
+src/structures/{affectation,clause,formula}.* :
+* Tom
+
+src/structures/{CL_proof,color_affectation,extended_formula,graph}.* :
+* Valentin
+
+src/structures/deductions.* :
+* Première écriture par Valentin
+* Réécriture partielle par Tom pour inclure les objets Deductions
+  dans les Formula.
+
+tests/structures_tests.* :
+* Tom et Valentin (au fur et à mesure de l’avancement)
+
+tests/{graphsolver,graphparser,satparser}_tests.* :
+* Valentin
+
+tests/{heuristics,dpll}_tests.* :
+* Tom
