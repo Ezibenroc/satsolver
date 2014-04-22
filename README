@@ -186,7 +186,7 @@ c) Grâce à c) et à la troisième clause, on déduit 5.
 (on ignore les clauses quatre et cinq, car elles sont satisfaites)
 d) Grâce à c) et à la clause six (resp. sept) on déduit 6 (resp. sept)
 e) Grâce à d) et à la huitième clause, on déduit 8.
-f) On dédecte un conflit pour la neuvième clause.
+f) On détecte un conflit pour la neuvième clause.
 
 Le graphe engendré à ce niveau traduit bien ce qu’il vient de se passer
 (avec le niveau de « dédoublement » correspondant à d) )
