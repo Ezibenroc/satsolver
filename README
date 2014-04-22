@@ -174,6 +174,33 @@ Quatre heuristiques sont implémentées pour le moment.
          On pari alors sur le littéral de somme Pt(x) maximale.
 
 
+Exemple pédagogique
+===================
+
+On prend comme exemple le fichier examples/simple.cnf (pour l’exécuter :
+« ./resol -verbose -CL -cl-interact ../examples/simple.cnf »)
+
+a) On commence par parier sur 1 et 2.
+b) Grâce a) et à la seconde clause, on en déduit -4.
+c) Grâce à c) et à la troisième clause, on déduit 5.
+(on ignore les clauses quatre et cinq, car elles sont satisfaites)
+d) Grâce à c) et à la clause six (resp. sept) on déduit 6 (resp. sept)
+e) Grâce à d) et à la huitième clause, on déduit 8.
+f) On dédecte un conflit pour la neuvième clause.
+
+Le graphe engendré à ce niveau traduit bien ce qu’il vient de se passer
+(avec le niveau de « dédoublement » correspondant à d) )
+
+On apprend alors la clause « -5 » (cf le fichier de preuve), ce qui vient
+du fait que les deux dernières clauses impliquent que l’on a -6 ou -7,
+ce qui implique que l’on ait -5.
+
+[[ Backtrack ????? ]]
+
+Alors, on déduit -5 de la clause que l’on vient d’ajouter. Puis on en déduit
+4 vu la troisième clause, puis [[ pourquoi on en déduit -6 ???? ]], etc…
+
+
 
 Répartition du travail
 ======================
