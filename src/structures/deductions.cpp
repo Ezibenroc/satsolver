@@ -14,6 +14,7 @@
 
 #include "structures/deductions.h"
 #include "structures/affectation.h"
+#include "config.h"
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
@@ -63,12 +64,13 @@ int Deductions::get_deduction_depth(int literal) const {
 }
 
 void Deductions::add_deduction(int literal, const std::unordered_set<int> &clause, int clause_id, int depth) {
-    for(auto l : clause) {
-        if(abs(l)==abs(literal))
-            continue ;
-        this->deduced_to_known[abs(literal)].insert(abs(l)) ;
-        this->known_to_deduced[abs(l)].insert(abs(literal)) ;
-    }
+    if(CL_INTERACT)
+        for(auto l : clause) {
+            if(abs(l)==abs(literal))
+                continue ;
+            this->deduced_to_known[abs(literal)].insert(abs(l)) ;
+            this->known_to_deduced[abs(l)].insert(abs(literal)) ;
+        }
     this->deduced_to_clause_id[abs(literal)] = clause_id ;
     this->deduction_depth[abs(literal)] = depth ;
 }
@@ -83,11 +85,13 @@ void Deductions::add_bet(int literal, int depth) {
 }
 
 void Deductions::remove_deduction(int literal) {
-    this->deduced_to_known[abs(literal)].clear() ;
-    this->known_to_deduced[abs(literal)].clear() ;
-    for(unsigned i = 1 ; i < deduced_to_known.size() ; i++) {
-        deduced_to_known[i].erase(abs(literal)) ;
-        known_to_deduced[i].erase(abs(literal)) ;
+    if(CL_INTERACT) {
+        this->deduced_to_known[abs(literal)].clear() ;
+        this->known_to_deduced[abs(literal)].clear() ;
+        for(unsigned i = 1 ; i < deduced_to_known.size() ; i++) {
+            deduced_to_known[i].erase(abs(literal)) ;
+            known_to_deduced[i].erase(abs(literal)) ;
+        }
     }
     this->deduced_to_clause_id[abs(literal)] = -1 ;
     this->deduction_depth[abs(literal)] = -1 ;
