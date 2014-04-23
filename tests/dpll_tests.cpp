@@ -56,9 +56,23 @@ void DpllTests::testBasicUsage() {
 		  delete f ;
 }
 void DpllTests::testBasicUsageWithWL() {
-  //  WITH_WL = true;
+    WITH_WL = true;
     DpllTests::testBasicUsage();
     WITH_WL = false;
+}
+void DpllTests::testBasicUsageWithCL() {
+    WITH_CL = true;
+    DpllTests::testBasicUsage();
+    WITH_CL = false;
+}
+void DpllTests::testBasicUsageWithWLWithCL() {
+    /* TODO: Enable this
+    WITH_WL = true;
+    WITH_CL = true;
+    DpllTests::testBasicUsage();
+    WITH_WL = false;
+    WITH_CL = false;
+    */
 }
 
 void DpllTests::testSmallConflict() {
@@ -71,6 +85,18 @@ void DpllTests::testSmallConflict() {
 void DpllTests::testSmallConflictWithWL() {
     WITH_WL = true;
     DpllTests::testSmallConflict();
+    WITH_WL = false;
+}
+void DpllTests::testSmallConflictWithCL() {
+    WITH_CL = true;
+    DpllTests::testSmallConflict();
+    WITH_CL = false;
+}
+void DpllTests::testSmallConflictWithWLWithCL() {
+    WITH_WL = true;
+    WITH_CL = true;
+    DpllTests::testSmallConflict();
+    WITH_CL = false;
     WITH_WL = false;
 }
 
@@ -97,14 +123,22 @@ void DpllTests::testDLIS() {
 
 CppUnit::Test* DpllTests::suite() {
     CppUnit::TestSuite *suite = new CppUnit::TestSuite("DpllTests");
-    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithoutWL",
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithoutWLWithoutCL",
                 &DpllTests::testBasicUsage));
-    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithWL",
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithWLWithoutCL",
                 &DpllTests::testBasicUsageWithWL));
-    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithoutWL",
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithoutWLWithCL",
+                &DpllTests::testBasicUsageWithCL));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testBasicUsageWithWLWithCL",
+                &DpllTests::testBasicUsageWithWLWithCL));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithoutWLWithoutCL",
                 &DpllTests::testSmallConflict));
-    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithWL",
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithWLWithoutCL",
                 &DpllTests::testSmallConflictWithWL));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithoutWLWithCL",
+                &DpllTests::testSmallConflictWithCL));
+    suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testSmallConflictWithWLWithCL",
+                &DpllTests::testSmallConflictWithWLWithCL));
     suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testRAND",
                 &DpllTests::testRAND));
     suite->addTest(new CppUnit::TestCaller<DpllTests>("DpllTests_testMOMS",
