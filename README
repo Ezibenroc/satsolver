@@ -236,7 +236,7 @@ CMakeLists.txt :
 * Valentin
 
 examples/ :
-* Internet
+* Internet (sauf simple.cnf)
 
 EXPERIENCES :
 * Tom
@@ -253,7 +253,7 @@ src/parsers/ :
 
 src/solvers/dpll.* :
 * Principalement par Tom (algo de DPLL et littéraux surveillés)
-* éléments du rendu 3 par Valentin
+* quelques éléments du rendu 3 par Valentin
 
 src/solvers/graphcolor.* :
 * Valentin
