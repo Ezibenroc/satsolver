@@ -66,6 +66,7 @@ void DpllTests::testBasicUsageWithCL() {
     WITH_CL = false;
 }
 void DpllTests::testBasicUsageWithWLWithCL() {
+    std::cout << "\n[[ BasicUsageWithWLWithCL skipped ]]\n";
     /* TODO: Enable this
     WITH_WL = true;
     WITH_CL = true;
