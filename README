@@ -198,7 +198,8 @@ ce qui implique que l’on ait -5.
 [[ Backtrack ????? ]]
 
 Alors, on déduit -5 de la clause que l’on vient d’ajouter. Puis on en déduit
-4 vu la troisième clause, puis [[ pourquoi on en déduit -6 ???? ]], etc…
+4 vu la troisième clause, puis on déduit -6 puisqu’il apparait uniquement
+avec cette polarité, etc…
 
 
 
@@ -235,7 +236,7 @@ CMakeLists.txt :
 * Valentin
 
 examples/ :
-* Internet
+* Internet (sauf simple.cnf)
 
 EXPERIENCES :
 * Tom
@@ -252,7 +253,7 @@ src/parsers/ :
 
 src/solvers/dpll.* :
 * Principalement par Tom (algo de DPLL et littéraux surveillés)
-* éléments du rendu 3 par Valentin
+* quelques éléments du rendu 3 par Valentin
 
 src/solvers/graphcolor.* :
 * Valentin
