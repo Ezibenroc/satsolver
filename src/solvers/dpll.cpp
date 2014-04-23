@@ -59,10 +59,10 @@ unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, i
 
 
 Affectation* satsolver::solve(Formula *formula) {
-    int literal;
+    int literal, literal_sav=0;
     bool with_proof;
     CLProof *proof;
-    unsigned int clause_id, tmp;
+    int clause_id, tmp;
     bool contains_false_clause;
     unsigned int skip_conflicts = 1; // Number of conflicts we will skip before showing another prompt
     int last_bet = 0; // Used for generating the graph.
@@ -72,18 +72,18 @@ Affectation* satsolver::solve(Formula *formula) {
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
             // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
-            formula->deduce_true(literal, clause_id); // Return value ignored, WITH_WL is false
+            formula->deduce_true(literal, clause_id,NULL,NULL,NULL); // Return value ignored, WITH_WL is false
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }
         else if((literal = formula->isolated_literal(&clause_id))) {
-	        formula->deduce_true(literal,-1) ;
+	        formula->deduce_true(literal,-1,NULL,NULL,NULL) ;
         }
         else {
             literal = formula->choose_literal(HEURISTIC) ;
             if (WITH_WL)
-                contains_false_clause = !formula->bet_true(literal);
+                contains_false_clause = !formula->bet_true(literal,&clause_id,&tmp,&literal);
             else {
-                formula->bet_true(literal);
+                formula->bet_true(literal,NULL,NULL,NULL);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }
@@ -92,9 +92,14 @@ Affectation* satsolver::solve(Formula *formula) {
             // Cette mise à jour sera annulée par le backtrack
             // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
             if(CL_INTERACT || WITH_CL) {
-                tmp = formula->get_ded()->get_clause_id(literal) ;
-                formula->get_ded()->remove_deduction(literal);
+                if(!WITH_WL) { // formalités administratives un peu moches
+                    tmp = formula->get_ded()->get_clause_id(literal) ;
+                    formula->get_ded()->remove_deduction(literal);
+                }
                 formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
+                if(WITH_WL)
+                    formula->get_aff()->set_true(literal) ;
+                literal_sav = literal ;
                 clause_id = tmp ;
                 if(formula->to_clauses_vector()[clause_id]->get_size() <= 1 && formula->to_clauses_vector()[tmp]->get_size() <= 1)
                     throw Conflict() ;
@@ -107,24 +112,26 @@ Affectation* satsolver::solve(Formula *formula) {
             }
             if (WITH_CL) {
                 proof = new CLProof();
-                literal = formula->learn_clause(proof,&clause_id, &depth_back);
+                literal = formula->learn_clause(proof,&clause_id, &depth_back, literal);
                 if (with_proof)
                     proof->to_latex_file(CL_PROOF_FILE_NAME);
                 delete proof;
                 formula->back(depth_back);
-                if(WITH_WL)
-                    formula->init_WL_learned_clause();
             }
             else {
                 literal = -formula->back() ;
                 clause_id = -1 ;
             }
+            if(WITH_WL && (WITH_CL || CL_INTERACT)) { // nettoyage
+                formula->get_ded()->remove_deduction(literal_sav) ;
+                formula->get_aff()->set_unknown(literal_sav) ;
+            }
             if(literal == 0)
                 throw Conflict() ;
             if (WITH_WL)
-                contains_false_clause = !formula->deduce_true(literal,clause_id);
+                contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal);
             else {
-                formula->deduce_true(literal, clause_id);
+                formula->deduce_true(literal, clause_id,NULL,NULL,NULL);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }

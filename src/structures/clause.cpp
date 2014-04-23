@@ -193,6 +193,13 @@ void Clause::init_WL() {
     this->watched.second = *it ;
 }
 
+void Clause::init_WL_CL(int l1, int l2) {
+    assert(this->literals.find(l1) != this->literals.end()) ;
+    assert(this->literals.find(l2) != this->literals.end()) ;
+    this->watched.first = l1 ;
+    this->watched.second = l2 ;
+}
+
 int Clause::fst_WL() const{
     assert(WITH_WL);
     return this->watched.first ;

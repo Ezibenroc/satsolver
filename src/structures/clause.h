@@ -69,6 +69,10 @@ class Clause {
 
        // Initialise les watched literals
        void init_WL() ;
+       
+       // Initialise les watched literals avec les deux littéraux donnés
+       // À n'utilise que pour les clauses apprises
+       void init_WL_CL(int l1, int l2) ;
 
        // Renvoie le premier ou le second watched literal
        int fst_WL() const ;

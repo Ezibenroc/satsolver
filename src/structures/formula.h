@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <stack>
+#include <unordered_set>
 
 #include "structures/clause.h"
 #include "structures/affectation.h"
@@ -13,19 +14,34 @@
 
 namespace satsolver {
 
+
+// Deux foncteurs utilisés pour l'ensemble to_do.
+struct Equal {
+	bool operator() (const std::pair<int,unsigned int> &a, const std::pair<int,unsigned int> &b) const {
+		  return (a.first == b.first);
+	}
+};
+struct Hash {
+	size_t operator() (const std::pair<int,unsigned int> &a) const {
+		return a.first ;
+	}
+};
+
 class Formula {
     private :
         Affectation *aff ;
         std::vector<std::shared_ptr<satsolver::Clause>> clauses ;
         int nb_variables ;
         std::vector<std::pair<int,bool>> mem ; // littéraux dans l'ordre où on les affecte (vrai si déduit, faux si parié)
-        std::set<int> to_do ; // littéraux déduits pas encore affectés (d’autres opérations sont « en cours »)
+        std::unordered_set<std::pair<int,unsigned int>,Hash,Equal> to_do ; // utilisé dans WL, littéraux déduits pas encore affectés (d’autres opérations sont « en cours »)
+                              // le second entier est l'indice de la clause ayant permi de déduire le littéral
         Deductions *ded ;     // graphe orienté représentant les déductions
         unsigned int ded_depth ; // profondeur courante de l'arbre de déductions
 
         // Affectation d'un litéral x
         // Si WITH_WL, renvoie faux ssi un conflit est généré
-        bool set_true(int x) ;
+        // Si WITH_WL et un conflit est généré, alors clause1 et clause2 sont mis à jour avec les indices des clauses en conflit (ainsi que literal)
+        bool set_true(int x, int *clause1, int *clause2, int *literal) ;
 
 
     public :
@@ -54,13 +70,13 @@ class Formula {
         // Si WITH_WL, renvoie faux ssi conflit
         // claude_id est l'indice de la clause qui est l'origine de cette déduction
         // pas de clause origine si clause_id = -1 (survient lors des déductions des littéraux isolés)
-        bool deduce_true(int x, int clause_id) ;
+        bool deduce_true(int x, int clause_id, int *clause1, int *clause2, int *literal) ;
         bool deduce_false(int x, int clause_id) ;
 
         // Pari sur l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
-        bool bet_true(int x) ;
-        bool bet_false(int x) ;
+        bool bet_true(int x, int *clause1, int *clause2, int *literal) ;
+        bool bet_false(int x, int *clause1, int *clause2, int *literal) ;
 
         // Retourne en arrière jusqu'au dernier pari
         // Renvoie le dernier littéral parié (0 si inexistant)
@@ -69,10 +85,10 @@ class Formula {
         int back(unsigned int depth) ;
 
         // Renvoie un monome de la formule (0 si inexistant)
-        int monome(unsigned int *clause_id) ;
+        int monome(int *clause_id) ;
 
         // Renvoie un litéral isolé de la formule (0 si inexistant)
-        int isolated_literal(unsigned int *clause_id) ;
+        int isolated_literal(int *clause_id) ;
 
         // Renvoie vrai ssi la formule ne contient pas de clauses
         bool is_empty() const;
@@ -87,10 +103,10 @@ class Formula {
         bool contains_empty_clause() const;
 
         // Determines whether one of the clauses is evaluated to false.
-        bool contains_false_clause(unsigned int *clause_id) const;
+        bool contains_false_clause(int *clause_id) const;
         
         // Determines whether all the clauses are evaluated to true.
-        bool only_true_clauses(unsigned int *clause_id) const;
+        bool only_true_clauses(int *clause_id) const;
 
         // Supprime toute les clauses contenant d'autres clauses
         // Affecte tous les monomes
@@ -137,10 +153,7 @@ class Formula {
         // Clause_id est mis à jour avec l'indice de la clause apprise
         // New_depth est mis à jour avec la profondeur vers laquelle backtracker
         // Renvoie un littéral l que l'on doit déduire après le backtrack (sans déduire le dernier littéral backtracké)
-        int learn_clause(CLProof *proof, unsigned int *clause_id, unsigned int *new_depth) ;
-        
-        // Initialise les WL de la dernière clause (à utiliser après un apprentissage de clause, une fois le backtrack effectué)
-        void init_WL_learned_clause() ;
+        int learn_clause(CLProof *proof, int *clause_id, unsigned int *new_depth, int literal) ;
         
         // Renvoie le dernier paris
         int last_bet() ;

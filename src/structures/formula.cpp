@@ -121,41 +121,47 @@ void Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
 }
 
 
-bool Formula::set_true(int x) {
-    int literal ;
+bool Formula::set_true(int x, int *clause1, int *clause2, int *literal) {
+ //   std::cout << this->aff->to_string() << std::endl ;
+    int l ;
     int clause_id=-1 ;
+    std::unordered_set<std::pair<int,unsigned int>,Hash,Equal>::const_iterator it ;
     if(WITH_WL) {
         for(unsigned int i=0; i<this->clauses.size(); i++) {
-            literal = this->clauses[i]->set_true(x) ;
-            if(literal){// on a engendré un monome
-                if(this->to_do.find(-literal) != this->to_do.end()) { // conflit
+            l = this->clauses[i]->set_true(x) ;
+            if(l){// on a engendré un monome
+                assert(this->get_aff()->is_unknown(l)) ;
+                if((it=this->to_do.find(std::pair<int,int>(-l,0))) != this->to_do.end()) { // conflit
                     this->to_do.clear();
                     if(VERBOSE) {
-                        print_space(ded_depth) ;
-                        std::cout << "[Watched Literals] Detected a conflict : " << literal << std::endl ;
+                        print_space(this->ded_depth) ;
+                        std::cout << "[Watched Literals] Detected a conflict : " << l << std::endl ;
                     }
-                    clause_id = i ;
+                    *clause1 = it->second ;
+                    *clause2 = i ;
+                    *literal = l ;
                     return false ;
                 }
-                this->to_do.insert(literal) ;
+                this->to_do.insert(std::pair<int,unsigned int>(l,i)) ;
             }
         }
     }
     this->aff->set_true(x) ;
     if(!this->to_do.empty()) { // on doit affecter ces littéraux
-        literal = *this->to_do.begin() ;
-        this->to_do.erase(literal) ;
-        return deduce_true(literal, clause_id) ;
+        l = this->to_do.begin()->first ;
+        clause_id= this->to_do.begin()->second ;
+        this->to_do.erase(this->to_do.begin()) ;
+        return deduce_true(l, clause_id, clause1, clause2, literal) ;
     }
     return true ;
 }
 
-bool Formula::deduce_true(int x, int clause_id) {
+bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int *literal) {
     if(VERBOSE) {
         print_space(this->ded_depth) ;
         std::cout << "Deduce " << x << std::endl ;
         if(clause_id >= 0) {
-            print_space(ded_depth) ;
+            print_space(this->ded_depth) ;
             std::cout << this->clauses[clause_id]->to_string() << " => " << x << std::endl;
         }
     }
@@ -164,17 +170,17 @@ bool Formula::deduce_true(int x, int clause_id) {
             this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
         }
         this->mem.push_back(std::pair<int,bool>(x,true)) ;
-        return this->set_true(x) ;
+        return this->set_true(x, clause1, clause2, literal) ;
     }
     else {
         return this->aff->is_true(x) ;
     }
 }
 bool Formula::deduce_false(int x, int clause_id) {
-    return deduce_true(-x, clause_id) ;
+    return deduce_true(-x, clause_id, NULL, NULL, NULL) ;
 }
 
-bool Formula::bet_true(int x) {
+bool Formula::bet_true(int x, int *clause1, int *clause2, int *literal) {
     if(VERBOSE) {
         print_space(this->ded_depth) ;
         std::cout << "Bet " << x << std::endl ;
@@ -183,19 +189,19 @@ bool Formula::bet_true(int x) {
     if(this->aff->is_unknown(x)) {
         this->ded->add_bet(x,this->ded_depth) ;
         this->mem.push_back(std::pair<int,bool>(x,false)) ;
-        return this->set_true(x) ;
+        return this->set_true(x,clause1,clause2,literal) ;
     }
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::bet_false(int x) {
-    return bet_true(-x) ;
+bool Formula::bet_false(int x, int *clause1, int *clause2, int *literal) {
+    return bet_true(-x,clause1,clause2,literal) ;
 }
 
 int Formula::back() {
     ded_depth -- ;
     if(VERBOSE) {
-        print_space(ded_depth) ;
+        print_space(this->ded_depth) ;
         std::cout << "Backtrack: " ;
     }
     std::pair<int,bool> p ;
@@ -219,7 +225,7 @@ int Formula::back() {
 int Formula::back(unsigned int depth) {
     int l=0 ;
     if(VERBOSE) {
-        print_space(ded_depth) ;
+        print_space(this->ded_depth) ;
         std::cout << "Performing " << this->ded_depth - depth << " backtrack(s)."  << std::endl ;
     }
     assert(depth <= this->ded_depth) ;
@@ -229,7 +235,7 @@ int Formula::back(unsigned int depth) {
     return l ;
 }
 
-int Formula::monome(unsigned int *clause_id) {
+int Formula::monome(int *clause_id) {
     int literal ;
     for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
         literal = this->clauses[i]->monome() ;
@@ -242,7 +248,7 @@ int Formula::monome(unsigned int *clause_id) {
     return 0 ;
 }
 
-int Formula::isolated_literal(unsigned int *clause_id) {
+int Formula::isolated_literal(int *clause_id) {
     unsigned int i;
     int *l ;
     std::vector<std::shared_ptr<Clause>> clauses = this->to_clauses_vector();
@@ -302,7 +308,7 @@ long unsigned int Formula::get_size() const {
 int Formula::get_nb_variables() const {
     return this->nb_variables;
 }
-bool Formula::contains_false_clause(unsigned int *clause_id) const {
+bool Formula::contains_false_clause(int *clause_id) const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
         if (this->clauses[i]->is_evaluated_to_false()) {
             if (clause_id)
@@ -312,7 +318,7 @@ bool Formula::contains_false_clause(unsigned int *clause_id) const {
     }
     return false;
 }
-bool Formula::only_true_clauses(unsigned int *clause_id) const {
+bool Formula::only_true_clauses(int *clause_id) const {
     for(unsigned i = 0 ; i < this->clauses.size() ; i ++) {
         if (!this->clauses[i]->is_evaluated_to_true()) {
             if (clause_id)
@@ -499,13 +505,29 @@ int Formula::choose_literal(int choice) {
 
 
 
-int Formula::learn_clause(CLProof *proof, unsigned int *clause_id, unsigned int *new_depth) {
+int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_depth, int literal) {
     long unsigned int i_conf; // The index in the memory “stack” of the literal we are making the resolution on.
-    int lit_conf;
+    int lit_conf, lit_inf;
     int clause_id1, clause_id2 ;
     int nb_same_lvl ;
     clause_id1 = *clause_id ;
-    std::unordered_set<int> clause = this->clauses[clause_id1]->whole_to_set(), clause2;
+    clause_id2 = this->ded->get_clause_id(literal) ;
+    std::unordered_set<int> clause = this->clauses[clause_id1]->whole_to_set() ;
+    std::unordered_set<int> clause2 = this->clauses[clause_id2]->whole_to_set() ;
+/*    
+        std::cout << "CLAUSE1 : " ;
+        for(auto l : clause)
+            std::cout << l << " " ;
+        std::cout << std::endl ;
+
+        std::cout << "CLAUSE2 : " ;
+        for(auto l : clause2)
+            std::cout << l << " " ;
+        std::cout << std::endl << std::endl  ;    
+*/    
+    clause.insert(clause2.begin(), clause2.end());
+    clause.erase(literal) ;
+    clause.erase(-literal);    
     while (true) {
         // Recherche d'un UIP (seul littéral de la clause affecté au niveau d'affectation courant)
         nb_same_lvl = 0 ;
@@ -545,30 +567,43 @@ int Formula::learn_clause(CLProof *proof, unsigned int *clause_id, unsigned int 
         clause.erase(-lit_conf);
     }
     proof->conclude(Clause(this->get_nb_variables(), clause));
+    if(clause.size() == 1) { // cas particulier
+        if(VERBOSE) {
+            print_space(this->ded_depth) ;    
+            std::cout << "Deduced a clause of size 1: {" << *clause.begin() << "}" << std::endl ;
+        }
+        *new_depth = 0 ; // on backtrack tout
+        *clause_id = -1 ;
+        return *clause.begin() ; // on devra ensuite déduire ce littéral
+        // on n'ajoute pas cette clause, pour ne pas avoir de problèmes avec WL
+        // la déduction au niveau zéro est équivalente (puisqu'elle ne sera jamais enlevée)
+    }
     int depth_max = -1 ;
     lit_conf = 0 ;
+    lit_inf = 0 ;
     for(auto l : clause) {
-        if(this->ded->get_deduction_depth(l) != static_cast<int>(this->ded_depth))
-            depth_max = std::max(this->ded->get_deduction_depth(l),depth_max) ;
+        if(this->ded->get_deduction_depth(l) != static_cast<int>(this->ded_depth)) {
+            if(this->ded->get_deduction_depth(l)>depth_max) { // nouveau niveau max
+                depth_max = this->ded->get_deduction_depth(l) ;
+                lit_inf = l ;
+            }
+        }
         else
             lit_conf = l ; // seul literal du niveau courant
     }
     assert(lit_conf) ;
+    assert(lit_inf) ;
+    assert(depth_max != -1) ;
     this->clauses.push_back(std::shared_ptr<Clause>(new Clause(nb_variables, clause,this->aff)));
+    if(WITH_WL)
+        this->clauses.back()->init_WL_CL(lit_conf,lit_inf) ; // nouveaux littéraux surveillés de la clause
     if(VERBOSE) {
-        print_space(ded_depth) ;    
+        print_space(this->ded_depth) ;    
         std::cout << "Learned the clause " << clauses.back()->to_string() << std::endl ;
     }
     *clause_id = static_cast<int> (this->clauses.size() - 1) ;
-    if(depth_max == -1)
-        *new_depth = std::min(static_cast<unsigned int>(0),this->ded_depth - 1) ;
-    else
-        *new_depth = depth_max ;
+    *new_depth = depth_max ;
     return lit_conf ;
-}
-
-void Formula::init_WL_learned_clause() {
-    this->clauses.back()->init_WL() ;
 }
 
 int Formula::last_bet() {
