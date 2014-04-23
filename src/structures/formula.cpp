@@ -123,7 +123,7 @@ void Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
 
 bool Formula::set_true(int x, int *clause1, int *clause2, int *literal) {
  //   std::cout << this->aff->to_string() << std::endl ;
-    int l ;
+    int l ; 
     int clause_id=-1 ;
     std::unordered_set<std::pair<int,unsigned int>,Hash,Equal>::const_iterator it ;
     if(WITH_WL) {
@@ -132,14 +132,14 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal) {
             if(l){// on a engendré un monome
                 assert(this->get_aff()->is_unknown(l)) ;
                 if((it=this->to_do.find(std::pair<int,int>(-l,0))) != this->to_do.end()) { // conflit
-                    this->to_do.clear();
                     if(VERBOSE) {
                         print_space(this->ded_depth) ;
                         std::cout << "[Watched Literals] Detected a conflict : " << l << std::endl ;
-                    }
+                    } 
                     *clause1 = it->second ;
                     *clause2 = i ;
                     *literal = l ;
+                    this->to_do.clear();
                     return false ;
                 }
                 this->to_do.insert(std::pair<int,unsigned int>(l,i)) ;
@@ -166,13 +166,18 @@ bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int 
         }
     }
     if(this->aff->is_unknown(x)) {
-        if((WITH_CL || CL_INTERACT) && clause_id >= 0) { // si clause_id < 0, alors littéral isolé
-            this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
+        if(WITH_CL || CL_INTERACT) { 
+            if(clause_id >= 0)
+                this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
+            else
+                this->ded->add_bet(x,this->ded_depth) ; // pas déduit grâce à une clause, on sauvegarde simplement sa profondeur
         }
         this->mem.push_back(std::pair<int,bool>(x,true)) ;
         return this->set_true(x, clause1, clause2, literal) ;
     }
     else {
+        if(this->aff->is_false(x) && this->ded_depth == 0)
+            throw Conflict() ;
         return this->aff->is_true(x) ;
     }
 }
@@ -524,7 +529,7 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
         for(auto l : clause2)
             std::cout << l << " " ;
         std::cout << std::endl << std::endl  ;    
-*/    
+*/  
     clause.insert(clause2.begin(), clause2.end());
     clause.erase(literal) ;
     clause.erase(-literal);    

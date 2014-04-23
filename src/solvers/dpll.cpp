@@ -72,7 +72,7 @@ Affectation* satsolver::solve(Formula *formula) {
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
             // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
-            formula->deduce_true(literal, clause_id,NULL,NULL,NULL); // Return value ignored, WITH_WL is false
+            formula->deduce_true(literal, clause_id,NULL,NULL,NULL);
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }
         else if((literal = formula->isolated_literal(&clause_id))) {

@@ -68,6 +68,7 @@ class Formula {
 
         // Déduction de l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
+        // Sinon, renvoie faux ssi x est déjà affecté, à faux
         // claude_id est l'indice de la clause qui est l'origine de cette déduction
         // pas de clause origine si clause_id = -1 (survient lors des déductions des littéraux isolés)
         bool deduce_true(int x, int clause_id, int *clause1, int *clause2, int *literal) ;
@@ -75,6 +76,7 @@ class Formula {
 
         // Pari sur l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
+        // Sinon, renvoie faux ssi x est déjà affecté, à faux
         bool bet_true(int x, int *clause1, int *clause2, int *literal) ;
         bool bet_false(int x, int *clause1, int *clause2, int *literal) ;
 
