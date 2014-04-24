@@ -176,8 +176,6 @@ bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int 
         return this->set_true(x, clause1, clause2, literal) ;
     }
     else {
-        if(this->aff->is_false(x) && this->ded_depth == 0)
-            throw Conflict() ;
         return this->aff->is_true(x) ;
     }
 }

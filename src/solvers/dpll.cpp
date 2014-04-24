@@ -91,6 +91,9 @@ Affectation* satsolver::solve(Formula *formula) {
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
             // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
+            if(formula->get_ded_depth() == 0) { // clause fausse sans aucun paris, donc insatisfiable
+                throw Conflict() ;
+            }
             if(CL_INTERACT || WITH_CL) {
                 if(!WITH_WL) { // formalités administratives un peu moches
                     tmp = formula->get_ded()->get_clause_id(literal) ;
