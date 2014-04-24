@@ -111,7 +111,7 @@ target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL Ext
 # Benchmarks
 ###########################################
 
-file(GLOB HelperFiles ${CMAKE_SOURCE_DIR}/benchmarks*/* ${CMAKE_SOURCE_DIR}/check_result.py)
+file(GLOB HelperFiles ${CMAKE_SOURCE_DIR}/benchmarks/* ${CMAKE_SOURCE_DIR}/benchmarks_results/rendu3/* ${CMAKE_SOURCE_DIR}/check_result.py)
 
 add_custom_target(Helpers SOURCES ${HelperFile})
 foreach(HelperFile ${HelperFiles})
