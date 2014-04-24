@@ -49,6 +49,8 @@ unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, i
             case 't':
                 CL_INTERACT = false;
                 return 0;
+            case 0:
+                exit(0);
             default:
                 std::cout << "Invalid character [g/r/c/s/t]. ";
                 continue;
