@@ -508,7 +508,7 @@ int Formula::choose_literal(int choice) {
 
 
 
-int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_depth, int literal) {
+int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_depth, int literal, Clause *learned_clause) {
     long unsigned int i_conf; // The index in the memory “stack” of the literal we are making the resolution on.
     int lit_conf, lit_inf;
     int clause_id1, clause_id2 ;
@@ -597,6 +597,8 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
     assert(lit_conf) ;
     assert(lit_inf) ;
     assert(depth_max != -1) ;
+    if (learned_clause)
+        *learned_clause = Clause(nb_variables, clause, this->aff);
     this->clauses.push_back(std::shared_ptr<Clause>(new Clause(nb_variables, clause,this->aff)));
     if(WITH_WL)
         this->clauses.back()->init_WL_CL(lit_conf,lit_inf) ; // nouveaux littéraux surveillés de la clause

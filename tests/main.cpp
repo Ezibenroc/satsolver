@@ -14,6 +14,7 @@ bool VERBOSE = false;
 bool WITH_WL = false;
 bool CL_INTERACT = false;
 bool WITH_CL = false;
+bool CL_STATS = false;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
 int main(void) {

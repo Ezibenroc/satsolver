@@ -155,7 +155,7 @@ class Formula {
         // Clause_id est mis à jour avec l'indice de la clause apprise
         // New_depth est mis à jour avec la profondeur vers laquelle backtracker
         // Renvoie un littéral l que l'on doit déduire après le backtrack (sans déduire le dernier littéral backtracké)
-        int learn_clause(CLProof *proof, int *clause_id, unsigned int *new_depth, int literal) ;
+        int learn_clause(CLProof *proof, int *clause_id, unsigned int *new_depth, int literal, Clause *learned_clause) ;
 
         // Renvoie le dernier paris
         int last_bet() ;

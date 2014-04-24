@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cassert>
 #include <memory>
+#include <iomanip>
 
 #include <exception>
 #include <stdexcept>
@@ -16,6 +17,7 @@
 #include "config.h"
 
 #define CL_PROOF_FILE_NAME "/tmp/CL_proof.tex"
+#define STEPS_BETWEEN_STATS 5
 
 using namespace satsolver;
 
@@ -62,6 +64,9 @@ unsigned int cl_interac(const Deductions &deductions, const Affectation &aff, in
 
 Affectation* satsolver::solve(Formula *formula) {
     int literal, literal_sav=0;
+    Clause learned_clause(formula->get_nb_variables(), std::unordered_set<int>());
+    unsigned int nb_learned_clauses=0, nb_learned_literals=0;
+    unsigned int steps_before_next_stats_print = STEPS_BETWEEN_STATS;
     bool with_proof;
     CLProof *proof;
     int clause_id, tmp;
@@ -117,7 +122,17 @@ Affectation* satsolver::solve(Formula *formula) {
             }
             if (WITH_CL) {
                 proof = new CLProof();
-                literal = formula->learn_clause(proof,&clause_id, &depth_back, literal);
+                literal = formula->learn_clause(proof,&clause_id, &depth_back, literal, &learned_clause);
+                nb_learned_clauses++;
+                nb_learned_literals += static_cast<unsigned int>(learned_clause.whole_to_set().size());
+                if (CL_STATS && !--steps_before_next_stats_print) {
+                    steps_before_next_stats_print = STEPS_BETWEEN_STATS;
+                    std::cout << "Stats: " << nb_learned_clauses << " clauses learned (";
+                    printf("%.2g", static_cast<double>(nb_learned_clauses)*100./static_cast<double>(formula->get_size()));
+                    std::cout << "% of all clauses), averaging ";
+                    printf("%.3g", static_cast<double>(nb_learned_literals)/static_cast<double>(nb_learned_clauses));
+                    std::cout << " literals per clause." << std::endl;
+                }
                 if (with_proof)
                     proof->to_latex_file(CL_PROOF_FILE_NAME);
                 delete proof;
