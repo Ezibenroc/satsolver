@@ -1,5 +1,5 @@
-Comparaison des performances
-============================
+Comparaison des performances RENDU 2
+====================================
 
 Nous avons implémenté un programme en OCaml, permettant de générer aléatoirement 
 un ensemble de clauses, une formule de logique propositionnelle, ou un graphe.
@@ -16,7 +16,7 @@ un fichier "abc.txt", on peut rajouter l'option "-o abc.txt".
 Nous avons remarqué, un peu tard, que notre générateur est trop lent pour 
 générer de grands ensembles de clauses.
 
-Nous avons auss écrit quatre scripts bash permettant de lancer automatiquement 
+Nous avons aussi écrit quatre scripts bash permettant de lancer automatiquement 
 des séries de résolutions.
 ./clause.nvar_3SAT.sh <int>
     Ensembles de clauses 3SAT, le nombre de variables varie.
@@ -41,7 +41,7 @@ dans le répertoire racine de ce projet).
 Pour générer de nouveaux résultats, il suffit d'exécuter les scripts mentionnés
 plus haut. Attention : cela écrasera les résultats expérimentaux présents dans
 le répertoire build, il faut penser à les sauvegarder.
-Pour génerer un nouveau fichier courbes.pdf, lancer : "gnuplot script-plot.p".
+Pour générer un nouveau fichier courbes.pdf, lancer : "gnuplot script-plot.p".
 
 
 Chaque résultat présenté a été calculé en faisant 100 tests, sur des objets 
@@ -128,3 +128,51 @@ heuristiques DUMB et RAND.
 L'heuristique RAND est meilleure que l'heuristique DUMB dans une majorité de cas.
 Il est difficile de départager l'heuristique MOMS de l'heuristique DLIS, l'une 
 étant meilleure que l'autre en fonction des expériences menées.
+
+
+
+Comparaison des performances RENDU 3
+====================================
+
+L'objectif est ici de voir comment évoluent les temps d'exécutions du solveur 
+avec l'apprentissage de clauses.
+Par manque de temps, seules des résolutions du problème SAT ont été traitées 
+(3SAT et 5SAT).
+Pour chaque paramètres différents, 10 tests ont été faits, en changeant 
+à chaque fois l'ensemble de clauses par un nouveau, généré aléatoirement.
+
+Les fichiers des résultats expérimentaux se trouvent dans le répertoire
+benchmarks_results/rendu3.
+Ils comparent les résultats avec et sans apprentissage de clause, pour toutes les
+heuristiques, avec et sans littéraux surveillés.
+La courbe ci jointe (courbes.pdf) présente ces résultats.
+
+
+3SAT
+----
+
+Pour les heuristiques MOMS et DLIS (qui sont les plus rapides), les temps
+d'exécution avec ou sans apprentissage de clauses sont similaires.
+On observe de plus grandes différences pour les heuristiques RAND et DUMB, pour
+lesquels l'apprentissage de clause entraîne un gain remarquable.
+Ces observations sont valables avec ou sans Watched Literals.
+
+
+5SAT
+----
+
+De manière surprenante, l'apprentissage de clauses est ici moins performant, 
+quelque soit l'heuristique, avec ou sans Watched Literals.
+Ceci pourrait s'expliquer intuitivement par la taille des clauses apprises : 
+celles ci sont en moyenne plus grande que pour 3SAT, ce qui diminue le gain
+apporté par leur apprentissage. 
+Au contraire, de plus grandes clauses entraîne un coût plus important pour les 
+générer.
+
+
+Conclusion
+-----------
+
+L'apprentissage de clause ne semble pas apporter de gain significatif pour les
+heuristiques rapides. Dans certains cas il entraîne une perte de performances 
+non négligeable.

@@ -113,11 +113,12 @@ Structures de données et choix d’implémentation
       src/parsers/extended_formula.y), la priorité suivante est donnée
       aux opérateurs : NOT > AND > OR > IMPLIES
 * Déductions :
-    * deux maps, chacune étant la réciproque de l’autre (une donne l’ensemble
-      des littéraux qui ont permis d’en déduire un, l’autre donne l’ensemble
-      des littéraux qu’un littéral a permis de déduire)
-    * contient les valeurs absolues des littéraux déduits / ayant induit une
-      déduction
+    * contient (sous forme de vecteurs), pour chaque littéral, la
+      profondeur de déduction à laquelle il a été déduit, et l'indice de la
+      clause ayant permis sa déduction
+    * contient aussi, seulement lorsque l'option cl-interac est active, deux
+      vecteurs d'ensembles, formant une double correspondance entre littéraux 
+      déduits, et les littéraux ayant permis la déduction (en valeurs absolues)
 * Preuves :
     * La classe CLProof contient un arbre de dérivation ayant permis
       d’engendrer une clause apprise. Cet arbre étend en réalité un peigne,
@@ -144,11 +145,15 @@ Modifications nécessaires pour le rendu 3
 -----------------------------------------
 
 Pour ajouter des clauses en cours de route :
-    trivial, il suffit d’ajouter des éléments à la fin du vecteur
+    il suffit d’ajouter des éléments à la fin du vecteur
     contenant toutes les clauses
+    pour les clauses de taille 1 déduites, nous avons choisi de ne pas les 
+    apprendre (ça aurait posé des problèmes avec WL), mais de backtracker au
+    niveau 0 et déduire l'unique littéral de la clause (cela produit quelque 
+    chose d'équivalent à l'apprentissage dans ce cas)
 
 Garder une trace de la raison pour laquelle un littéral a été déduit :
-    cf ci-dessus (la structure « Deductions »)
+    cf ci-dessus (la structure « Déductions »)
 
 
 
@@ -178,7 +183,7 @@ Exemple pédagogique
 ===================
 
 On prend comme exemple le fichier examples/simple.cnf (pour l’exécuter :
-« ./resol -verbose -CL -cl-interac ../examples/simple.cnf »)
+« ./resol -verbose -CL -cl-interact ../examples/simple.cnf »)
 
 a) On commence par parier sur 1 et 2.
 b) Grâce a) et à la seconde clause, on en déduit -4.
@@ -191,15 +196,13 @@ f) On détecte un conflit pour la neuvième clause.
 Le graphe engendré à ce niveau traduit bien ce qu’il vient de se passer
 (avec le niveau de « dédoublement » correspondant à d) )
 
-On apprend alors la clause « -5 » (cf le fichier de preuve), ce qui vient
+On déduit alors la clause « -5 » (cf le fichier de preuve), ce qui vient
 du fait que les deux dernières clauses impliquent que l’on a -6 ou -7,
 ce qui implique que l’on ait -5.
-
-[[ Backtrack ????? ]]
-
-Alors, on déduit -5 de la clause que l’on vient d’ajouter. Puis on en déduit
-4 vu la troisième clause, puis on déduit -6 puisqu’il apparait uniquement
-avec cette polarité, etc…
+Comme expliqué plus haut, on n'ajoute pas cette clause, car elle est de taille 1.
+On fait donc un backtrack au niveau 0, et on déduit -5.
+Puis on en déduit 4 vu la troisième clause, puis on déduit -6 puisqu’il apparaît 
+uniquement avec cette polarité, etc…
 
 
 
