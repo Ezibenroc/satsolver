@@ -7,7 +7,7 @@ for line in sys.stdin.readlines():
         continue
     elif line.startswith('s UNSATISFIABLE'):
     			print('ok (unsatisfiable)')
-    			exit()
+    			exit(20)
     (mode, variable) = line.split(' ')
     valuation.add(int(variable.strip()))
 
@@ -18,3 +18,4 @@ with open(sys.argv[1]) as fd:
             literals = [int(x) for x in literals if x != '0']
             assert any([x in valuation for x in literals]), literals
 print('ok')
+exit(10)

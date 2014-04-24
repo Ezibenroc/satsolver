@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     }
     catch (satsolver::Conflict e) {
         std::cout << "s UNSATISFIABLE" << std::endl;
-        return 0;
+        return 1;
     }
 
     /*********************
