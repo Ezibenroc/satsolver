@@ -14,7 +14,7 @@ CommandLineParser::CommandLineParser(int argc, char *argv[], std::unordered_set<
     for (i=1; i<argc && argv[i][0]=='-'; i++) {
         if (!strcmp(argv[i], "-verbose"))
             VERBOSE = true;
-        else if (!strcmp(argv[i], "-cl-interact"))
+        else if (!strcmp(argv[i], "-cl-interac"))
             CL_INTERACT = true;
         else if (!strcmp(argv[i], "-WL"))
             WITH_WL = true;
@@ -37,7 +37,7 @@ CommandLineParser::CommandLineParser(int argc, char *argv[], std::unordered_set<
     this->nb_parsed_args = i;
 }
 void CommandLineParser::print_syntax_error(char *executable) {
-    std::cout << "Syntax: " << executable << " [-verbose] [-cl-interact]  [-WL] [-CL]  [-rand | -moms | -dlis] " << this->extra_syntax << "\n\n";
+    std::cout << "Syntax: " << executable << " [-verbose] [-cl-interac]  [-WL] [-CL]  [-rand | -moms | -dlis] " << this->extra_syntax << "\n\n";
     std::cout << "If filename is not given, stdin is used instead." << std::endl;
 }
 int CommandLineParser::get_nb_parsed_args() {

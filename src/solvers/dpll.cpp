@@ -21,7 +21,7 @@ using namespace satsolver;
 
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
-unsigned int cl_interact(const Deductions &deductions, const Affectation &aff, int last_bet, int literal, bool *with_proof) {
+unsigned int cl_interac(const Deductions &deductions, const Affectation &aff, int last_bet, int literal, bool *with_proof) {
     char mode;
     unsigned int steps;
     assert(deductions.has_variable(abs(literal)));
@@ -113,7 +113,7 @@ Affectation* satsolver::solve(Formula *formula) {
             if (CL_INTERACT && --skip_conflicts == 0) {
                 last_bet = formula->last_bet() ;
                 assert(last_bet);
-                skip_conflicts = cl_interact(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);
+                skip_conflicts = cl_interac(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);
             }
             if (WITH_CL) {
                 proof = new CLProof();

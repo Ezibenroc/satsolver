@@ -22,7 +22,7 @@ les autres paramètres) :
 * -rand, -moms, ou -dlis (mutuellement exclusifs) pour activer les heuristiques
   du même nom
 * -CL pour activer l’apprentissage de clauses
-* -cl-interact pour activer le mode interactif
+* -cl-interac pour activer le mode interactif
 
 `colorie` prend également un entier qui est le nombre de couleur maximal à
 utiliser.
@@ -178,7 +178,7 @@ Exemple pédagogique
 ===================
 
 On prend comme exemple le fichier examples/simple.cnf (pour l’exécuter :
-« ./resol -verbose -CL -cl-interact ../examples/simple.cnf »)
+« ./resol -verbose -CL -cl-interac ../examples/simple.cnf »)
 
 a) On commence par parier sur 1 et 2.
 b) Grâce a) et à la seconde clause, on en déduit -4.
