@@ -35,11 +35,11 @@ class Deductions {
         void add_deduction(int literal, const std::set<int> &clause, int clause_id, int depth);
         void add_bet(int literal, int depth) ;
         void remove_deduction(int literal) ;
-	
+
         void print() const;
         void print_edges(FILE *graph_file, const satsolver::Affectation &aff) const ;
         void print_UIP(FILE *graph_file, const satsolver::Affectation &aff, int bet, int conflict) const ;
-        
+
         void make_conflict_graph(const satsolver::Affectation &aff, int root, int literal) const;
 };
 

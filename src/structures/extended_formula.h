@@ -11,7 +11,7 @@
 namespace satsolver {
 
 class ExtendedFormula {
-    public: 
+    public:
         enum Type {
             XOR, OR, AND, IMPLIES, NOT, LITERAL,
             TRUE, FALSE

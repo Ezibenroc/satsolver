@@ -16,7 +16,7 @@ using namespace satsolver;
 
 
 void print_space(int depth) {
-	std::cout << "TIME : " << (static_cast<float>(clock()))/CLOCKS_PER_SEC << "\t" ;
+    std::cout << "TIME : " << (static_cast<float>(clock()))/CLOCKS_PER_SEC << "\t" ;
     for(int i = 0 ; i < depth ; i++)
         std::cout << "\t" ;
 }
@@ -123,7 +123,7 @@ void Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
 
 bool Formula::set_true(int x, int *clause1, int *clause2, int *literal) {
  //   std::cout << this->aff->to_string() << std::endl ;
-    int l ; 
+    int l ;
     int clause_id=-1 ;
     std::unordered_set<std::pair<int,unsigned int>,Hash,Equal>::const_iterator it ;
     if(WITH_WL) {
@@ -135,7 +135,7 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal) {
                     if(VERBOSE) {
                         print_space(this->ded_depth) ;
                         std::cout << "[Watched Literals] Detected a conflict : " << l << std::endl ;
-                    } 
+                    }
                     *clause1 = it->second ;
                     *clause2 = i ;
                     *literal = l ;
@@ -166,7 +166,7 @@ bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int 
         }
     }
     if(this->aff->is_unknown(x)) {
-        if(WITH_CL || CL_INTERACT) { 
+        if(WITH_CL || CL_INTERACT) {
             if(clause_id >= 0)
                 this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
             else
@@ -369,7 +369,7 @@ void Formula::clean() {
     this->clauses.reserve(old_clauses.size()) ;
 //    unsigned j ;
     for(unsigned i = 0 ; i < old_clauses.size() ; i++) {
-/*	Les lignes suivantes suppriment les clauses contenant d'autres clauses : cela prend beaucoup trop de temps
+/*    Les lignes suivantes suppriment les clauses contenant d'autres clauses : cela prend beaucoup trop de temps
         j = 0 ;
         if(!to_delete(old_clauses[i],literals_to_delete)) {
               while(j < old_clauses.size() && (old_clauses[j] == NULL || j == i
@@ -385,8 +385,8 @@ void Formula::clean() {
             this->clauses.push_back(old_clauses[i]) ;
         }
 */
-		if(!to_delete(old_clauses[i],literals_to_delete))
-			this->clauses.push_back(old_clauses[i]) ;
+        if(!to_delete(old_clauses[i],literals_to_delete))
+            this->clauses.push_back(old_clauses[i]) ;
     }
 
 }
@@ -409,11 +409,11 @@ int Formula::get_ded_depth() {
 }
 
 std::vector<int> Formula::get_unknown_literals(void) const {
-	std::vector<int> v = std::vector<int>() ;
-	for(unsigned i = 0 ; i < clauses.size() ; i++) {
-		clauses[i]->add_literals_to_vector(v) ;
-	}
-	return v ;
+    std::vector<int> v = std::vector<int>() ;
+    for(unsigned i = 0 ; i < clauses.size() ; i++) {
+        clauses[i]->add_literals_to_vector(v) ;
+    }
+    return v ;
 }
 
 int Formula::choose_literal_dumb() const {
@@ -427,83 +427,83 @@ int Formula::choose_literal_dumb() const {
 }
 
 int Formula::choose_literal_random() const {
-	std::vector<int> v = this->get_unknown_literals() ;
-	assert(v.size() > 0) ;
-	return v[rand()%v.size()] ;
+    std::vector<int> v = this->get_unknown_literals() ;
+    assert(v.size() > 0) ;
+    return v[rand()%v.size()] ;
 }
 
 int Formula::choose_literal_moms() const {
-	bool there_is_literals = false ;
-	long unsigned min_clause_size = ULONG_MAX;
-	std::vector<int> v = std::vector<int>() ;
-	int *count = static_cast<int*>(malloc((2*this->nb_variables+1)*sizeof(int))); // count[i] = nombre d'apparitions du littéral i-nb_variables
-	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-		v.clear() ;
-		this->clauses[i]->add_literals_to_vector(v) ;
-		there_is_literals = there_is_literals || v.size() > 0 ;
-		if(v.size() < min_clause_size && v.size() > 0) { // trouvé une clause plus petite, on remet tout à zéro
-			min_clause_size = v.size() ;
-			memset(count,0,(2*this->nb_variables+1)*sizeof(int)) ;
-		}
-		if(v.size() == min_clause_size) { // on incrémente le compteur de tous les littéraux de v
-			for(unsigned j = 0 ; j < v.size() ; j++) {
-				count[v[j]+this->nb_variables] ++ ;
-			}
-		}
-	}
-	// Recherche du maximum dans count
-	int max_occurence, max_literal ;
-	max_occurence = 0 ;  max_literal = 0 ;
-	for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) { 
-		if(count[i] > max_occurence) {
-			max_occurence = count[i] ;
-			max_literal = i ;
-		}
-	}
-	free(count) ;
-	assert(there_is_literals) ;
-	return max_literal-this->nb_variables ;
+    bool there_is_literals = false ;
+    long unsigned min_clause_size = ULONG_MAX;
+    std::vector<int> v = std::vector<int>() ;
+    int *count = static_cast<int*>(malloc((2*this->nb_variables+1)*sizeof(int))); // count[i] = nombre d'apparitions du littéral i-nb_variables
+    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+        v.clear() ;
+        this->clauses[i]->add_literals_to_vector(v) ;
+        there_is_literals = there_is_literals || v.size() > 0 ;
+        if(v.size() < min_clause_size && v.size() > 0) { // trouvé une clause plus petite, on remet tout à zéro
+            min_clause_size = v.size() ;
+            memset(count,0,(2*this->nb_variables+1)*sizeof(int)) ;
+        }
+        if(v.size() == min_clause_size) { // on incrémente le compteur de tous les littéraux de v
+            for(unsigned j = 0 ; j < v.size() ; j++) {
+                count[v[j]+this->nb_variables] ++ ;
+            }
+        }
+    }
+    // Recherche du maximum dans count
+    int max_occurence, max_literal ;
+    max_occurence = 0 ;  max_literal = 0 ;
+    for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) {
+        if(count[i] > max_occurence) {
+            max_occurence = count[i] ;
+            max_literal = i ;
+        }
+    }
+    free(count) ;
+    assert(there_is_literals) ;
+    return max_literal-this->nb_variables ;
 }
 
 int Formula::choose_literal_dlis() const {
-	bool there_is_literals = false ;
-	std::vector<int> v = std::vector<int>() ;
-	// count[i] = nombre d'apparitions du littéral i-nb_variables
-	std::vector<double> count = std::vector<double>(2*this->nb_variables+1,0.0) ;
-	double point ;
-	for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
-		v.clear() ;
-		this->clauses[i]->add_literals_to_vector(v) ;
-		there_is_literals = there_is_literals || v.size() > 0 ;
-		point = pow(2,-static_cast<double>(v.size()));
-		for(unsigned j = 0 ; j < v.size() ; j ++) {
-			count[v[j]+this->nb_variables] += point ;
-		}
-	}
-	// Recherche du maximum dans count
-	double max_occurence ;
-	int max_literal ;
-	max_occurence = 0 ;  max_literal = 0 ;
-	for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) {
-		if(count[i] > max_occurence) {
-			max_occurence = count[i] ;
-			max_literal = i ;
-		}
-	}
-	assert(there_is_literals) ;
-	return max_literal-this->nb_variables ;
+    bool there_is_literals = false ;
+    std::vector<int> v = std::vector<int>() ;
+    // count[i] = nombre d'apparitions du littéral i-nb_variables
+    std::vector<double> count = std::vector<double>(2*this->nb_variables+1,0.0) ;
+    double point ;
+    for(unsigned i = 0 ; i < this->clauses.size() ; i++) {
+        v.clear() ;
+        this->clauses[i]->add_literals_to_vector(v) ;
+        there_is_literals = there_is_literals || v.size() > 0 ;
+        point = pow(2,-static_cast<double>(v.size()));
+        for(unsigned j = 0 ; j < v.size() ; j ++) {
+            count[v[j]+this->nb_variables] += point ;
+        }
+    }
+    // Recherche du maximum dans count
+    double max_occurence ;
+    int max_literal ;
+    max_occurence = 0 ;  max_literal = 0 ;
+    for(int i = 0 ; i < 2*this->nb_variables+1 ; i++) {
+        if(count[i] > max_occurence) {
+            max_occurence = count[i] ;
+            max_literal = i ;
+        }
+    }
+    assert(there_is_literals) ;
+    return max_literal-this->nb_variables ;
 }
 
 int Formula::choose_literal(int choice) {
-	int literal=0 ;
-	switch(choice) {
-		case DUMB : literal = this->choose_literal_dumb() ; break ;
-		case RANDOM : literal = this->choose_literal_random() ; break ;
-		case MOMS : literal = this->choose_literal_moms() ; break ;
-		case DLIS : literal = this->choose_literal_dlis() ; break ;
-	}
-	assert(literal && this->aff->is_unknown(literal)) ;
-	return(literal) ;
+    int literal=0 ;
+    switch(choice) {
+        case DUMB : literal = this->choose_literal_dumb() ; break ;
+        case RANDOM : literal = this->choose_literal_random() ; break ;
+        case MOMS : literal = this->choose_literal_moms() ; break ;
+        case DLIS : literal = this->choose_literal_dlis() ; break ;
+    }
+    assert(literal && this->aff->is_unknown(literal)) ;
+    return(literal) ;
 }
 
 
@@ -517,7 +517,7 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
     clause_id2 = this->ded->get_clause_id(literal) ;
     std::unordered_set<int> clause = this->clauses[clause_id1]->whole_to_set() ;
     std::unordered_set<int> clause2 = this->clauses[clause_id2]->whole_to_set() ;
-/*    
+/*
         std::cout << "CLAUSE1 : " ;
         for(auto l : clause)
             std::cout << l << " " ;
@@ -526,11 +526,11 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
         std::cout << "CLAUSE2 : " ;
         for(auto l : clause2)
             std::cout << l << " " ;
-        std::cout << std::endl << std::endl  ;    
-*/  
+        std::cout << std::endl << std::endl  ;
+*/
     clause.insert(clause2.begin(), clause2.end());
     clause.erase(literal) ;
-    clause.erase(-literal);    
+    clause.erase(-literal);
     while (true) {
         // Recherche d'un UIP (seul littéral de la clause affecté au niveau d'affectation courant)
         nb_same_lvl = 0 ;
@@ -548,11 +548,11 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
           assert(i_conf);
           i_conf-- ;
           assert(this->mem[i_conf].second) ;
-          lit_conf = this->mem[i_conf].first ; 
+          lit_conf = this->mem[i_conf].first ;
         } while(clause.find(-lit_conf) == clause.end() && clause.find(lit_conf) == clause.end()) ;
         clause_id2 = this->ded->get_clause_id(lit_conf) ;
         clause2 = this->clauses[clause_id2]->whole_to_set(); // Clause correspondante
-/* 
+/*
         std::cout << "CLAUSE1 : " ;
         for(auto l : clause)
             std::cout << l << " " ;
@@ -572,7 +572,7 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
     proof->conclude(Clause(this->get_nb_variables(), clause));
     if(clause.size() == 1) { // cas particulier
         if(VERBOSE) {
-            print_space(this->ded_depth) ;    
+            print_space(this->ded_depth) ;
             std::cout << "Deduced a clause of size 1: {" << *clause.begin() << "}" << std::endl ;
         }
         *new_depth = 0 ; // on backtrack tout
@@ -601,7 +601,7 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
     if(WITH_WL)
         this->clauses.back()->init_WL_CL(lit_conf,lit_inf) ; // nouveaux littéraux surveillés de la clause
     if(VERBOSE) {
-        print_space(this->ded_depth) ;    
+        print_space(this->ded_depth) ;
         std::cout << "Learned the clause " << clauses.back()->to_string() << std::endl ;
     }
     *clause_id = static_cast<int> (this->clauses.size() - 1) ;

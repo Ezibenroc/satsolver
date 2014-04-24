@@ -17,14 +17,14 @@ namespace satsolver {
 
 // Deux foncteurs utilisés pour l'ensemble to_do.
 struct Equal {
-	bool operator() (const std::pair<int,unsigned int> &a, const std::pair<int,unsigned int> &b) const {
-		  return (a.first == b.first);
-	}
+    bool operator() (const std::pair<int,unsigned int> &a, const std::pair<int,unsigned int> &b) const {
+        return (a.first == b.first);
+    }
 };
 struct Hash {
-	size_t operator() (const std::pair<int,unsigned int> &a) const {
-		return a.first ;
-	}
+    size_t operator() (const std::pair<int,unsigned int> &a) const {
+        return a.first ;
+    }
 };
 
 class Formula {
@@ -106,7 +106,7 @@ class Formula {
 
         // Determines whether one of the clauses is evaluated to false.
         bool contains_false_clause(int *clause_id) const;
-        
+
         // Determines whether all the clauses are evaluated to true.
         bool only_true_clauses(int *clause_id) const;
 
@@ -123,40 +123,40 @@ class Formula {
         // Renvoie l'affectation
         // Ne pas utiliser en dehors des tests unitaires, ou de la fin de DPLL
         Affectation *get_aff() ;
-        
+
         // Renvoie les déductions
         Deductions *get_ded() ;
         // Renvoie la profondeur de déduction
         int get_ded_depth() ;
-                
+
         // Renvoie un vecteur de littéraux inconnus
         std::vector<int> get_unknown_literals (void) const ;
 
         // Renvoie un littéral de la formule
         // Pré-condition : la formule n'est pas vide, et n'est pas le monome clause vide
         int choose_literal_dumb() const;
-        
+
         // Choisis un littéral aléatoirement dans la formule
         // Pré-condition : le générateur pseudo-aléatoire a été initialisé correctement
         int choose_literal_random() const ;
-        
+
         // Choisis un littéral avec l'heuristique MOMS
         int choose_literal_moms() const ;
-     
+
         // Choisis un littéral avec l'heuristique DLIS (variante)
         int choose_literal_dlis() const ;
-        
+
         // Choisis un littéral selon l'heuristique spécifiée
         int choose_literal(int choice) ;
-        
-        
+
+
         // Apprentissage d'une clause
         // Le littéral donné doit être en conflis dans la clause d'indice donné
         // Clause_id est mis à jour avec l'indice de la clause apprise
         // New_depth est mis à jour avec la profondeur vers laquelle backtracker
         // Renvoie un littéral l que l'on doit déduire après le backtrack (sans déduire le dernier littéral backtracké)
         int learn_clause(CLProof *proof, int *clause_id, unsigned int *new_depth, int literal) ;
-        
+
         // Renvoie le dernier paris
         int last_bet() ;
 };

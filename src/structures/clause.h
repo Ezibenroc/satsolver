@@ -69,7 +69,7 @@ class Clause {
 
        // Initialise les watched literals
        void init_WL() ;
-       
+
        // Initialise les watched literals avec les deux littéraux donnés
        // À n'utilise que pour les clauses apprises
        void init_WL_CL(int l1, int l2) ;
@@ -97,10 +97,10 @@ class Clause {
 
        // Determines whether all literals in the clause are set to false.
        bool is_evaluated_to_false() const;
-       
+
        // Determines whether at least one literal in the clause is set to true.
        bool is_evaluated_to_true() const;
-       
+
        // Si la clause ne contient pas de littéral vrai, alors ajoute tous ses littéraux indéterminés au vecteur
        void add_literals_to_vector(std::vector<int> &v) const ;
 };

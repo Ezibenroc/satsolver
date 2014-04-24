@@ -280,8 +280,8 @@ int Clause::monome() {
 }
 
 bool Clause::is_evaluated_to_false() const {
-		if(WITH_WL)
-			return (this->aff->is_false(this->fst_WL()) && this->aff->is_false(this->snd_WL())) ;
+    if(WITH_WL)
+        return (this->aff->is_false(this->fst_WL()) && this->aff->is_false(this->snd_WL())) ;
     for (auto literal : this->literals)
         if (!this->aff->is_false(literal))
             return false;
@@ -289,8 +289,8 @@ bool Clause::is_evaluated_to_false() const {
 }
 
 bool Clause::is_evaluated_to_true() const {
-		if(WITH_WL && (this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL()))) 
-			return true ;
+    if(WITH_WL && (this->aff->is_true(this->fst_WL()) || this->aff->is_true(this->snd_WL())))
+        return true ;
     for (auto literal : this->literals)
         if (this->aff->is_true(literal))
             return true;
@@ -298,10 +298,10 @@ bool Clause::is_evaluated_to_true() const {
 }
 
 void Clause::add_literals_to_vector(std::vector<int> &v) const {
-	if(this->is_evaluated_to_true())
-		return ;
-	for(auto l : this->literals) { // clause insatisfaite, on ajoute tous les littéraux non faux
-		if(this->aff->is_unknown(l))
-			v.push_back(l) ;
-	}
+    if(this->is_evaluated_to_true())
+        return ;
+    for(auto l : this->literals) { // clause insatisfaite, on ajoute tous les littéraux non faux
+        if(this->aff->is_unknown(l))
+            v.push_back(l) ;
+    }
 }

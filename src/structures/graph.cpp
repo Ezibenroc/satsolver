@@ -42,7 +42,7 @@ graphsolver::Graph& graphsolver::Graph::operator=(const graphsolver::Graph &that
 Graph::~Graph() {
     int i;
     free(this->values);
-    
+
     for (i=0; i<this->nodes_count; i++) {
         delete this->adjacency[i];
     }
@@ -51,7 +51,7 @@ Graph::~Graph() {
 
 void Graph::set_value(int node_id, int value) {
     assert(node_id > 0);
-    assert(node_id <= this->nodes_count); 
+    assert(node_id <= this->nodes_count);
     this->values[node_id-1] = value;
 }
 

@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
      ********************/
     parser = new satsolver::SatParser(*input);
     try {
-				parser->parse();
-				formula = parser->get_formula();
+        parser->parse();
+        formula = parser->get_formula();
         solution = satsolver::solve(formula);
     }
     catch (satsolver::Conflict e) {

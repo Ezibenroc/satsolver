@@ -226,7 +226,7 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
     delete raw_clauses;
     if (clauses.size() == 1) // Conjonction of one clause (the literal of the “root” formula)
         return NULL;
-    
+
     if (name_to_variable_ptr)
         *name_to_variable_ptr = name_to_variable;
     return std::shared_ptr<Formula>(new Formula(clauses, nb_variables));

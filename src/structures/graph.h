@@ -10,7 +10,7 @@ class Graph {
         int nodes_count;
         int *values;
         std::set<int> **adjacency;
-        
+
     public:
         Graph(int nodes_count, int default_value);
         Graph(const Graph&);

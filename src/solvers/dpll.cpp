@@ -76,7 +76,7 @@ Affectation* satsolver::solve(Formula *formula) {
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }
         else if((literal = formula->isolated_literal(&clause_id))) {
-	        formula->deduce_true(literal,-1,NULL,NULL,NULL) ;
+            formula->deduce_true(literal,-1,NULL,NULL,NULL) ;
         }
         else {
             literal = formula->choose_literal(HEURISTIC) ;

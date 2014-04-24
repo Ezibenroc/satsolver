@@ -101,7 +101,7 @@ std::set<int>* Affectation::to_set() const {
 }
 
 int Affectation::get_nb_unknown() {
-	return this->nb_unknown ;
+    return this->nb_unknown ;
 }
 
 unsigned Affectation::get_nb_var() const{

@@ -98,7 +98,7 @@ std::shared_ptr<graphsolver::ColorAffectation> graphsolver::solve_colors(int nb_
     satsolver::Affectation *sat_solution;
     std::shared_ptr<graphsolver::ColorAffectation> color_affectation;
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
-    
+
     nb_bits = reduce_graph_coloration_to_extended_formula(graph, nb_colors, &ext_formula);
     if (VERBOSE || DISPLAY_FORMULA)
         std::cout << "Reduction of graph coloring problem to: " << ext_formula->to_string() << std::endl;

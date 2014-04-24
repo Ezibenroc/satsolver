@@ -19,7 +19,7 @@
 #define AS_AFF(a, l) (a.is_true(l) ? l : -l)
 
 // Case 0 inutilisée
-Deductions::Deductions(int nb_var) : known_to_deduced(nb_var+1,std::unordered_set<int>()), 
+Deductions::Deductions(int nb_var) : known_to_deduced(nb_var+1,std::unordered_set<int>()),
                                      deduced_to_known(nb_var+1,std::unordered_set<int>()),
                                      deduced_to_clause_id(nb_var+1,-1),
                                      deduction_depth(nb_var+1,-1) {
@@ -139,7 +139,7 @@ void Deductions::print_UIP(FILE *graph_file, const satsolver::Affectation &aff, 
     std::stack<std::pair<int,int>> DFS ; // pile de (noeud,parent)
     int node,tmp ;
     std::pair<int,int> p ;
-    
+
     DFS.push(std::pair<int,int>(abs(bet),abs(bet))) ;
     for(unsigned i = 1 ; i <= aff.get_nb_var() ; i++) {
         candidates_UIP.insert(i) ;
@@ -166,7 +166,7 @@ void Deductions::print_UIP(FILE *graph_file, const satsolver::Affectation &aff, 
             nodes_in_path.insert(abs(bet)) ;
             candidates_UIP.clear() ;
             candidates_UIP.swap(nodes_in_path) ;
-        }   
+        }
         else {
             if(known_to_deduced[node].size() > 0) {
                 for(auto l : known_to_deduced[node]) {
@@ -177,22 +177,22 @@ void Deductions::print_UIP(FILE *graph_file, const satsolver::Affectation &aff, 
     }
     for(auto l : nodes_in_level)
         if(candidates_UIP.find(l) == candidates_UIP.end())
-            fprintf(graph_file, "\t%d [color = \"blue\"];\n", AS_AFF(aff,l));           
+            fprintf(graph_file, "\t%d [color = \"blue\"];\n", AS_AFF(aff,l));
     for(auto l : candidates_UIP)
         fprintf(graph_file, "\t%d [color = \"yellow\"];\n", AS_AFF(aff,l));
 }
 
 void Deductions::make_conflict_graph(const satsolver::Affectation &aff, int root, int literal) const{
     FILE *graph_file = NULL;
-    
+
     graph_file = fopen(CONFLICT_GRAPH_FILE_NAME, "w");
     assert(graph_file) ;
-    
+
     fprintf(graph_file, "digraph G {\n");
-    
+
     // Arêtes
     this->print_edges(graph_file,aff) ;
-    
+
     // Noeuds
     this->print_UIP(graph_file,aff,root,literal) ;
     fprintf(graph_file, "\t%d [color = \"red\"];\n", literal);
