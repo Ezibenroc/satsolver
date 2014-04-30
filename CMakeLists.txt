@@ -40,10 +40,12 @@ add_library(ColorAffectation src/structures/color_affectation.cpp)
 add_library(Graph src/structures/graph.cpp)
 add_library(CLProof src/structures/CL_proof.cpp)
 add_library(Deductions src/structures/deductions.cpp)
+add_library(DifferenceAtom src/structures/difference_atom.cpp)
+add_library(CongruenceAtom src/structures/congruence_atom.cpp)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp "")
 add_library(Structures ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
-target_link_libraries(Structures Formula Clause Affectation ColorAffectation Graph ExtendedFormula CLProof Deductions)
+target_link_libraries(Structures Formula Clause Affectation ColorAffectation Graph ExtendedFormula CLProof Deductions DifferenceAtom CongruenceAtom)
 set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
 
 
@@ -77,7 +79,7 @@ set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/extended_formula.y.cpp P
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp "")
 add_library(Parsers ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp)
-target_link_libraries(Parsers SatParser GraphParser ExtendedFormulaParser)
+target_link_libraries(Parsers SatParser GraphParser ExtendedFormulaParser CongruenceAtom DifferenceAtom)
 set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/parsers.cpp)
 
 

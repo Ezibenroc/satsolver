@@ -1,5 +1,5 @@
-#ifndef STRUCTURES_EXTENDED_FORMULE_H
-#define STRUCTURES_EXTENDED_FORMULE_H
+#ifndef STRUCTURED_EXTENDED_FORMULE_H
+#define STRUCTURED_EXTENDED_FORMULE_H
 
 #include <unordered_set>
 #include <string>
