@@ -25,9 +25,7 @@ int yyerror(const char *);
 
 void parser_result(SPEF formula);
 
-unsigned long int nb_DA;
 std::vector<SPDA> literal_to_DA;
-unsigned long int nb_CA;
 std::vector<SPCA> literal_to_CA;
 SPDA difference_atom;
 
@@ -92,14 +90,12 @@ difference_atom:
 atom:
       VAR { $$ = new EF(EF::LITERAL, std::string($1)); }
     | difference_atom {
-         nb_DA = literal_to_DA.size();
          literal_to_DA.push_back(SPDA((DA*) $1));
-         $$ = new EF(EF::LITERAL, "#" + std::to_string(nb_DA));
+         $$ = new EF(EF::LITERAL, "#" + std::to_string(literal_to_DA.size()));
          }
     | congruence_atom {
-         nb_CA = literal_to_CA.size();
          literal_to_CA.push_back(SPCA((CA*) $1));
-         $$ = new EF(EF::LITERAL, "#" + std::to_string(nb_CA));
+         $$ = new EF(EF::LITERAL, "#" + std::to_string(literal_to_CA.size()));
          }
     ;
 
