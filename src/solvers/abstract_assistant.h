@@ -3,6 +3,9 @@
 
 namespace theorysolver {
 
+/* The parent class of all assistants. Assistants are objects that
+ * help the SAT solver by giving it extra informations that come from
+ * the theory. */
 class AbstractAssistant {
     public:
         // Called every time we set a variable to true or to false.
