@@ -14,6 +14,7 @@
 #include "structures/formula.h"
 #include "structures/clause.h"
 #include "solvers/dpll.h"
+#include "solvers/void_assistant.h"
 #include "config.h"
 
 #define CL_PROOF_FILE_NAME "/tmp/CL_proof.tex"
@@ -61,8 +62,12 @@ unsigned int cl_interac(const Deductions &deductions, const Affectation &aff, in
 }
 
 
-
 Affectation* satsolver::solve(Formula *formula) {
+    theorysolver::VoidAssistant assistant;
+    return satsolver::solve(formula, &assistant);
+}
+
+Affectation* satsolver::solve(Formula *formula, theorysolver::AbstractAssistant *assistant) {
     int literal, literal_sav=0;
     Clause learned_clause(formula->get_nb_variables(), std::unordered_set<int>());
     unsigned int nb_learned_clauses=0, nb_learned_literals=0;
@@ -80,10 +85,12 @@ Affectation* satsolver::solve(Formula *formula) {
             // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
             formula->deduce_true(literal, clause_id,NULL,NULL,NULL);
+            assistant->on_flip(abs(literal));
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }
         else if((literal = formula->isolated_literal(&clause_id))) {
             formula->deduce_true(literal,-1,NULL,NULL,NULL) ;
+            assistant->on_flip(abs(literal));
         }
         else {
             literal = formula->choose_literal(HEURISTIC) ;
@@ -91,10 +98,11 @@ Affectation* satsolver::solve(Formula *formula) {
                 contains_false_clause = !formula->bet_true(literal,&clause_id,&tmp,&literal);
             else {
                 formula->bet_true(literal,NULL,NULL,NULL);
+                assistant->on_flip(abs(literal));
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }
-        while(contains_false_clause) {
+        while(contains_false_clause || !assistant->is_state_consistent()) {
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
             // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral

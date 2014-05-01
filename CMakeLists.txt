@@ -99,8 +99,10 @@ set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BI
 # Solvers
 #########
 
+add_library(VoidAssistant src/solvers/void_assistant.cpp)
+
 add_library(DPLL src/solvers/dpll.cpp)
-target_link_libraries(DPLL Structures)
+target_link_libraries(DPLL Structures VoidAssistant)
 
 add_library(Tseitin src/solvers/tseitin.cpp)
 target_link_libraries(Tseitin Structures)
