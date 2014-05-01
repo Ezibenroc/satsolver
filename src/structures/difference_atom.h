@@ -1,6 +1,8 @@
 #ifndef STRUCTURES_DIFFERENCE_ATOM_H
 #define STRUCTURES_DIFFERENCE_ATOM_H
 
+#include <string>
+
 namespace theorysolver {
 
 class DifferenceAtom {
@@ -15,6 +17,8 @@ class DifferenceAtom {
 
         DifferenceAtom(unsigned int i, enum Operator op, unsigned int n);
         DifferenceAtom(unsigned int i, unsigned int j, enum Operator op, unsigned int n);
+
+        std::string to_string() const;
 };
 
 }

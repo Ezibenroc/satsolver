@@ -9,3 +9,8 @@ Term::Term(std::string function_name, std::vector<std::shared_ptr<Term>> argumen
 
 CongruenceAtom::CongruenceAtom(std::shared_ptr<Term> left, enum Operator op, std::shared_ptr<Term> right) : left(left), right(right), op(op) {
 }
+
+std::string CongruenceAtom::to_string() const {
+    // TODO
+    return std::string();
+}

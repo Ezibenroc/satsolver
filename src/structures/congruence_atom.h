@@ -20,6 +20,8 @@ class Term {
 
         Term(unsigned int symbol_id);
         Term(std::string function_name, std::vector<std::shared_ptr<Term>> arguments);
+
+        std::string to_string() const;
 };
 
 class CongruenceAtom {
@@ -32,6 +34,7 @@ class CongruenceAtom {
         Operator op;
 
         CongruenceAtom(std::shared_ptr<Term> left, enum Operator op, std::shared_ptr<Term> right);
+        std::string to_string() const;
 };
 
 }
