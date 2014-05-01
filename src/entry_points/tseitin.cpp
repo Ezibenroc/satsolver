@@ -7,6 +7,7 @@
 #include "config.h"
 #include "parsers/cli.h"
 #include "solvers/dpll.h"
+#include "solvers/tseitin.h"
 #include "structures/congruence_atom.h"
 #include "structures/difference_atom.h"
 #include "structures/extended_formula.h"
@@ -32,46 +33,25 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA, std::vect
     assert(literal_to_DA.size() == 0);
     assert(literal_to_CA.size() == 0);
     /*********************
-     * Solve
+     * Reduce
      ********************/
     satsolver::Affectation *sat_solution;
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
     std::shared_ptr<std::unordered_set<std::string>> literals = ext_formula->get_literals();
+    std::shared_ptr<satsolver::Formula> formula;
 
     if (VERBOSE || DISPLAY_FORMULA)
         std::cout << "Interpreted formula as: " << ext_formula->to_string() << std::endl;
-    ext_formula = ext_formula->simplify();
-    if (VERBOSE)
-        std::cout << "Reduction of formula to: " << ext_formula->to_string() << std::endl;
-    std::shared_ptr<satsolver::Formula> formula = NULL;
-    try {
-        formula = ext_formula->reduce_to_formula(&name_to_variable);
-    }
-    catch (satsolver::Conflict) {
-    }
-
-    /*********************
-     * Display solution
-     ********************/
-    if (!formula) { // The formula is always false
+    if (!tseitin_reduction(DISPLAY_SAT, ext_formula, name_to_variable, formula)) {
+        // The formula is always false
         if (DISPLAY_SAT)
             std::cout << "c The formula is so obviously wrong it is not even needed to convert it to conjonctive form." << std::endl;
         std::cout << "s UNSATISFIABLE" << std::endl;
         return;
     }
-    if (VERBOSE)
-        std::cout << "Reduction of formula to SAT: " << formula->to_string() << std::endl;
-    if (DISPLAY_SAT) {
-        std::cout << "c Start of formula\n" ;
-        std::cout << formula->to_string2();
-        for (int i=1; i<=formula->get_nb_variables(); i++) {
-            if (formula->get_aff()->is_true(i))
-                std::cout << i << " 0\n";
-            else if (formula->get_aff()->is_false(i))
-                std::cout << -i << " 0\n";
-        }
-        std::cout << "c End of formula\n" << std::endl ;
-    }
+    /*********************
+     * Solve
+     ********************/
     try {
         sat_solution = satsolver::solve(&*formula);
     }
@@ -79,6 +59,9 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA, std::vect
         std::cout << "s UNSATISFIABLE" << std::endl;
         return;
     }
+    /*********************
+     * Display solution
+     ********************/
     if (VERBOSE)
         std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
     for (auto literal : *literals) {

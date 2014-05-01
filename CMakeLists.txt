@@ -89,6 +89,9 @@ set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BI
 add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Structures)
 
+add_library(Tseitin src/solvers/tseitin.cpp)
+target_link_libraries(Tseitin Structures)
+
 add_library(GraphColorSolver src/solvers/graphcolor.cpp)
 target_link_libraries(GraphColorSolver Structures DPLL)
 
@@ -105,7 +108,7 @@ add_executable(colorie src/entry_points/colorie.cpp)
 target_link_libraries(colorie GraphParser CommandLineParser GraphColorSolver)
 
 add_executable(tseitin src/entry_points/tseitin.cpp)
-target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL ExtendedFormulaParser)
+target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL ExtendedFormulaParser Tseitin)
 
 
 
