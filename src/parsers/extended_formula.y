@@ -23,7 +23,7 @@ int yylex(void);
 int yyerror(const char *);
 }
 
-void parser_result(SPEF formula);
+void parser_result(SPEF formula, std::vector<SPDA> &literal_to_DA, std::vector<SPCA> &literal_to_CA);
 
 std::vector<SPDA> literal_to_DA;
 std::vector<SPCA> literal_to_CA;
@@ -52,7 +52,7 @@ SPDA difference_atom;
 
 %%
 whole_formula:
-      formula { parser_result(SPEF((EF*) $1)); }
+      formula { parser_result(SPEF((EF*) $1), literal_to_DA, literal_to_CA); }
     ;
 
 term:

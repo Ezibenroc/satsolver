@@ -1,16 +1,23 @@
 #include <set>
 #include <string>
 #include <memory>
+#include <cassert>
 #include <iostream>
 
 #include "config.h"
 #include "parsers/cli.h"
 #include "solvers/dpll.h"
+#include "structures/congruence_atom.h"
+#include "structures/difference_atom.h"
 #include "structures/extended_formula.h"
 #include "extended_formula.y.hpp"
 
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
+#define DA theorysolver::DifferenceAtom
+#define SPDA std::shared_ptr<DA>
+#define CA theorysolver::CongruenceAtom
+#define SPCA std::shared_ptr<CA>
 
 extern FILE *yyin;
 extern int yyparse();
@@ -21,7 +28,9 @@ bool DISPLAY_SAT;
 bool DISPLAY_FORMULA;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
-void parser_result(SPEF ext_formula) {
+void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA, std::vector<SPCA> &literal_to_CA) {
+    assert(literal_to_DA.size() == 0);
+    assert(literal_to_CA.size() == 0);
     /*********************
      * Solve
      ********************/
