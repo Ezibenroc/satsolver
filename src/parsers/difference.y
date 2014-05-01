@@ -29,7 +29,7 @@ std::vector<SPDA> literal_to_DA;
 
 %error-verbose
 
-%union { char *type_string; void *type_formula; int type_integer; int type_operator; void *type_atom; void *type_term; };
+%union { char *type_string; void *type_formula; int type_integer; int type_operator; void *type_atom; };
 
 %token VAR
 %token LEFT_PAREN RIGHT_PAREN
@@ -45,7 +45,6 @@ std::vector<SPDA> literal_to_DA;
 %type <type_operator> difference_operator
 %type <type_integer> INT
 %type <type_atom> difference_atom
-%type <type_term> term;
 
 %%
 whole_formula:
@@ -53,12 +52,12 @@ whole_formula:
     ;
 
 difference_operator:
-      LOWER { $$ = LOWER; }
-    | GREATER { $$ = GREATER; }
-    | LEQ { $$ = LEQ; }
-    | GEQ { $$ = GEQ; }
-    | EQUAL { $$ = EQUAL; }
-    | UNEQUAL { $$ = UNEQUAL; }
+      LOWER { $$ = theorysolver::DifferenceAtom::LOWER; }
+    | GREATER { $$ = theorysolver::DifferenceAtom::GREATER; }
+    | LEQ { $$ = theorysolver::DifferenceAtom::LEQ; }
+    | GEQ { $$ = theorysolver::DifferenceAtom::GEQ; }
+    | EQUAL { $$ = theorysolver::DifferenceAtom::EQUAL; }
+    | UNEQUAL { $$ = theorysolver::DifferenceAtom::UNEQUAL; }
     ;
 
 difference_atom:

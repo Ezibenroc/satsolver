@@ -66,8 +66,8 @@ argument_list:
     ;
 
 congruence_operator:
-      EQUAL { $$ = EQUAL; }
-    | UNEQUAL { $$ = UNEQUAL; }
+      EQUAL { $$ = theorysolver::CongruenceAtom::EQUAL; }
+    | UNEQUAL { $$ = theorysolver::CongruenceAtom::UNEQUAL; }
     ;
 
 congruence_atom:

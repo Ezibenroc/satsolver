@@ -1,3 +1,4 @@
+#include <cassert>
 #include "structures/difference_atom.h"
 
 using namespace theorysolver;
@@ -19,6 +20,7 @@ std::string DifferenceAtom::to_string() const {
         case GEQ: op = ">="; break;
         case EQUAL: op = "="; break;
         case UNEQUAL: op = "!="; break;
+        default: assert(false);
     }
     s += op + " " + std::to_string(n);
     return s;
