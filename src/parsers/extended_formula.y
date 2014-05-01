@@ -20,6 +20,9 @@
 
 extern "C" {
 int yylex(void);
+
+extern int yylineno;
+
 int yyerror(const char *);
 }
 
@@ -30,6 +33,8 @@ std::vector<SPCA> literal_to_CA;
 SPDA difference_atom;
 
 %}
+
+%error-verbose
 
 %union { char *type_string; void *type_formula; int type_integer; int type_operator; void *type_atom; void *type_term; void *type_term_vector; };
 
@@ -124,6 +129,6 @@ formula:
 
 extern "C" {
 int yyerror (const char *msg) {
-    return fprintf (stderr, "YACC: %s\n", msg);
+    return fprintf (stderr, "YACC (line %d) : %s\n", yylineno, msg);
 }
 }
