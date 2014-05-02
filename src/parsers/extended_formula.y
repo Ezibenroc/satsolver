@@ -40,7 +40,7 @@ whole_formula:
 
 
 atom:
-      VAR { $$ = new EF(EF::LITERAL, std::string($1)); }
+      VAR { $$ = new EF(EF::LITERAL, std::string($1)); free($1); }
     ;
 
 formula_not:

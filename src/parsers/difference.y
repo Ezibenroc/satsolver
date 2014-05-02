@@ -61,12 +61,12 @@ difference_operator:
     ;
 
 difference_atom:
-      VAR difference_operator INT { $$ = new DA(atoi($1+1), (theorysolver::DifferenceAtom::Operator) $2, $3); }
-    | VAR MINUS VAR difference_operator INT { $$ = new DA(atoi($1+1), atoi($3+1), (theorysolver::DifferenceAtom::Operator) $4, $5); }
+      VAR difference_operator INT { $$ = new DA(atoi($1+1), (theorysolver::DifferenceAtom::Operator) $2, $3); free($1); }
+    | VAR MINUS VAR difference_operator INT { $$ = new DA(atoi($1+1), atoi($3+1), (theorysolver::DifferenceAtom::Operator) $4, $5); free($1); free($3); }
     ;
 
 atom:
-      VAR { $$ = new EF(EF::LITERAL, std::string($1)); }
+      VAR { $$ = new EF(EF::LITERAL, std::string($1)); free($1); }
     | difference_atom {
          literal_to_DA.push_back(SPDA((DA*) $1));
          $$ = new EF(EF::LITERAL, "#" + std::to_string(literal_to_DA.size()));

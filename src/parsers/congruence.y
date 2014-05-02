@@ -77,7 +77,7 @@ congruence_atom:
 
 
 atom:
-      VAR { $$ = new EF(EF::LITERAL, std::string($1)); }
+      VAR { $$ = new EF(EF::LITERAL, std::string($1)); free($1); }
     | congruence_atom {
          literal_to_CA.push_back(SPCA((CA*) $1));
          $$ = new EF(EF::LITERAL, "#" + std::to_string(literal_to_CA.size()));
