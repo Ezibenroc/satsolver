@@ -43,7 +43,15 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
     if (VERBOSE || DISPLAY_ATOMS) {
         std::cout << "Atoms:" << std::endl;
         for (unsigned int i=0; i<literal_to_DA.size(); i++)
-            std::cout << "\t#" << i << ": " << literal_to_DA[i]->to_string() << std::endl;
+            std::cout << "\t#" << i+1 << ": " << literal_to_DA[i]->to_string() << std::endl;
+    }
+    ext_formula = theorysolver::DifferenceAssistant::canonize_formula(ext_formula, literal_to_DA);
+    if (VERBOSE || DISPLAY_FORMULA)
+        std::cout << "Canonized formula as: " << ext_formula->to_string() << std::endl;
+    if (VERBOSE || DISPLAY_ATOMS) {
+        std::cout << "Atoms:" << std::endl;
+        for (unsigned int i=0; i<literal_to_DA.size(); i++)
+            std::cout << "\t#" << i+1 << ": " << literal_to_DA[i]->to_string() << std::endl;
     }
     if (!tseitin_reduction(DISPLAY_SAT, ext_formula, name_to_variable, formula)) {
         // The formula is always false
@@ -68,8 +76,17 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
      ********************/
     if (VERBOSE)
         std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
+    for (auto i : *name_to_variable)
+        std::cout << i.first << ": " << i.second << std::endl;
     for (auto literal : *literals) {
-        std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
+        try {
+            std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
+        }
+        catch (std::out_of_range) {
+            int opposite_literal = static_cast<int>(literal_to_DA[atoi(literal.c_str()+1)-1]->opposite_id);
+            std::cout << literal << " (inferred from ~#" << opposite_literal << ")" << " = ";
+            std::cout << (sat_solution->is_true(name_to_variable->at("#" + std::to_string(opposite_literal))) ? "true" : "false") << std::endl;
+        }
     }
     delete assistant;
 }
