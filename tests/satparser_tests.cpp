@@ -15,7 +15,7 @@ void SatParserTests::testBasic() {
     std::istringstream &stream2 = stream;
     std::vector<std::shared_ptr<satsolver::Clause>> clauses;
     std::set<std::set<int>> clauses_set;
-    satsolver::Formula *formula;
+    std::shared_ptr<satsolver::Formula> formula;
     satsolver::SatParser *parser;
     parser = new satsolver::SatParser(stream2);
     CPPUNIT_ASSERT_NO_THROW(parser->parse());
@@ -32,7 +32,6 @@ void SatParserTests::testBasic() {
     std::set<int> *set = formula->get_aff()->to_set();
     CPPUNIT_ASSERT(*set == std::set<int>({3}));
     delete parser;
-    delete formula;
     delete set;
 }
 void SatParserTests::testExtraWhitespaces() {
@@ -46,7 +45,6 @@ void SatParserTests::testExtraWhitespaces() {
     CPPUNIT_ASSERT(clauses[0]->to_set() == std::set<int>({3}));
     CPPUNIT_ASSERT(clauses[1]->to_set() == std::set<int>({1, 2, 4}));
     CPPUNIT_ASSERT(clauses[2]->to_set() == std::set<int>({1, 5}));
-    delete parser->get_formula();
     delete parser;
 }
 

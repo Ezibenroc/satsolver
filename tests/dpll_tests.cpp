@@ -28,7 +28,7 @@ void DpllTests::testBasicUsage() {
 		         *c7=new Clause(3, {1, -2, -3}), *c8=new Clause(3, {-1, -2, -3});
 		  std::vector<std::shared_ptr<Clause>> clauses;
 		  std::vector<std::shared_ptr<Clause>> clauses2 ;
-		  Formula *f;
+          std::shared_ptr<Formula> f;
 		  Affectation *solution;
 		  clauses.push_back(std::shared_ptr<Clause>(c1));
 		  clauses.push_back(std::shared_ptr<Clause>(c2));
@@ -45,15 +45,13 @@ void DpllTests::testBasicUsage() {
 		  clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c6)));
 		  clauses2.push_back(std::shared_ptr<Clause>(c7));
 		  clauses2.push_back(std::shared_ptr<Clause>(new Clause(*c8)));   
-		  f = new Formula(clauses, 3);
+		  f = std::make_shared<Formula>(clauses, 3);
 		  solution = solve(f);
 		  CPPUNIT_ASSERT(solution->is_false(1));
 		  CPPUNIT_ASSERT(solution->is_true(2));
 		  CPPUNIT_ASSERT(solution->is_true(3));
-		  delete f ;
-		  f = new Formula(clauses2, 3);
+		  f = std::make_shared<Formula>(clauses2, 3);
 		  CPPUNIT_ASSERT_THROW(solve(f), Conflict);
-		  delete f ;
 }
 void DpllTests::testBasicUsageWithWL() {
     WITH_WL = true;

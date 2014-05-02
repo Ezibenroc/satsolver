@@ -62,12 +62,12 @@ unsigned int cl_interac(const Deductions &deductions, const Affectation &aff, in
 }
 
 
-Affectation* satsolver::solve(Formula *formula) {
+Affectation* satsolver::solve(std::shared_ptr<Formula> formula) {
     theorysolver::VoidAssistant assistant;
     return satsolver::solve(formula, &assistant);
 }
 
-Affectation* satsolver::solve(Formula *formula, theorysolver::AbstractAssistant *assistant) {
+Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::AbstractAssistant *assistant) {
     int literal, literal_sav=0;
     Clause learned_clause(formula->get_nb_variables(), std::unordered_set<int>());
     unsigned int nb_learned_clauses=0, nb_learned_literals=0;

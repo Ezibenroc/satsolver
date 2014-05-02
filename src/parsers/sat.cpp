@@ -26,7 +26,7 @@ void SatParser::parse() {
     enum SatParser::State state = WAITING_FOR_HEADER;
     while (state != SatParser::END_OF_FILE)
         state = this->transition(state);
-    this->formula = new Formula(this->clauses, this->variables_count);
+    this->formula = std::make_shared<Formula>(this->clauses, this->variables_count);
 }
 
 enum SatParser::State SatParser::transition(enum SatParser::State state) {
@@ -113,7 +113,7 @@ enum SatParser::State SatParser::transition(enum SatParser::State state) {
 std::vector<std::shared_ptr<Clause>> SatParser::get_clauses() {
     return this->clauses;
 }
-Formula* SatParser::get_formula() {
+std::shared_ptr<Formula> SatParser::get_formula() {
     return this->formula;
 }
 int SatParser::get_variables_count() const {

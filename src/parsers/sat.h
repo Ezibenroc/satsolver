@@ -5,6 +5,7 @@
 #include <istream>
 #include <vector>
 #include <string>
+#include <memory>
 #include <unordered_set>
 #include <exception>
 
@@ -37,7 +38,7 @@ class SatParser : public AbstractParser {
         std::vector<std::shared_ptr<Clause>> clauses;
         int variables_count, clauses_count;
         std::unordered_set<int> literals;
-        Formula *formula;
+        std::shared_ptr<Formula> formula;
 
         enum State transition(enum State);
 
@@ -50,7 +51,7 @@ class SatParser : public AbstractParser {
         virtual void parse();
 
         std::vector<std::shared_ptr<Clause>> get_clauses();
-        Formula* get_formula();
+        std::shared_ptr<Formula> get_formula();
         int get_variables_count() const;
         int get_clauses_count() const;
 };

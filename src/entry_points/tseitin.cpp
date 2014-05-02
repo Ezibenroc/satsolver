@@ -51,7 +51,7 @@ void parser_result(SPEF ext_formula) {
      * Solve
      ********************/
     try {
-        sat_solution = satsolver::solve(&*formula);
+        sat_solution = satsolver::solve(formula);
     }
     catch (satsolver::Conflict) {
         std::cout << "s UNSATISFIABLE" << std::endl;

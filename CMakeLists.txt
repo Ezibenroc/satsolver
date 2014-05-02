@@ -100,6 +100,7 @@ set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BI
 #########
 
 add_library(VoidAssistant src/solvers/void_assistant.cpp)
+add_library(DifferenceAssistant src/solvers/difference_assistant.cpp)
 
 add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Structures VoidAssistant)
@@ -126,7 +127,7 @@ add_executable(tseitin src/entry_points/tseitin.cpp)
 target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL ExtendedFormulaParser Tseitin)
 
 add_executable(resol_diff src/entry_points/resol_diff.cpp)
-target_link_libraries(resol_diff CommandLineParser ExtendedFormula Formula DPLL DifferenceParser Tseitin)
+target_link_libraries(resol_diff CommandLineParser ExtendedFormula Formula DPLL DifferenceParser Tseitin DifferenceAssistant)
 
 
 

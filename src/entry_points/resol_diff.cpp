@@ -8,17 +8,15 @@
 #include "parsers/cli.h"
 #include "solvers/dpll.h"
 #include "solvers/tseitin.h"
-#include "structures/congruence_atom.h"
 #include "structures/difference_atom.h"
 #include "structures/extended_formula.h"
+#include "solvers/difference_assistant.h"
 #include "extended_formula.y.hpp"
 
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
 #define DA theorysolver::DifferenceAtom
 #define SPDA std::shared_ptr<DA>
-#define CA theorysolver::CongruenceAtom
-#define SPCA std::shared_ptr<CA>
 
 extern FILE *yyin;
 extern int yyparse();
@@ -34,6 +32,7 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
     /*********************
      * Reduce
      ********************/
+    theorysolver::DifferenceAssistant *assistant;
     satsolver::Affectation *sat_solution;
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
     std::shared_ptr<std::unordered_set<std::string>> literals = ext_formula->get_literals();
@@ -53,11 +52,12 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
         std::cout << "s UNSATISFIABLE" << std::endl;
         return;
     }
+    assistant = new theorysolver::DifferenceAssistant(literal_to_DA, formula);
     /*********************
      * Solve
      ********************/
     try {
-        sat_solution = satsolver::solve(&*formula);
+        sat_solution = satsolver::solve(formula);
     }
     catch (satsolver::Conflict) {
         std::cout << "s UNSATISFIABLE" << std::endl;
@@ -71,6 +71,7 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
     for (auto literal : *literals) {
         std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
     }
+    delete assistant;
 }
 
 int main (int argc, char *argv[]) {

@@ -121,7 +121,7 @@ std::shared_ptr<graphsolver::ColorAffectation> graphsolver::solve_colors(int nb_
         }
         std::cout << "c End of formula\n" << std::endl ;
     }
-    sat_solution = satsolver::solve(&*formula); // May raise a satsolver::Conflict
+    sat_solution = satsolver::solve(formula); // May raise a satsolver::Conflict
     if (VERBOSE)
         std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
     color_affectation = ColorAffectation::from_sat_solution(sat_solution, name_to_variable, graph->get_nodes_count(), nb_bits);

@@ -20,7 +20,7 @@ satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 int main(int argc, char *argv[]) {
     srand(static_cast<unsigned int>(time(NULL)));
     satsolver::SatParser *parser;
-    satsolver::Formula *formula;
+    std::shared_ptr<satsolver::Formula> formula;
     satsolver::Affectation *solution;
     std::set<int> *solution_set;
     std::set<int>::iterator solution_set_iterator;
@@ -75,6 +75,5 @@ int main(int argc, char *argv[]) {
         delete input;
     delete parser;
     delete solution_set ;
-    delete formula;
     return 0;
 }

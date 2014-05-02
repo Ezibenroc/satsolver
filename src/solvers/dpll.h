@@ -7,8 +7,8 @@
 
 namespace satsolver {
 
-    Affectation* solve(Formula *formula);
-    Affectation* solve(Formula *formula, theorysolver::AbstractAssistant *assistant);
+    Affectation* solve(std::shared_ptr<Formula> formula);
+    Affectation* solve(std::shared_ptr<Formula> formula, theorysolver::AbstractAssistant *assistant);
 
 
 }

@@ -231,7 +231,7 @@ void StructuresTests::testExtendedFormula() {
     CPPUNIT_ASSERT(variable_to_literal);
     CPPUNIT_ASSERT(variable_to_literal->size() >= 2);
     CPPUNIT_ASSERT(variable_to_literal->find("foo") != variable_to_literal->end());
-    Affectation *sat_solution = satsolver::solve(&*formula);
+    Affectation *sat_solution = satsolver::solve(formula);
     CPPUNIT_ASSERT(sat_solution->is_true(variable_to_literal->at("foo")));
 
     extended_formula =
@@ -248,7 +248,7 @@ void StructuresTests::testExtendedFormula() {
     variable_to_literal->clear();
     CPPUNIT_ASSERT_THROW((
         formula = extended_formula->reduce_to_formula(&variable_to_literal),
-        satsolver::solve(&*formula)), satsolver::Conflict);
+        satsolver::solve(formula)), satsolver::Conflict);
 
 
 
@@ -265,7 +265,7 @@ void StructuresTests::testExtendedFormula() {
             ));
     variable_to_literal->clear();
     formula = extended_formula->reduce_to_formula(&variable_to_literal);
-    sat_solution = satsolver::solve(&*formula);
+    sat_solution = satsolver::solve(formula);
     CPPUNIT_ASSERT(sat_solution->is_true(variable_to_literal->at("foo")));
 
     extended_formula =
@@ -281,7 +281,7 @@ void StructuresTests::testExtendedFormula() {
             ));
     variable_to_literal->clear();
     formula = extended_formula->reduce_to_formula(&variable_to_literal);
-    sat_solution = satsolver::solve(&*formula);
+    sat_solution = satsolver::solve(formula);
     CPPUNIT_ASSERT(sat_solution->is_false(variable_to_literal->at("foo")));
     CPPUNIT_ASSERT(sat_solution->is_true(variable_to_literal->at("bar")));
 
@@ -302,7 +302,7 @@ void StructuresTests::testExtendedFormula() {
     variable_to_literal->clear();
     CPPUNIT_ASSERT_THROW((
         formula = extended_formula->reduce_to_formula(&variable_to_literal),
-        satsolver::solve(&*formula)), satsolver::Conflict);
+        satsolver::solve(formula)), satsolver::Conflict);
 }
 
 void StructuresTests::testExtendedFormulaSimplification() {
