@@ -63,6 +63,11 @@ class ExtendedFormula {
         std::shared_ptr<ExtendedFormula> simplify() const;
         // Returns a set of all literals in the formula.
         std::shared_ptr<std::unordered_set<std::string>> get_literals() const;
+
+        Type get_type() const { return this->type; }
+        std::shared_ptr<ExtendedFormula> get_f1() const { return this->f1; }
+        std::shared_ptr<ExtendedFormula> get_f2() const { return this->f2; }
+        std::string get_literal() const { return this->literal; }
 };
 
 }

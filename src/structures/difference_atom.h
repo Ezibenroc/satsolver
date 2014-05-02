@@ -15,6 +15,8 @@ class DifferenceAtom {
         Operator op;
         unsigned int n;
 
+        unsigned long int opposite_id;
+
         DifferenceAtom(unsigned int i, enum Operator op, unsigned int n);
         DifferenceAtom(unsigned int i, unsigned int j, enum Operator op, unsigned int n);
 
