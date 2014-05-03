@@ -64,10 +64,14 @@ class ExtendedFormula {
         // Returns a set of all literals in the formula.
         std::shared_ptr<std::unordered_set<std::string>> get_literals() const;
 
+        int get_id() const { return this->id; }
         Type get_type() const { return this->type; }
         std::shared_ptr<ExtendedFormula> get_f1() const { return this->f1; }
         std::shared_ptr<ExtendedFormula> get_f2() const { return this->f2; }
         std::string get_literal() const { return this->literal; }
+
+        bool is_true(Affectation *aff, std::shared_ptr<std::map<std::string, int>> name_to_variable) const;
+        bool is_false(Affectation *aff, std::shared_ptr<std::map<std::string, int>> name_to_variable) const;
 };
 
 }

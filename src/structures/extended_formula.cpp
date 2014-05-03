@@ -382,3 +382,46 @@ std::shared_ptr<std::unordered_set<std::string>> EF::get_literals() const {
     }
     assert(false);
 }
+
+bool EF::is_true(Affectation *aff, std::shared_ptr<std::map<std::string, int>> name_to_variable) const {
+    switch (this->type) {
+        case EF::TRUE:
+            return true;
+        case EF::FALSE:
+            return false;
+        case EF::LITERAL:
+            return aff->is_true(name_to_variable->at(this->literal));
+        case EF::NOT:
+            return this->f1->is_false(aff, name_to_variable);
+        case EF::AND:
+            return this->f1->is_true(aff, name_to_variable) && this->f2->is_true(aff, name_to_variable);
+        case EF::OR:
+            return this->f1->is_true(aff, name_to_variable) || this->f2->is_true(aff, name_to_variable);
+        case EF::XOR: // Note: Does not handle unknown literals well
+            return this->f1->is_true(aff, name_to_variable) ^ this->f2->is_true(aff, name_to_variable);
+        case EF::IMPLIES:
+            return this->f1->is_false(aff, name_to_variable) || this->f2->is_true(aff, name_to_variable);
+    }
+    assert(false);
+}
+bool EF::is_false(Affectation *aff, std::shared_ptr<std::map<std::string, int>> name_to_variable) const {
+    switch (this->type) {
+        case EF::TRUE:
+            return false;
+        case EF::FALSE:
+            return true;
+        case EF::LITERAL:
+            return aff->is_false(name_to_variable->at(this->literal));
+        case EF::NOT:
+            return this->f1->is_true(aff, name_to_variable);
+        case EF::AND:
+            return this->f1->is_false(aff, name_to_variable) || this->f2->is_false(aff, name_to_variable);
+        case EF::OR:
+            return this->f1->is_false(aff, name_to_variable) && this->f2->is_false(aff, name_to_variable);
+        case EF::XOR: // Note: Does not handle unknown literals well
+            return !(this->f1->is_true(aff, name_to_variable) ^ this->f2->is_true(aff, name_to_variable));
+        case EF::IMPLIES:
+            return this->f1->is_true(aff, name_to_variable) && this->f2->is_false(aff, name_to_variable);
+    }
+    assert(false);
+}
