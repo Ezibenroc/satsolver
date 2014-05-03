@@ -4,9 +4,9 @@
 using namespace theorysolver;
 
 
-DifferenceAtom::DifferenceAtom(unsigned int i, enum Operator op, unsigned int n) : i(i), j(0), op(op), n(n), opposite_id(0) {
+DifferenceAtom::DifferenceAtom(unsigned int i, enum Operator op, int n) : i(i), j(0), op(op), n(n), canonical(NULL) {
 }
-DifferenceAtom::DifferenceAtom(unsigned int i, unsigned int j, enum Operator op, unsigned int n) : i(i), j(j), op(op), n(n), opposite_id(0) {
+DifferenceAtom::DifferenceAtom(unsigned int i, unsigned int j, enum Operator op, int n) : i(i), j(j), op(op), n(n), canonical(NULL) {
 }
 
 std::string DifferenceAtom::to_string() const {

@@ -2,6 +2,7 @@
 #define STRUCTURES_DIFFERENCE_ATOM_H
 
 #include <string>
+#include "structures/extended_formula.h"
 
 namespace theorysolver {
 
@@ -13,12 +14,12 @@ class DifferenceAtom {
 
         unsigned int i, j;
         Operator op;
-        unsigned int n;
+        int n;
 
-        unsigned long int opposite_id;
+        std::shared_ptr<satsolver::ExtendedFormula> canonical;
 
-        DifferenceAtom(unsigned int i, enum Operator op, unsigned int n);
-        DifferenceAtom(unsigned int i, unsigned int j, enum Operator op, unsigned int n);
+        DifferenceAtom(unsigned int i, enum Operator op, int n);
+        DifferenceAtom(unsigned int i, unsigned int j, enum Operator op, int n);
 
         std::string to_string() const;
 };

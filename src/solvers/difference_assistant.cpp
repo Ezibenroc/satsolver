@@ -9,49 +9,53 @@ using namespace theorysolver;
 #define DA DifferenceAtom
 #define SPDA std::shared_ptr<DA>
 
+// Return a formula that uses only atoms in the canonical “xi-xj<=n” form.
+// Note that it may use literal #0; for instance, xi >= n is converted to
+// x0 - xi <= -n, so we will have to make sure x0 is always equal to 0.
 SPEF canonize_atom(SPDA atom, std::vector<SPDA> &literal_to_DA, std::string literal) {
-    unsigned long int id = atom->opposite_id;
+    unsigned long int id1, id2;
     assert(atom);
     switch (atom->op) {
-        case DA::LOWER:
-        case DA::LEQ:
-        case DA::EQUAL:
-            return SPEF(new EF(EF::LITERAL, literal));
-        case DA::GREATER:
-            if (!id) {
-                literal_to_DA.push_back(SPDA(new DA(atom->i, atom->j, DA::GEQ, atom->n)));
-                id = literal_to_DA.size();
-                atom->opposite_id = id;
-            }
-            return SPEF(new EF(EF::NOT,
-                        SPEF(new EF(EF::LITERAL,
-                                    "#" + std::to_string(id)
-                        ))
+        case DA::LOWER: // xi - xj < n   -->   xi - xj <= n-1
+            literal_to_DA.push_back(SPDA(new DA(atom->i, atom->j, DA::LEQ, atom->n-1)));
+            id1 = literal_to_DA.size();
+            atom->canonical = SPEF(new EF(EF::LITERAL, "#" + std::to_string(id1)));
+            break;
+        case DA::LEQ: // xi - xj <= n   -->   xi - xj <= n
+            atom->canonical = SPEF(new EF(EF::LITERAL, literal));
+            break;
+        case DA::GREATER: // xi - xj > n   -->   ~(xi - xj <= n)
+            literal_to_DA.push_back(SPDA(new DA(atom->i, atom->j, DA::LEQ, atom->n)));
+            id1 = literal_to_DA.size();
+            atom->canonical = SPEF(new EF(EF::NOT,
+                        SPEF(new EF(EF::LITERAL, "#" + std::to_string(id1)))
                    ));
-        case DA::GEQ:
-            if (!id) {
-                literal_to_DA.push_back(SPDA(new DA(atom->i, atom->j, DA::LOWER, atom->n)));
-                id = literal_to_DA.size();
-                atom->opposite_id = id;
-            }
-            return SPEF(new EF(EF::NOT,
-                        SPEF(new EF(EF::LITERAL,
-                                    "#" + std::to_string(id)
-                        ))
-                   ));
-        case DA::UNEQUAL:
-            if (!id) {
-                literal_to_DA.push_back(SPDA(new DA(atom->i, atom->j, DA::EQUAL, atom->n)));
-                id = literal_to_DA.size();
-                atom->opposite_id = id;
-            }
-            return SPEF(new EF(EF::NOT,
-                        SPEF(new EF(EF::LITERAL,
-                                    "#" + std::to_string(id)
-                        ))
-                   ));
+            break;
+        case DA::GEQ: // xi - xj >= n   -->   xj - xi <= -n
+            literal_to_DA.push_back(SPDA(new DA(atom->j, atom->i, DA::LEQ, -atom->n)));
+            id1 = literal_to_DA.size();
+            atom->canonical = SPEF(new EF(EF::LITERAL, "#" + std::to_string(id1)));
+            break;
+        case DA::EQUAL: // xi - xj = n   -->   xi - xj <= n  ∧  xj - xi <= -n
+            literal_to_DA.push_back(SPDA(new DA(atom->i, atom->j, DA::LEQ, atom->n)));
+            id1 = literal_to_DA.size();
+            literal_to_DA.push_back(SPDA(new DA(atom->j, atom->i, DA::LEQ, -atom->n)));
+            id2 = literal_to_DA.size();
+            atom->canonical = SPEF(new EF(EF::AND,
+                SPEF(new EF(EF::LITERAL, "#" + std::to_string(id1))),
+                SPEF(new EF(EF::LITERAL, "#" + std::to_string(id2)))));
+            break;
+        case DA::UNEQUAL: // xi - xj != n   -->   xi - xj <= n-1  ∨  xj - xi <= -n-1
+            literal_to_DA.push_back(SPDA(new DA(atom->i, atom->j, DA::LEQ, atom->n-1)));
+            id1 = literal_to_DA.size();
+            literal_to_DA.push_back(SPDA(new DA(atom->j, atom->i, DA::LEQ, -atom->n-1)));
+            id2 = literal_to_DA.size();
+            atom->canonical = SPEF(new EF(EF::OR,
+                SPEF(new EF(EF::LITERAL, "#" + std::to_string(id1))),
+                SPEF(new EF(EF::LITERAL, "#" + std::to_string(id2)))));
+            break;
     }
-    assert(false);
+    return atom->canonical;
 }
 
 SPEF DifferenceAssistant::canonize_formula(SPEF formula, std::vector<SPDA> &literal_to_DA) {

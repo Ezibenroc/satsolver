@@ -76,16 +76,14 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
      ********************/
     if (VERBOSE)
         std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
-    for (auto i : *name_to_variable)
-        std::cout << i.first << ": " << i.second << std::endl;
     for (auto literal : *literals) {
         try {
             std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
         }
         catch (std::out_of_range) {
-            int opposite_literal = static_cast<int>(literal_to_DA[atoi(literal.c_str()+1)-1]->opposite_id);
-            std::cout << literal << " (inferred from ~#" << opposite_literal << ")" << " = ";
-            std::cout << (sat_solution->is_true(name_to_variable->at("#" + std::to_string(opposite_literal))) ? "true" : "false") << std::endl;
+            SPEF f = literal_to_DA[atoi(literal.c_str()+1)-1]->canonical;
+            std::cout << literal << " (inferred from " << f->to_string() << ")" << " = ";
+            std::cout << (f->is_true(formula->get_aff(), name_to_variable) ? "true" : "false") << std::endl;
         }
     }
     delete assistant;
