@@ -9,6 +9,7 @@ class StructuresTests : public CppUnit::TestFixture {
         void testAffectationCreationUsage();
         void testSetTrueClause() ;
         void testFormula() ;
+        void testAdjGraph();
         void testExtendedFormula();
         void testExtendedFormulaComparison();
         void testExtendedFormulaSimplification();

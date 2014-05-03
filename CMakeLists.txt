@@ -48,7 +48,7 @@ add_library(CongruenceAtom src/structures/congruence_atom.cpp)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp "")
 add_library(Structures ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
-target_link_libraries(Structures Formula Clause Affectation ColorAffectation Graph ExtendedFormula CLProof Deductions DifferenceAtom CongruenceAtom)
+target_link_libraries(Structures Formula Clause Affectation ColorAffectation Graph AdjGraph ExtendedFormula CLProof Deductions DifferenceAtom CongruenceAtom)
 set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/structures.cpp)
 
 

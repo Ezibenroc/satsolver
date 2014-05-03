@@ -24,6 +24,11 @@ class AdjGraph {
         void delete_edge(unsigned int u, unsigned int v);
         const adj_list& get_adj_list(unsigned int u) const;
 
+        // Returns a path from a node to another with a minimum weight, if any
+        // (returns an empty list otherwise)
+        // Assumes there is no negative cycle in the graph.
+        std::pair<std::list<unsigned int>, int> find_lowest_path(unsigned int from, unsigned int to) const;
+
 };
 
 }

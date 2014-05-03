@@ -15,6 +15,7 @@
 #include "structures/formula.h"
 #include "structures/affectation.h"
 #include "structures/extended_formula.h"
+#include "structures/adj_graph.h"
 #include "solvers/dpll.h"
 #include "structures_tests.h"
 #include "config.h"
@@ -211,6 +212,30 @@ void StructuresTests::testFormula() {
 
 }
 
+void StructuresTests::testAdjGraph() {
+    theorysolver::AdjGraph g;
+    std::pair<std::list<unsigned int>, int> r;
+    std::list<unsigned int>::iterator it;
+    g.add_edge(4, 6, 1);
+    g.add_edge(6, 2, 4);
+    g.add_edge(4, 3, -1);
+    g.add_edge(3, 1, 2);
+    g.add_edge(1, 2, 1);
+    r = g.find_lowest_path(4, 2);
+    it = r.first.begin();
+    CPPUNIT_ASSERT(it != r.first.end());
+    CPPUNIT_ASSERT(*it == 3);
+    it++;
+    CPPUNIT_ASSERT(it != r.first.end());
+    CPPUNIT_ASSERT(*it == 1);
+    it++;
+    CPPUNIT_ASSERT(it != r.first.end());
+    CPPUNIT_ASSERT(*it == 2);
+    it++;
+    CPPUNIT_ASSERT(it == r.first.end());
+    CPPUNIT_ASSERT(r.second == 2);
+}
+
 void StructuresTests::testExtendedFormula() {
     std::shared_ptr<std::map<std::string, int>> variable_to_literal;
     std::shared_ptr<Formula> formula;
@@ -333,6 +358,8 @@ CppUnit::Test* StructuresTests::suite() {
                 &StructuresTests::testSetTrueClause));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testFormula",
                 &StructuresTests::testFormula));
+    suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testAdjGraph",
+                &StructuresTests::testAdjGraph));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtendedFormula",
                 &StructuresTests::testExtendedFormula));
     suite->addTest(new CppUnit::TestCaller<StructuresTests>("StructuresTests_testExtendedFormulaComparison",
