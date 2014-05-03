@@ -234,6 +234,18 @@ void StructuresTests::testAdjGraph() {
     it++;
     CPPUNIT_ASSERT(it == r.first.end());
     CPPUNIT_ASSERT(r.second == 2);
+
+    g.delete_edge(3, 1);
+    r = g.find_lowest_path(4, 2);
+    it = r.first.begin();
+    CPPUNIT_ASSERT(it != r.first.end());
+    CPPUNIT_ASSERT(*it == 6);
+    it++;
+    CPPUNIT_ASSERT(it != r.first.end());
+    CPPUNIT_ASSERT(*it == 2);
+    it++;
+    CPPUNIT_ASSERT(it == r.first.end());
+    CPPUNIT_ASSERT(r.second == 5);
 }
 
 void StructuresTests::testExtendedFormula() {
