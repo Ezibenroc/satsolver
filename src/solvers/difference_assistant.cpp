@@ -94,7 +94,7 @@ bool DifferenceAssistant::on_flip(unsigned int variable) {
     atom = DifferenceAtom::SPDA_from_literal(this->literal_to_DA, this->variable_to_name, variable);
     i = atom->i;
     j = atom->j;
-    n = atom->j;
+    n = atom->n;
     if (this->formula->get_aff()->is_true(variable)) {
         r = this->adj_graph.find_lowest_path(j, i);
         this->adj_graph.add_edge(i, j, atom_id, n);
