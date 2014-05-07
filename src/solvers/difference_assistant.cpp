@@ -83,7 +83,7 @@ SPEF DifferenceAssistant::canonize_formula(SPEF formula, std::vector<SPDA> &lite
 
 
 DifferenceAssistant::DifferenceAssistant(std::vector<SPDA> &literal_to_DA, std::shared_ptr<std::map<std::string, int>> name_to_variable, std::shared_ptr<satsolver::Formula> formula) :
-    formula(formula), literal_to_DA(literal_to_DA), name_to_variable(*name_to_variable), variable_to_name(), adj_graph() {
+    formula(formula), literal_to_DA(literal_to_DA), name_to_variable(*name_to_variable), variable_to_name(), adj_graph(), consistent_state(true), vertex_of_cycle(0, 0) {
     for (auto it : *name_to_variable)
         this->variable_to_name.insert(make_pair(it.second, it.first));
 }
@@ -107,7 +107,9 @@ bool DifferenceAssistant::on_flip(unsigned int variable) {
         this->adj_graph.add_edge(i, j, atom_id, n);
         if (r.second < n) {
             this->learn_clause(r.first, atom_id);
-            return false;
+            assert(this->consistent_state);
+            this->vertex_of_cycle = std::make_pair(i, j);
+            this->consistent_state = false;
         }
         this->adj_graph.delete_edge(j, i);
     }
@@ -116,16 +118,30 @@ bool DifferenceAssistant::on_flip(unsigned int variable) {
         this->adj_graph.add_edge(j, i, -atom_id, -n-1);
         if (r.second < n) {
             this->learn_clause(r.first, -atom_id);
-            return false;
+            assert(this->consistent_state);
+            this->vertex_of_cycle = std::make_pair(j, i);
+            this->consistent_state = false;
         }
         // ~(xi - xj <= n) <-> (xj - xi <= -n-1)
         this->adj_graph.delete_edge(i, j);
     }
     else {
         this->adj_graph.delete_edge(i, j);
-        this->adj_graph.delete_edge(j, i);
+        if (!this->consistent_state) {
+            if (i == this->vertex_of_cycle.first && j == this->vertex_of_cycle.second)
+                this->consistent_state = true;
+            else {
+                r = this->adj_graph.find_lowest_path(this->vertex_of_cycle.second, this->vertex_of_cycle.first);
+                // u->v was part of all negative cycles of the graph.
+                // Search if there is no more negative cycle containing u->v.
+                if (r.second >= this->adj_graph.get_weight(this->vertex_of_cycle.first, this->vertex_of_cycle.second)) {
+                    this->consistent_state = false;
+                }
+            }
+
+        }
     }
-    return true;
+    return this->consistent_state;
 }
 
 int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
@@ -144,5 +160,5 @@ void DifferenceAssistant::learn_clause(std::list<std::pair<unsigned int, int>> &
 }
 
 bool DifferenceAssistant::is_state_consistent() {
-    return true;
+    return this->consistent_state;
 }

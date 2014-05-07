@@ -12,7 +12,7 @@
 
 namespace theorysolver {
 
-// An assistant for the equality theory
+// An assistant for the difference theory
 class DifferenceAssistant : public AbstractAssistant {
     private:
         std::shared_ptr<satsolver::Formula> formula;
@@ -20,6 +20,8 @@ class DifferenceAssistant : public AbstractAssistant {
         std::map<std::string, int> name_to_variable;
         std::map<int, std::string> variable_to_name;
         AdjGraph adj_graph;
+        bool consistent_state;
+        std::pair<unsigned int, unsigned int> vertex_of_cycle;
 
         int literal_from_atom_id(int atom_id) const;
     public:

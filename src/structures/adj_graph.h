@@ -23,6 +23,7 @@ class AdjGraph {
         void add_edge(unsigned int u, unsigned int v, int tag, int weight);
         void delete_edge(unsigned int u, unsigned int v);
         const adj_list& get_adj_list(unsigned int u) const;
+        int get_weight(unsigned int u, unsigned int v) const;
 
         // Returns a path from a node to another with a minimum weight, if any
         // (returns an empty list otherwise)

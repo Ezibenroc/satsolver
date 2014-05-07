@@ -39,6 +39,13 @@ const adj_list& AdjGraph::get_adj_list(unsigned int u) const {
     return this->adj_lists[u];
 }
 
+
+int AdjGraph::get_weight(unsigned int u, unsigned int v) const {
+    assert(this->adj_lists.size() == this->adj_list_links.size());
+    assert(u<this->adj_list_links.size() && v<this->adj_list_links[u].size());
+    return this->adj_list_links[u][v]->second.second;
+}
+
 std::pair<std::list<std::pair<unsigned int, int>>, int> AdjGraph::find_lowest_path(unsigned int from, unsigned int to) const {
     unsigned int u;
     unsigned long int nb_nodes = max(max(from, to)+1, this->adj_lists.size()+1);
