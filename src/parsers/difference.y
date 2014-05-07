@@ -23,7 +23,7 @@ int yyerror(const char *);
 
 void parser_result(SPEF formula, std::vector<SPDA> &literal_to_DA);
 
-std::vector<SPDA> literal_to_DA;
+theorysolver::DA_list literal_to_DA;
 
 %}
 
