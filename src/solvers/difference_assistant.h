@@ -21,7 +21,10 @@ class DifferenceAssistant : public AbstractAssistant {
         std::map<int, std::string> variable_to_name;
         AdjGraph adj_graph;
         bool consistent_state;
-        std::pair<unsigned int, unsigned int> vertex_of_cycle;
+        // As we forbid adding an edge when there is a negative cycle,
+        // the following edge belong to *all* possible negative cycles
+        // of the graphe.
+        std::pair<unsigned int, unsigned int> edge_of_cycle;
 
         int literal_from_atom_id(int atom_id) const;
     public:
