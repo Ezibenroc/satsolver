@@ -21,11 +21,13 @@ void print_space(int depth) {
         std::cout << "\t" ;
 }
 
-Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do(), ded(new Deductions(nb_variables)),ded_depth(0) {
+Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : Formula(v, nb_variables, NULL) {
+}
+Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables, std::vector<unsigned int> *affected_literals) : aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do(), ded(new Deductions(nb_variables)),ded_depth(0) { 
     for(auto c : this->clauses) {
         c->set_affectation(this->aff) ;
     }
-    this->clean() ;
+    this->clean(affected_literals) ;
     for(auto c : this->clauses) {
         if(c->get_size() == 0)
             throw Conflict() ;
@@ -341,7 +343,7 @@ bool to_delete(std::shared_ptr<Clause> c, std::unordered_set<int> &literals_to_d
     return false ;
 }
 
-void Formula::clean() {
+void Formula::clean(std::vector<unsigned int> *affected_literals) {
     // Affectation des monomes
     std::unordered_set<int> literals_to_delete = std::unordered_set<int>() ;
     int literal ;
@@ -355,6 +357,8 @@ void Formula::clean() {
         }
         if(literal) {
             this->aff->set_true(literal) ;
+            if (affected_literals)
+                affected_literals->push_back(abs(literal));
             this->mem.push_back(std::pair<int,bool>(literal,true)) ;
             literals_to_delete.insert(literal) ;
             for(auto c : this->clauses) {

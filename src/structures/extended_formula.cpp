@@ -182,6 +182,9 @@ void EF::reduce(std::vector<const EF*> *formulas, std::vector<std::vector<std::s
 
 
 std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::string, int>> *name_to_variable_ptr) const {
+    return this->reduce_to_formula(name_to_variable_ptr, NULL);
+}
+std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::string, int>> *name_to_variable_ptr, std::vector<unsigned int> *affected_literals) const {
     std::vector<std::vector<std::string>*> *raw_clauses = this->reduce_all();
     std::shared_ptr<std::map<std::string, int>> name_to_variable = std::make_shared<std::map<std::string, int>>();
     int nb_variables = 0;
@@ -229,7 +232,7 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
 
     if (name_to_variable_ptr)
         *name_to_variable_ptr = name_to_variable;
-    return std::shared_ptr<Formula>(new Formula(clauses, nb_variables));
+    return std::shared_ptr<Formula>(new Formula(clauses, nb_variables, affected_literals));
 
 
 }

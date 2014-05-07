@@ -46,6 +46,7 @@ class Formula {
 
     public :
         Formula(std::vector<std::shared_ptr<satsolver::Clause>> v, int nb_variables) ;
+        Formula(std::vector<std::shared_ptr<satsolver::Clause>> v, int nb_variables, std::vector<unsigned int> *affected_literals) ;
         Formula(const Formula&);
         Formula& operator=(const Formula &that);
         ~Formula() ;
@@ -114,7 +115,7 @@ class Formula {
         // Affecte tous les monomes
         // Assez lourd (nombre de clauses au carré fois le nombre de variables)
         // À utiliser seulement à l'initialisation
-        void clean() ;
+        void clean(std::vector<unsigned int> *affected_literals) ;
 
         // Renvoie la pile d'affectations
         // Ne pas utiliser en dehors des tests unitaires

@@ -102,6 +102,7 @@ set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BI
 
 add_library(VoidAssistant src/solvers/void_assistant.cpp)
 add_library(DifferenceAssistant src/solvers/difference_assistant.cpp)
+target_link_libraries(DifferenceAssistant Formula DifferenceAtom ExtendedFormula AdjGraph)
 
 add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Structures VoidAssistant)
@@ -114,7 +115,7 @@ target_link_libraries(GraphColorSolver Structures DPLL)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp "")
 add_library(Solvers ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp)
-target_link_libraries(Solvers DPLL GraphColorSolver)
+target_link_libraries(Solvers DifferenceAssistant DPLL GraphColorSolver Tseitin)
 set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp)
 
 
@@ -160,7 +161,7 @@ add_custom_target(Benchmarks ALL
 find_package(CppUnit)
 if (CPPUNIT_FOUND)
 
-    add_executable(testrunner tests/main.cpp tests/structures_tests.cpp tests/heuristics_tests.cpp tests/dpll_tests.cpp tests/satparser_tests tests/graphparser_tests.cpp tests/graphsolver_tests.cpp)
+    add_executable(testrunner tests/main.cpp tests/structures_tests.cpp tests/heuristics_tests.cpp tests/dpll_tests.cpp tests/satparser_tests tests/graphparser_tests.cpp tests/graphsolver_tests.cpp tests/theory_tests.cpp)
     target_link_libraries(testrunner Structures Parsers Solvers)
     target_link_libraries(testrunner cppunit)
 else (CPPUNIT_FOUND)

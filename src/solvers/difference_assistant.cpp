@@ -82,13 +82,65 @@ SPEF DifferenceAssistant::canonize_formula(SPEF formula, std::vector<SPDA> &lite
 }
 
 
-DifferenceAssistant::DifferenceAssistant(std::vector<SPDA> &literal_to_DA, std::shared_ptr<satsolver::Formula> formula) :
-    formula(formula), literal_to_DA(literal_to_DA) {
+DifferenceAssistant::DifferenceAssistant(std::vector<SPDA> &literal_to_DA, std::shared_ptr<std::map<std::string, int>> name_to_variable, std::shared_ptr<satsolver::Formula> formula) :
+    formula(formula), literal_to_DA(literal_to_DA), name_to_variable(*name_to_variable), variable_to_name(), adj_graph() {
+    for (auto it : *name_to_variable)
+        this->variable_to_name.insert(make_pair(it.second, it.first));
 }
 
 bool DifferenceAssistant::on_flip(unsigned int variable) {
-    (void) variable;
+    unsigned int atom_id;
+    unsigned int i, j;
+    int n;
+    std::pair<std::list<std::pair<unsigned int, int>>, int> r;
+    if (this->variable_to_name[variable].c_str()[0] != '#') {
+        return true; // We care only about variables matching atoms.
+    }
+    atom_id = atoi(this->variable_to_name[variable].c_str()+1);
+    assert(atom_id > 0);
+    assert(atom_id <= this->literal_to_DA.size());
+    i = this->literal_to_DA[atom_id-1]->i;
+    j = this->literal_to_DA[atom_id-1]->j;
+    n = this->literal_to_DA[atom_id-1]->n;
+    if (this->formula->get_aff()->is_true(variable)) {
+        r = this->adj_graph.find_lowest_path(j, i);
+        this->adj_graph.add_edge(i, j, atom_id, n);
+        if (r.second < n) {
+            this->learn_clause(r.first, atom_id);
+            return false;
+        }
+        this->adj_graph.delete_edge(j, i);
+    }
+    else if (this->formula->get_aff()->is_false(variable)) {
+        r = this->adj_graph.find_lowest_path(i, j);
+        this->adj_graph.add_edge(j, i, -atom_id, -n-1);
+        if (r.second < n) {
+            this->learn_clause(r.first, -atom_id);
+            return false;
+        }
+        // ~(xi - xj <= n) <-> (xj - xi <= -n-1)
+        this->adj_graph.delete_edge(i, j);
+    }
+    else {
+        this->adj_graph.delete_edge(i, j);
+        this->adj_graph.delete_edge(j, i);
+    }
     return true;
+}
+
+int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
+    if (atom_id > 0)
+        return this->name_to_variable.at("#" + std::to_string(abs(atom_id)));
+    else
+        return -this->name_to_variable.at("#" + std::to_string(abs(atom_id)));
+}
+
+void DifferenceAssistant::learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id) {
+    std::unordered_set<int> clause;
+    clause.insert(this->literal_from_atom_id(atom_id));
+    for (auto it : path)
+        clause.insert(this->literal_from_atom_id(it.second));
+    this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause));
 }
 
 bool DifferenceAssistant::is_state_consistent() {

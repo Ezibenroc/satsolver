@@ -1,16 +1,22 @@
+#include <cassert>
 #include <iostream>
 #include "solvers/tseitin.h"
 
 bool tseitin_reduction(bool DISPLAY_SAT, std::shared_ptr<satsolver::ExtendedFormula> ext_formula, std::shared_ptr<std::map<std::string, int>> &name_to_variable, std::shared_ptr<satsolver::Formula> &formula) {
+    return tseitin_reduction(DISPLAY_SAT, ext_formula, name_to_variable, formula, NULL);
+}
+bool tseitin_reduction(bool DISPLAY_SAT, std::shared_ptr<satsolver::ExtendedFormula> ext_formula, std::shared_ptr<std::map<std::string, int>> &name_to_variable, std::shared_ptr<satsolver::Formula> &formula, std::vector<unsigned int> *affected_literals) {
     ext_formula = ext_formula->simplify();
     if (VERBOSE)
         std::cout << "Reduction of formula to: " << ext_formula->to_string() << std::endl;
     try {
-        formula = ext_formula->reduce_to_formula(&name_to_variable);
+        formula = ext_formula->reduce_to_formula(&name_to_variable, affected_literals);
     }
     catch (satsolver::Conflict) {
         return false;
     }
+    if (!formula)
+        return false;
 
     if (VERBOSE)
         std::cout << "Reduction of formula to SAT: " << formula->to_string() << std::endl;

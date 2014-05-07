@@ -52,6 +52,7 @@ class ExtendedFormula {
         void reduce(std::vector<const ExtendedFormula*> *formulas, std::vector<std::vector<std::string>*> *clauses) const;
         // Calls reduce and returns a formula from it.
         std::shared_ptr<Formula> reduce_to_formula(std::shared_ptr<std::map<std::string, int>> *name_to_variable_ptr) const;
+        std::shared_ptr<Formula> reduce_to_formula(std::shared_ptr<std::map<std::string, int>> *name_to_variable_ptr, std::vector<unsigned int> *affected_literals) const;
 
         // Returns a readable string representing the extended formula.
         std::string to_string() const;

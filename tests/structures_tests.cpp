@@ -214,23 +214,26 @@ void StructuresTests::testFormula() {
 
 void StructuresTests::testAdjGraph() {
     theorysolver::AdjGraph g;
-    std::pair<std::list<unsigned int>, int> r;
-    std::list<unsigned int>::iterator it;
-    g.add_edge(4, 6, 1);
-    g.add_edge(6, 2, 4);
-    g.add_edge(4, 3, -1);
-    g.add_edge(3, 1, 2);
-    g.add_edge(1, 2, 1);
+    std::pair<std::list<std::pair<unsigned int, int>>, int> r;
+    std::list<std::pair<unsigned int, int>>::iterator it;
+    g.add_edge(4, 6, 10, 1);
+    g.add_edge(6, 2, 11, 4);
+    g.add_edge(4, 3, 12, -1);
+    g.add_edge(3, 1, 13, 2);
+    g.add_edge(1, 2, 14, 1);
     r = g.find_lowest_path(4, 2);
     it = r.first.begin();
     CPPUNIT_ASSERT(it != r.first.end());
-    CPPUNIT_ASSERT(*it == 3);
+    CPPUNIT_ASSERT(it->first == 3);
+    CPPUNIT_ASSERT(it->second == 12);
     it++;
     CPPUNIT_ASSERT(it != r.first.end());
-    CPPUNIT_ASSERT(*it == 1);
+    CPPUNIT_ASSERT(it->first == 1);
+    CPPUNIT_ASSERT(it->second == 13);
     it++;
     CPPUNIT_ASSERT(it != r.first.end());
-    CPPUNIT_ASSERT(*it == 2);
+    CPPUNIT_ASSERT(it->first == 2);
+    CPPUNIT_ASSERT(it->second == 14);
     it++;
     CPPUNIT_ASSERT(it == r.first.end());
     CPPUNIT_ASSERT(r.second == 2);
@@ -239,13 +242,19 @@ void StructuresTests::testAdjGraph() {
     r = g.find_lowest_path(4, 2);
     it = r.first.begin();
     CPPUNIT_ASSERT(it != r.first.end());
-    CPPUNIT_ASSERT(*it == 6);
+    CPPUNIT_ASSERT(it->first == 6);
+    CPPUNIT_ASSERT(it->second == 10);
     it++;
     CPPUNIT_ASSERT(it != r.first.end());
-    CPPUNIT_ASSERT(*it == 2);
+    CPPUNIT_ASSERT(it->first == 2);
+    CPPUNIT_ASSERT(it->second == 11);
     it++;
     CPPUNIT_ASSERT(it == r.first.end());
     CPPUNIT_ASSERT(r.second == 5);
+
+    r = g.find_lowest_path(2, 19);
+    r = g.find_lowest_path(10, 15);
+
 }
 
 void StructuresTests::testExtendedFormula() {

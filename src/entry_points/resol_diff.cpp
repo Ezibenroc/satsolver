@@ -34,7 +34,9 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
      ********************/
     theorysolver::DifferenceAssistant *assistant;
     satsolver::Affectation *sat_solution;
+    std::vector<unsigned int> affected_literals;
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
+    std::map<int, std::string> variable_to_name;
     std::shared_ptr<std::unordered_set<std::string>> literals = ext_formula->get_literals();
     std::shared_ptr<satsolver::Formula> formula;
 
@@ -53,14 +55,21 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
         for (unsigned int i=0; i<literal_to_DA.size(); i++)
             std::cout << "\t#" << i+1 << ": " << literal_to_DA[i]->to_string() << std::endl;
     }
-    if (!tseitin_reduction(DISPLAY_SAT, ext_formula, name_to_variable, formula)) {
+    if (!tseitin_reduction(DISPLAY_SAT, ext_formula, name_to_variable, formula, &affected_literals)) {
         // The formula is always false
         if (DISPLAY_SAT)
             std::cout << "c The formula is so obviously wrong it is not even needed to convert it to conjonctive form." << std::endl;
         std::cout << "s UNSATISFIABLE" << std::endl;
         return;
     }
-    assistant = new theorysolver::DifferenceAssistant(literal_to_DA, formula);
+    assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, formula);
+    for (auto it : affected_literals) {
+        if (!assistant->on_flip(it)) {
+            std::cout << "s UNSATISFIABLE" << std::endl;
+            return;
+        }
+    }
+
     /*********************
      * Solve
      ********************/
