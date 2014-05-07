@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "structures/adj_graph.h"
+#include "config.h"
 
 #define max(u, v) ((u > v) ? (u) : (v))
 
@@ -25,14 +26,19 @@ void AdjGraph::add_edge(unsigned int u, unsigned int v, int tag, int weight) {
     this->adj_lists[u].push_front(std::make_pair(v, std::make_pair(tag, weight)));
     if (v >= this->adj_list_links[u].size())
         this->adj_list_links[u].resize(v+1);
-    this->adj_list_links[u][v] = this->adj_lists[u].begin();
+    this->adj_list_links[u][v] = make_pair(true, this->adj_lists[u].begin());
 }
 
 void AdjGraph::delete_edge(unsigned int u, unsigned int v) {
     assert(this->adj_lists.size() == this->adj_list_links.size());
     if (u>=this->adj_list_links.size() || v>=this->adj_list_links[u].size())
         return;
-    this->adj_lists[u].erase(this->adj_list_links[u][v]);
+    if (this->adj_list_links[u][v].first) {
+        this->adj_list_links[u][v].first = false;
+        this->adj_lists[u].erase(this->adj_list_links[u][v].second);
+    }
+    else if (VERBOSE)
+        std::cout << "Trying to delete a non-existing edge…" << std::endl;
 }
 
 const adj_list& AdjGraph::get_adj_list(unsigned int u) const {
@@ -43,7 +49,8 @@ const adj_list& AdjGraph::get_adj_list(unsigned int u) const {
 int AdjGraph::get_weight(unsigned int u, unsigned int v) const {
     assert(this->adj_lists.size() == this->adj_list_links.size());
     assert(u<this->adj_list_links.size() && v<this->adj_list_links[u].size());
-    return this->adj_list_links[u][v]->second.second;
+    assert(this->adj_list_links[u][v].first);
+    return this->adj_list_links[u][v].second->second.second;
 }
 
 std::pair<std::list<std::pair<unsigned int, int>>, int> AdjGraph::find_lowest_path(unsigned int from, unsigned int to) const {

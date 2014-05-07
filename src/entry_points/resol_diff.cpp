@@ -83,8 +83,11 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
     /*********************
      * Display solution
      ********************/
-    if (VERBOSE)
+    assert(assistant->is_state_consistent());
+    if (VERBOSE) {
         std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
+        std::cout << assistant->get_graph().to_string() << std::endl;
+    }
     for (auto literal : *literals) {
         try {
             std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;

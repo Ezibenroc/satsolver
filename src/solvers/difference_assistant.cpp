@@ -1,6 +1,7 @@
 #include <cassert>
 #include <iostream>
 #include "solvers/difference_assistant.h"
+#include "config.h"
 
 using namespace theorysolver;
 
@@ -87,38 +88,48 @@ bool DifferenceAssistant::on_flip(unsigned int variable) {
     unsigned int i, j;
     int n;
     std::pair<std::list<std::pair<unsigned int, int>>, int> r;
+    if (VERBOSE)
+        std::cout << "flip variable: " << variable;
     if (!DifferenceAtom::is_atom_literal(this->variable_to_name, variable)) {
+        if (VERBOSE)
+            std::cout << ", which is not an atom." << std::endl;
         return true; // We care only about variables matching atoms.
     }
     atom_id = DifferenceAtom::atom_id_from_literal(this->variable_to_name, variable);
     atom = DifferenceAtom::SPDA_from_literal(this->literal_to_DA, this->variable_to_name, variable);
+    if (VERBOSE)
+        std::cout << ", whose atom is: " << atom_id << ", and whose new state is: ";
     i = atom->i;
     j = atom->j;
     n = atom->n;
     if (this->formula->get_aff()->is_true(variable)) {
+        if (VERBOSE)
+            std::cout << "true" << std::endl;
         r = this->adj_graph.find_lowest_path(j, i);
         this->adj_graph.add_edge(i, j, atom_id, n);
-        if (r.second < n) { // It creates a negative cycle
+        if (r.second < -n) { // It creates a negative cycle
             this->learn_clause(r.first, atom_id);
             assert(this->consistent_state);
             this->edge_of_cycle = std::make_pair(i, j);
             this->consistent_state = false;
         }
-        this->adj_graph.delete_edge(j, i);
     }
     else if (this->formula->get_aff()->is_false(variable)) {
+        if (VERBOSE)
+            std::cout << "false" << std::endl;
         r = this->adj_graph.find_lowest_path(i, j);
         this->adj_graph.add_edge(j, i, -atom_id, -n-1);
-        if (r.second < n) { // It creates a negative cycle
+        if (r.second < n+1) { // It creates a negative cycle
             this->learn_clause(r.first, -atom_id);
             assert(this->consistent_state);
             this->edge_of_cycle = std::make_pair(j, i);
             this->consistent_state = false;
         }
         // ~(xi - xj <= n) <-> (xj - xi <= -n-1)
-        this->adj_graph.delete_edge(i, j);
     }
     else {
+        if (VERBOSE)
+            std::cout << "unknown" << std::endl;
         this->adj_graph.delete_edge(i, j);
         if (!this->consistent_state) {
             if (i == this->edge_of_cycle.first && j == this->edge_of_cycle.second)
@@ -127,8 +138,8 @@ bool DifferenceAssistant::on_flip(unsigned int variable) {
                 r = this->adj_graph.find_lowest_path(this->edge_of_cycle.second, this->edge_of_cycle.first);
                 // u->v was part of all negative cycles of the graph.
                 // Search if there is no more negative cycle containing u->v.
-                if (r.second >= this->adj_graph.get_weight(this->edge_of_cycle.first, this->edge_of_cycle.second)) {
-                    this->consistent_state = false;
+                if (r.second >= -this->adj_graph.get_weight(this->edge_of_cycle.first, this->edge_of_cycle.second)) {
+                    this->consistent_state = true;
                 }
             }
 

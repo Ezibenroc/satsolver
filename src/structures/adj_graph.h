@@ -14,7 +14,7 @@ typedef std::list<std::pair<unsigned int, std::pair<unsigned int, int>>> adj_lis
 class AdjGraph {
     private:
         std::vector<adj_list> adj_lists;
-        std::vector<std::vector<adj_list::iterator>> adj_list_links; // Pointers to items of adj_list (for O(1) deletion).
+        std::vector<std::vector<std::pair<bool, adj_list::iterator>>> adj_list_links; // Pointers to items of adj_list (for O(1) deletion).
 
     public:
         AdjGraph();

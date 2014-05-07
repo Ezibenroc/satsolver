@@ -35,6 +35,8 @@ class DifferenceAssistant : public AbstractAssistant {
         void learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id);
 
         bool is_state_consistent();
+
+        const AdjGraph& get_graph() { return this->adj_graph; }
 };
 
 }
