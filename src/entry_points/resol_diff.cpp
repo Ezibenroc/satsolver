@@ -75,7 +75,7 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
      * Solve
      ********************/
     try {
-        sat_solution = satsolver::solve(formula);
+        sat_solution = satsolver::solve(formula, assistant);
     }
     catch (satsolver::Conflict) {
         std::cout << "s UNSATISFIABLE" << std::endl;
