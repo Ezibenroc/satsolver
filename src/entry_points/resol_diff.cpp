@@ -3,6 +3,7 @@
 #include <memory>
 #include <cassert>
 #include <iostream>
+#include <stdexcept>
 
 #include "config.h"
 #include "parsers/cli.h"
