@@ -31,8 +31,9 @@ class DifferenceAssistant : public AbstractAssistant {
         static std::shared_ptr<satsolver::ExtendedFormula> canonize_formula(std::shared_ptr<satsolver::ExtendedFormula> formula, std::vector<std::shared_ptr<DifferenceAtom>> &literal_to_DA);
         DifferenceAssistant(std::vector<std::shared_ptr<DifferenceAtom>> &literal_to_DA, std::shared_ptr<std::map<std::string, int>> name_to_variable, std::shared_ptr<satsolver::Formula> formula);
 
-        bool on_flip(unsigned int variable);
-        void learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id);
+        /* Both return the index of the learned clause, if any. UINT_MAX otherwise. */
+        unsigned int on_flip(unsigned int variable);
+        unsigned int learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id);
 
         bool is_state_consistent();
 

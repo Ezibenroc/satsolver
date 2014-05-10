@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <climits>
 #include "solvers/difference_assistant.h"
 #include "config.h"
 
@@ -82,10 +83,10 @@ DifferenceAssistant::DifferenceAssistant(std::vector<SPDA> &literal_to_DA, std::
         this->variable_to_name.insert(make_pair(it.second, it.first));
 }
 
-bool DifferenceAssistant::on_flip(unsigned int variable) {
+unsigned int DifferenceAssistant::on_flip(unsigned int variable) {
     unsigned int atom_id;
     SPDA atom;
-    unsigned int i, j;
+    unsigned int i, j, clause_id=UINT_MAX;
     int n;
     std::pair<std::list<std::pair<unsigned int, int>>, int> r;
     if (VERBOSE)
@@ -108,7 +109,7 @@ bool DifferenceAssistant::on_flip(unsigned int variable) {
         r = this->adj_graph.find_lowest_path(j, i);
         this->adj_graph.add_edge(i, j, atom_id, n);
         if (r.second < -n) { // It creates a negative cycle
-            this->learn_clause(r.first, atom_id);
+            clause_id = this->learn_clause(r.first, atom_id);
             assert(this->consistent_state);
             this->edge_of_cycle = std::make_pair(i, j);
             this->consistent_state = false;
@@ -120,7 +121,7 @@ bool DifferenceAssistant::on_flip(unsigned int variable) {
         r = this->adj_graph.find_lowest_path(i, j);
         this->adj_graph.add_edge(j, i, -atom_id, -n-1);
         if (r.second < n+1) { // It creates a negative cycle
-            this->learn_clause(r.first, -atom_id);
+            clause_id = this->learn_clause(r.first, -atom_id);
             assert(this->consistent_state);
             this->edge_of_cycle = std::make_pair(j, i);
             this->consistent_state = false;
@@ -145,7 +146,7 @@ bool DifferenceAssistant::on_flip(unsigned int variable) {
 
         }
     }
-    return this->consistent_state;
+    return clause_id;
 }
 
 int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
@@ -155,12 +156,13 @@ int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
         return -DifferenceAtom::literal_from_atom_id(this->name_to_variable, static_cast<unsigned int>(-atom_id));
 }
 
-void DifferenceAssistant::learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id) {
+unsigned int DifferenceAssistant::learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id) {
     std::unordered_set<int> clause;
     clause.insert(this->literal_from_atom_id(atom_id));
     for (auto it : path)
         clause.insert(this->literal_from_atom_id(it.second));
     this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause));
+    return static_cast<unsigned int>(this->formula->to_clauses_vector().size())-1;
 }
 
 bool DifferenceAssistant::is_state_consistent() {

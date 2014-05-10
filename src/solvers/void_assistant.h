@@ -6,7 +6,7 @@ namespace theorysolver {
  * valid for DPLL. Used when we don't want to have a theory. */
 class VoidAssistant : public AbstractAssistant {
     public:
-        bool on_flip(unsigned int variable);
+        unsigned int on_flip(unsigned int variable);
         bool is_state_consistent();
 };
 

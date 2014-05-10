@@ -1,3 +1,5 @@
+#include <climits>
+
 #include "structures/extended_formula.h"
 #include "structures/difference_atom.h"
 #include "solvers/difference_assistant.h"
@@ -28,8 +30,8 @@ void TheoryTests::testDifferencesObviousFail() {
     ef = theorysolver::DifferenceAssistant::canonize_formula(ef, literal_to_DA);
     CPPUNIT_ASSERT(tseitin_reduction(false, ef, name_to_variable, f, &affected_literals));
     assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, f);
-    CPPUNIT_ASSERT(assistant->on_flip(name_to_variable->at("#3")));
-    CPPUNIT_ASSERT(!assistant->on_flip(name_to_variable->at("#4")));
+    CPPUNIT_ASSERT(UINT_MAX == assistant->on_flip(name_to_variable->at("#3")));
+    CPPUNIT_ASSERT(UINT_MAX != assistant->on_flip(name_to_variable->at("#4")));
 }
 
 void TheoryTests::testDifferencesLessObviousFail() {
@@ -51,18 +53,18 @@ void TheoryTests::testDifferencesLessObviousFail() {
     assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, f);
     if (f->get_aff()->is_unknown(name_to_variable->at("#4")))
         f->get_aff()->set_true(name_to_variable->at("#4"));
-    CPPUNIT_ASSERT(assistant->on_flip(name_to_variable->at("#4")));
+    CPPUNIT_ASSERT(UINT_MAX == assistant->on_flip(name_to_variable->at("#4")));
     CPPUNIT_ASSERT(assistant->is_state_consistent());
     if (f->get_aff()->is_unknown(name_to_variable->at("#5")))
         f->get_aff()->set_false(name_to_variable->at("#5"));
     if (f->get_aff()->is_unknown(name_to_variable->at("#6")))
         f->get_aff()->set_true(name_to_variable->at("#6"));
-    CPPUNIT_ASSERT(!assistant->on_flip(name_to_variable->at("#5")) || !assistant->on_flip(name_to_variable->at("#6")));
+    CPPUNIT_ASSERT(UINT_MAX != assistant->on_flip(name_to_variable->at("#5")) || UINT_MAX != assistant->on_flip(name_to_variable->at("#6")));
     CPPUNIT_ASSERT(!assistant->is_state_consistent());
 
     f->get_aff()->set_unknown(name_to_variable->at("#5"));
     f->get_aff()->set_unknown(name_to_variable->at("#6"));
-    CPPUNIT_ASSERT(assistant->on_flip(name_to_variable->at("#5")) || assistant->on_flip(name_to_variable->at("#6")));
+    CPPUNIT_ASSERT(UINT_MAX == assistant->on_flip(name_to_variable->at("#5")) || UINT_MAX == assistant->on_flip(name_to_variable->at("#6")));
     CPPUNIT_ASSERT(assistant->is_state_consistent());
 }
 
