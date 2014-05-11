@@ -126,10 +126,10 @@ add_executable(colorie src/entry_points/colorie.cpp)
 target_link_libraries(colorie GraphParser CommandLineParser GraphColorSolver)
 
 add_executable(tseitin src/entry_points/tseitin.cpp)
-target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL ExtendedFormulaParser Tseitin)
+target_link_libraries(tseitin CommandLineParser ExtendedFormula Formula DPLL ExtendedFormulaParser TseitinSolver)
 
 add_executable(resol_diff src/entry_points/resol_diff.cpp)
-target_link_libraries(resol_diff CommandLineParser ExtendedFormula Formula DPLL DifferenceParser Tseitin DifferenceAssistant)
+target_link_libraries(resol_diff CommandLineParser ExtendedFormula Formula DPLL DifferenceParser TseitinSolver DifferenceAssistant)
 
 
 
