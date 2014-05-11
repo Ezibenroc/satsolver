@@ -107,15 +107,15 @@ target_link_libraries(DifferenceAssistant Formula DifferenceAtom ExtendedFormula
 add_library(DPLL src/solvers/dpll.cpp)
 target_link_libraries(DPLL Structures VoidAssistant)
 
-add_library(Tseitin src/solvers/tseitin.cpp)
-target_link_libraries(Tseitin Structures)
+add_library(TseitinSolver src/solvers/tseitin.cpp)
+target_link_libraries(TseitinSolver Structures)
 
 add_library(GraphColorSolver src/solvers/graphcolor.cpp)
 target_link_libraries(GraphColorSolver Structures DPLL)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp "")
 add_library(Solvers ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp)
-target_link_libraries(Solvers DifferenceAssistant DPLL GraphColorSolver Tseitin)
+target_link_libraries(Solvers DifferenceAssistant DPLL GraphColorSolver TseitinSolver)
 set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/solvers.cpp)
 
 
