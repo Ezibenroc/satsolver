@@ -3,8 +3,8 @@
 using namespace theorysolver;
 
 
-unsigned int VoidAssistant::on_flip(unsigned int variable __attribute__((unused))) {
-    return true;
+int VoidAssistant::on_flip(unsigned int variable __attribute__((unused))) {
+    return -1;
 }
 bool VoidAssistant::is_state_consistent() {
     return true;

@@ -83,10 +83,11 @@ DifferenceAssistant::DifferenceAssistant(std::vector<SPDA> &literal_to_DA, std::
         this->variable_to_name.insert(make_pair(it.second, it.first));
 }
 
-unsigned int DifferenceAssistant::on_flip(unsigned int variable) {
+int DifferenceAssistant::on_flip(unsigned int variable) {
     unsigned int atom_id;
     SPDA atom;
-    unsigned int i, j, clause_id=UINT_MAX;
+    unsigned int i, j;
+    int clause_id=-1;
     int n;
     std::pair<std::list<std::pair<unsigned int, int>>, int> r;
     if (VERBOSE)
@@ -156,13 +157,12 @@ int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
         return -DifferenceAtom::literal_from_atom_id(this->name_to_variable, static_cast<unsigned int>(-atom_id));
 }
 
-unsigned int DifferenceAssistant::learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id) {
+int DifferenceAssistant::learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id) {
     std::unordered_set<int> clause;
     clause.insert(this->literal_from_atom_id(atom_id));
     for (auto it : path)
         clause.insert(this->literal_from_atom_id(it.second));
-    this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause));
-    return static_cast<unsigned int>(this->formula->to_clauses_vector().size())-1;
+    return static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause)));
 }
 
 bool DifferenceAssistant::is_state_consistent() {

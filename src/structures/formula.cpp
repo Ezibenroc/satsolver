@@ -118,8 +118,9 @@ std::vector<std::shared_ptr<Clause>>& Formula::to_clauses_vector() {
     return this->clauses;
 }
 
-void Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
+unsigned int Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
     this->clauses.push_back(clause);
+    return static_cast<unsigned int>(this->clauses.size())-1;
 }
 
 

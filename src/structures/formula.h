@@ -65,7 +65,8 @@ class Formula {
         std::set<Clause*> to_clauses_set() const;
         std::vector<std::shared_ptr<Clause>>& to_clauses_vector() ;
 
-        void add_clause(std::shared_ptr<satsolver::Clause> clause);
+        // Ajoute une clause, et renvoie son index dans la formule.
+        unsigned int add_clause(std::shared_ptr<satsolver::Clause> clause);
 
         // Déduction de l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
