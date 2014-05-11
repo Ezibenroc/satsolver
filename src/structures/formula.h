@@ -7,6 +7,7 @@
 #include <stack>
 #include <unordered_set>
 
+#include "solvers/abstract_assistant.h"
 #include "structures/clause.h"
 #include "structures/affectation.h"
 #include "structures/deductions.h"
@@ -84,9 +85,9 @@ class Formula {
 
         // Retourne en arrière jusqu'au dernier pari
         // Renvoie le dernier littéral parié (0 si inexistant)
-        int back() ;
+        int back(theorysolver::AbstractAssistant *assistant) ;
         // Fait plusieurs backtrack, jusqu'à obtenir la profondeur de déduction donnée
-        int back(unsigned int depth) ;
+        int back(theorysolver::AbstractAssistant *assistant, unsigned int depth) ;
 
         // Renvoie un monome de la formule (0 si inexistant)
         int monome(int *clause_id) ;

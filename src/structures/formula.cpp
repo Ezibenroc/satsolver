@@ -204,7 +204,7 @@ bool Formula::bet_false(int x, int *clause1, int *clause2, int *literal) {
     return bet_true(-x,clause1,clause2,literal) ;
 }
 
-int Formula::back() {
+int Formula::back(theorysolver::AbstractAssistant *assistant) {
     ded_depth -- ;
     if(VERBOSE) {
         print_space(this->ded_depth) ;
@@ -217,6 +217,7 @@ int Formula::back() {
         this->aff->set_unknown(p.first) ;
         this->mem.pop_back() ;
         this->ded->remove_deduction(p.first) ;
+        assistant->on_flip(abs(p.first));
         if(!p.second) {// on est arrivé au pari
             if(VERBOSE)
                 std::cout << std::endl ;
@@ -228,7 +229,7 @@ int Formula::back() {
     return 0 ;
 }
 
-int Formula::back(unsigned int depth) {
+int Formula::back(theorysolver::AbstractAssistant *assistant, unsigned int depth) {
     int l=0 ;
     if(VERBOSE) {
         print_space(this->ded_depth) ;
@@ -236,7 +237,7 @@ int Formula::back(unsigned int depth) {
     }
     assert(depth <= this->ded_depth) ;
     while(depth != this->ded_depth) {
-        l = this->back() ;
+        l = this->back(assistant) ;
     }
     return l ;
 }

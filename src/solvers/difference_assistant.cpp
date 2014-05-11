@@ -89,6 +89,7 @@ int DifferenceAssistant::on_flip(unsigned int variable) {
     unsigned int i, j;
     int clause_id=-1;
     int n;
+    std::cout << this->adj_graph.to_string(); // DEBUG
     std::pair<std::list<std::pair<unsigned int, int>>, int> r;
     if (VERBOSE)
         std::cout << "flip variable: " << variable;

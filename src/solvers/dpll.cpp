@@ -108,6 +108,7 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
             // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
+            std::cout << formula->get_ded_depth() << std::endl;
             if(formula->get_ded_depth() == 0) { // clause fausse sans aucun paris, donc insatisfiable
                 throw Conflict() ;
             }
@@ -148,10 +149,11 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                 if (with_proof)
                     proof->to_latex_file(CL_PROOF_FILE_NAME);
                 delete proof;
-                formula->back(depth_back);
+                formula->back(assistant, depth_back);
             }
             else {
-                literal = -formula->back() ;
+                literal = -formula->back(assistant) ;
+                assistant->on_flip(abs(literal));
                 clause_id = -1 ;
             }
             if(WITH_WL && (WITH_CL || CL_INTERACT)) { // nettoyage
@@ -161,8 +163,10 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             }
             if(literal == 0)
                 throw Conflict() ;
-            if (WITH_WL)
+            if (WITH_WL) {
                 contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal);
+                assistant->on_flip(abs(literal));
+            }
             else {
                 formula->deduce_true(literal, clause_id,NULL,NULL,NULL);
                 assistant->on_flip(abs(literal));
