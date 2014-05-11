@@ -94,8 +94,10 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
         }
         else {
             literal = formula->choose_literal(HEURISTIC) ;
-            if (WITH_WL)
+            if (WITH_WL) {
                 contains_false_clause = !formula->bet_true(literal,&clause_id,&tmp,&literal);
+                assistant->on_flip(abs(literal));
+            }
             else {
                 formula->bet_true(literal,NULL,NULL,NULL);
                 assistant->on_flip(abs(literal));
@@ -115,8 +117,10 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                     formula->get_ded()->remove_deduction(literal);
                 }
                 formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
-                if(WITH_WL)
+                if(WITH_WL) {
                     formula->get_aff()->set_true(literal) ;
+                    assistant->on_flip(abs(literal));
+                }
                 literal_sav = literal ;
                 clause_id = tmp ;
                 if(formula->to_clauses_vector()[clause_id]->get_size() <= 1 && formula->to_clauses_vector()[tmp]->get_size() <= 1)
@@ -153,6 +157,7 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             if(WITH_WL && (WITH_CL || CL_INTERACT)) { // nettoyage
                 formula->get_ded()->remove_deduction(literal_sav) ;
                 formula->get_aff()->set_unknown(literal_sav) ;
+                assistant->on_flip(abs(literal_sav));
             }
             if(literal == 0)
                 throw Conflict() ;
@@ -160,6 +165,7 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                 contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal);
             else {
                 formula->deduce_true(literal, clause_id,NULL,NULL,NULL);
+                assistant->on_flip(abs(literal));
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }
