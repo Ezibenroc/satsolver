@@ -87,11 +87,11 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             formula->deduce_true(literal, clause_id,NULL,NULL,NULL);
             assistant->on_flip(abs(literal));
             contains_false_clause = formula->contains_false_clause(&clause_id);
-        }
+        }/*
         else if((literal = formula->isolated_literal(&clause_id))) {
             formula->deduce_true(literal,-1,NULL,NULL,NULL) ;
             assistant->on_flip(abs(literal));
-        }
+        }*/
         else {
             literal = formula->choose_literal(HEURISTIC) ;
             if (WITH_WL) {
@@ -108,7 +108,6 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
             // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
-            std::cout << formula->get_ded_depth() << std::endl;
             if(formula->get_ded_depth() == 0) { // clause fausse sans aucun paris, donc insatisfiable
                 throw Conflict() ;
             }

@@ -24,7 +24,8 @@ class DifferenceAssistant : public AbstractAssistant {
         // As we forbid adding an edge when there is a negative cycle,
         // the following edge belong to *all* possible negative cycles
         // of the graphe.
-        std::pair<unsigned int, unsigned int> edge_of_cycle;
+        std::pair<std::pair<unsigned int, unsigned int>, unsigned int> edge_of_cycle; // ((u, v), tag)
+        std::vector<int> old_polarity;
 
         int literal_from_atom_id(int atom_id) const;
     public:
@@ -33,7 +34,7 @@ class DifferenceAssistant : public AbstractAssistant {
 
         /* Return the index of the learned clause, if any. -1 otherwise. */
         int on_flip(unsigned int variable);
-        int learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id);
+        int learn_clause(std::list<path_item> &path, int atom_id);
 
         bool is_state_consistent();
 

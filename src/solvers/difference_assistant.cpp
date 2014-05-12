@@ -6,6 +6,8 @@
 
 using namespace theorysolver;
 
+#define VERBOSE_ASSISTANT false
+
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
 #define DA DifferenceAtom
@@ -78,7 +80,7 @@ SPEF DifferenceAssistant::canonize_formula(SPEF formula, std::vector<SPDA> &lite
 
 
 DifferenceAssistant::DifferenceAssistant(std::vector<SPDA> &literal_to_DA, std::shared_ptr<std::map<std::string, int>> name_to_variable, std::shared_ptr<satsolver::Formula> formula) :
-    formula(formula), literal_to_DA(literal_to_DA), name_to_variable(*name_to_variable), variable_to_name(), adj_graph(), consistent_state(true), edge_of_cycle(0, 0) {
+    formula(formula), literal_to_DA(literal_to_DA), name_to_variable(*name_to_variable), variable_to_name(), adj_graph(), consistent_state(true), edge_of_cycle(std::make_pair(0, 0), 0), old_polarity(formula->get_nb_variables()+1, 0) {
     for (auto it : *name_to_variable)
         this->variable_to_name.insert(make_pair(it.second, it.first));
 }
@@ -86,67 +88,83 @@ DifferenceAssistant::DifferenceAssistant(std::vector<SPDA> &literal_to_DA, std::
 int DifferenceAssistant::on_flip(unsigned int variable) {
     unsigned int atom_id;
     SPDA atom;
-    unsigned int i, j;
+    unsigned int i, j, tmp;
     int clause_id=-1;
     int n;
-    std::cout << this->adj_graph.to_string(); // DEBUG
-    std::pair<std::list<std::pair<unsigned int, int>>, int> r;
-    if (VERBOSE)
+    std::pair<std::list<path_item>, int> r;
+    if (VERBOSE_ASSISTANT && VERBOSE)
         std::cout << "flip variable: " << variable;
     if (!DifferenceAtom::is_atom_literal(this->variable_to_name, variable)) {
-        if (VERBOSE)
+        if (VERBOSE_ASSISTANT && VERBOSE)
             std::cout << ", which is not an atom." << std::endl;
         return true; // We care only about variables matching atoms.
     }
+    assert(variable <= static_cast<unsigned int>(this->formula->get_nb_variables()));
     atom_id = DifferenceAtom::atom_id_from_literal(this->variable_to_name, variable);
     atom = DifferenceAtom::SPDA_from_literal(this->literal_to_DA, this->variable_to_name, variable);
-    if (VERBOSE)
+    if (VERBOSE_ASSISTANT && VERBOSE)
         std::cout << ", whose atom is: " << atom_id << ", and whose new state is: ";
     i = atom->i;
     j = atom->j;
     n = atom->n;
     if (this->formula->get_aff()->is_true(variable)) {
-        if (VERBOSE)
+        if (VERBOSE_ASSISTANT && VERBOSE)
             std::cout << "true" << std::endl;
+        assert(this->consistent_state);
+        if (this->old_polarity[variable] == 1)
+            return -1;
         r = this->adj_graph.find_lowest_path(j, i);
         this->adj_graph.add_edge(i, j, atom_id, n);
         if (r.second < -n) { // It creates a negative cycle
             clause_id = this->learn_clause(r.first, atom_id);
             assert(this->consistent_state);
-            this->edge_of_cycle = std::make_pair(i, j);
+            this->edge_of_cycle = std::make_pair(std::make_pair(i, j), variable);
             this->consistent_state = false;
         }
+        this->old_polarity[variable] = 1;
     }
     else if (this->formula->get_aff()->is_false(variable)) {
-        if (VERBOSE)
+        if (VERBOSE_ASSISTANT && VERBOSE)
             std::cout << "false" << std::endl;
+        assert(this->consistent_state);
+        if (this->old_polarity[variable] == -1)
+            return -1;
         r = this->adj_graph.find_lowest_path(i, j);
-        this->adj_graph.add_edge(j, i, -atom_id, -n-1);
+        this->adj_graph.add_edge(j, i, atom_id, -n-1);
         if (r.second < n+1) { // It creates a negative cycle
-            clause_id = this->learn_clause(r.first, -atom_id);
+            clause_id = this->learn_clause(r.first, atom_id);
             assert(this->consistent_state);
-            this->edge_of_cycle = std::make_pair(j, i);
+            this->edge_of_cycle = std::make_pair(std::make_pair(j, i), variable);
             this->consistent_state = false;
         }
+        this->old_polarity[variable] = -1;
         // ~(xi - xj <= n) <-> (xj - xi <= -n-1)
     }
     else {
-        if (VERBOSE)
+        if (VERBOSE_ASSISTANT && VERBOSE)
             std::cout << "unknown" << std::endl;
-        this->adj_graph.delete_edge(i, j);
+        if (this->old_polarity[variable] == 0)
+            return -1;
+        if (this->old_polarity[variable] == -1) {
+            tmp = i;
+            i = j;
+            j = tmp;
+        }
+        this->adj_graph.delete_edge(i, j, atom_id);
         if (!this->consistent_state) {
-            if (i == this->edge_of_cycle.first && j == this->edge_of_cycle.second)
+            if (i == this->edge_of_cycle.first.first && j == this->edge_of_cycle.first.second)
                 this->consistent_state = true;
             else {
-                r = this->adj_graph.find_lowest_path(this->edge_of_cycle.second, this->edge_of_cycle.first);
+                r = this->adj_graph.find_lowest_path(this->edge_of_cycle.first.second, this->edge_of_cycle.first.first);
                 // u->v was part of all negative cycles of the graph.
                 // Search if there is no more negative cycle containing u->v.
-                if (r.second >= -this->adj_graph.get_weight(this->edge_of_cycle.first, this->edge_of_cycle.second)) {
+                if (r.second >= -this->adj_graph.get_weight(this->edge_of_cycle.second)) {
                     this->consistent_state = true;
                 }
             }
 
         }
+        this->old_polarity[variable] = 0;
     }
     return clause_id;
 }
@@ -158,12 +176,12 @@ int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
         return -DifferenceAtom::literal_from_atom_id(this->name_to_variable, static_cast<unsigned int>(-atom_id));
 }
 
-int DifferenceAssistant::learn_clause(std::list<std::pair<unsigned int, int>> &path, int atom_id) {
+int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
     std::unordered_set<int> clause;
     clause.insert(this->literal_from_atom_id(atom_id));
     for (auto it : path)
-        clause.insert(this->literal_from_atom_id(it.second));
-    return static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause)));
+        clause.insert(this->literal_from_atom_id(it.tag));
+    return static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
 }
 
 bool DifferenceAssistant::is_state_consistent() {
