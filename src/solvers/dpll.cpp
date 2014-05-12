@@ -84,23 +84,19 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
             // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
-            formula->deduce_true(literal, clause_id,NULL,NULL,NULL);
-            assistant->on_flip(abs(literal));
+            formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant);
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }/*
         else if((literal = formula->isolated_literal(&clause_id))) {
             formula->deduce_true(literal,-1,NULL,NULL,NULL) ;
-            assistant->on_flip(abs(literal));
         }*/
         else {
             literal = formula->choose_literal(HEURISTIC) ;
             if (WITH_WL) {
-                contains_false_clause = !formula->bet_true(literal,&clause_id,&tmp,&literal);
-                assistant->on_flip(abs(literal));
+                contains_false_clause = !formula->bet_true(literal,&clause_id,&tmp,&literal, assistant);
             }
             else {
-                formula->bet_true(literal,NULL,NULL,NULL);
-                assistant->on_flip(abs(literal));
+                formula->bet_true(literal,NULL,NULL,NULL, assistant);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }
@@ -119,7 +115,6 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                 formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
                 if(WITH_WL) {
                     formula->get_aff()->set_true(literal) ;
-                    assistant->on_flip(abs(literal));
                 }
                 literal_sav = literal ;
                 clause_id = tmp ;
@@ -152,23 +147,20 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             }
             else {
                 literal = -formula->back(assistant) ;
-                assistant->on_flip(abs(literal));
                 clause_id = -1 ;
             }
             if(WITH_WL && (WITH_CL || CL_INTERACT)) { // nettoyage
                 formula->get_ded()->remove_deduction(literal_sav) ;
+                std::cout << "*== " << literal_sav << " ===" << std::endl;
                 formula->get_aff()->set_unknown(literal_sav) ;
-                assistant->on_flip(abs(literal_sav));
             }
             if(literal == 0)
                 throw Conflict() ;
             if (WITH_WL) {
-                contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal);
-                assistant->on_flip(abs(literal));
+                contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant);
             }
             else {
-                formula->deduce_true(literal, clause_id,NULL,NULL,NULL);
-                assistant->on_flip(abs(literal));
+                formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }

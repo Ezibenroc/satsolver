@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 
+#include "solvers/void_assistant.h"
 #include "structures/clause.h"
 #include "structures/formula.h"
 #include "structures/affectation.h"
@@ -25,6 +26,7 @@
 using namespace satsolver;
 
 void HeuristicsTests::testRandom() {
+    theorysolver::VoidAssistant assistant;
     std::vector<std::shared_ptr<Clause>> g ;
     std::unordered_set <int> v = {1,2,-3} ;
     g.push_back(std::shared_ptr<Clause>(new Clause(3,v))) ;
@@ -55,7 +57,7 @@ void HeuristicsTests::testRandom() {
     		c = true ;
     }
     CPPUNIT_ASSERT(a && b && c) ;
-    f->bet_true(1,NULL,NULL,NULL) ;
+    f->bet_true(1,NULL,NULL,NULL, &assistant) ;
     for(int i = 0 ; i < 1000 ; i++) {
     	CPPUNIT_ASSERT(f->choose_literal_random() == 2) ;
     }
