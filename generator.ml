@@ -16,6 +16,7 @@ let mode = ref Unknown
 let mode_formula = ref Unknown_f
 
 let width_term = 5 
+let int_max = 10
 
 ;;
 Random.self_init() ;
@@ -215,12 +216,12 @@ type term =
     | Fun of string * term list
     
 type ineq =
-    | Leq of string*string
-    | Lt of string*string
-    | Geq of string*string
-    | Gt of string*string
-    | Eq of string*string
-    | Neq of string*string
+    | Leq of string*string*int
+    | Lt of string*string*int
+    | Geq of string*string*int
+    | Gt of string*string*int
+    | Eq of string*string*int
+    | Neq of string*string*int
     
 type atom = Teq of term*term | Tneq of term*term | I of ineq | V of string
 
@@ -238,12 +239,12 @@ let rec string_of_term (t : term) : string =
 
 let string_of_ineq (i : ineq) : string =
   match i with
-  | Leq(x1,x2) -> x1^"<="^x2
-  | Lt(x1,x2) -> x1^"<"^x2
-  | Geq(x1,x2) -> x1^">="^x2
-  | Gt(x1,x2) -> x1^">"^x2
-  | Eq(x1,x2) -> x1^"="^x2
-  | Neq(x1,x2) -> x1^"!="^x2
+  | Leq(x1,x2,n) -> x1^"-"^x2^"<="^(string_of_int n)
+  | Lt(x1,x2,n) -> x1^"-"^x2^"<"^(string_of_int n)
+  | Geq(x1,x2,n) -> x1^"-"^x2^">="^(string_of_int n)
+  | Gt(x1,x2,n) -> x1^"-"^x2^">"^(string_of_int n)
+  | Eq(x1,x2,n) -> x1^"-"^x2^"="^(string_of_int n)
+  | Neq(x1,x2,n) -> x1^"-"^x2^"!="^(string_of_int n)
 
 let string_of_atom (a : atom) : string =
   match a with
@@ -287,13 +288,13 @@ and gen_term_list(nvar : int) (depth : int) (w : int) : term list =
   
 
 let gen_diff (nvar : int) : ineq =
-  let op = Random.int nb_diff and x1 = var_of_int (Random.int nvar) and x2 = var_of_int (Random.int nvar) in
-  if op = 0 then Leq(x1,x2)
-  else if op = 1 then Lt(x1,x2)
-  else if op = 2 then Geq(x1,x2)
-  else if op = 3 then Gt(x1,x2)
-  else if op = 4 then Eq(x1,x2)
-  else  Neq(x1,x2)
+  let op = Random.int nb_diff and x1 = var_of_int (Random.int nvar) and x2 = var_of_int (Random.int nvar) and n = Random.int int_max in
+  if op = 0 then Leq(x1,x2,n)
+  else if op = 1 then Lt(x1,x2,n)
+  else if op = 2 then Geq(x1,x2,n)
+  else if op = 3 then Gt(x1,x2,n)
+  else if op = 4 then Eq(x1,x2,n)
+  else  Neq(x1,x2,n)
 
 let gen_atom (nvar : int) (depth : int) : atom =
   match !mode_formula with
