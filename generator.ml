@@ -4,13 +4,18 @@ let nvar = ref 0
 let nclause = ref 0
 let sclause = ref 0
 let depth = ref 0
+let depth_term = ref 0
 let nedge = ref 0
 let pathologic = ref false
 let name_f = ref ""
 let non_constant = ref false 
 
 type mode_t = Clause_set | Formula | Graph | Unknown
+type mode_formula_t = Difference | Congruence | Unknown_f
 let mode = ref Unknown
+let mode_formula = ref Unknown_f
+
+let width_term = 5 
 
 ;;
 Random.self_init() ;
@@ -205,16 +210,52 @@ let print_clause_set (nb_var : int) (nb_clause : int) (size_clause : int) (name_
   
 (** FORMULAE ********************************)
 
-type formula = | Var of string
+type term =
+    | Var of string
+    | Fun of string * term list
+    
+type ineq =
+    | Leq of string*string
+    | Lt of string*string
+    | Geq of string*string
+    | Gt of string*string
+    | Eq of string*string
+    | Neq of string*string
+    
+type atom = Teq of term*term | Tneq of term*term | I of ineq | V of string
+
+type formula = | Atom of atom
 	       | And of formula * formula
 	       | Or of formula * formula
 	       | Imp of formula * formula
 	       (*| Xor of formula * formula*)
 	       | Not of formula
 
+let rec string_of_term (t : term) : string =
+    match t with
+    | Var s -> s
+    | Fun(s,l) -> s^"("^(List.fold_left (fun acc x -> acc^","^(string_of_term x)) (string_of_term (List.hd l)) (List.tl l))^")"
+
+let string_of_ineq (i : ineq) : string =
+  match i with
+  | Leq(x1,x2) -> x1^"<="^x2
+  | Lt(x1,x2) -> x1^"<"^x2
+  | Geq(x1,x2) -> x1^">="^x2
+  | Gt(x1,x2) -> x1^">"^x2
+  | Eq(x1,x2) -> x1^"="^x2
+  | Neq(x1,x2) -> x1^"!="^x2
+
+let string_of_atom (a : atom) : string =
+  match a with
+  | Teq(t1,t2) -> (string_of_term t1)^"="^(string_of_term t2)
+  | Tneq(t1,t2) -> (string_of_term t1)^"!="^(string_of_term t2)
+  | I(i) -> string_of_ineq i
+  | V(s) -> s
+
+
 let rec string_of_formula (f : formula) : string =
   match f with
-  | Var(s) -> s
+  | Atom(a) -> string_of_atom a
   | And(f1,f2) -> "("^(string_of_formula f1)^"/\\"^(string_of_formula f2)^")"
   | Or(f1,f2) -> "("^(string_of_formula f1)^"\\/"^(string_of_formula f2)^")"
   | Imp(f1,f2) -> "("^(string_of_formula f1)^"=>"^(string_of_formula f2)^")"
@@ -223,33 +264,67 @@ let rec string_of_formula (f : formula) : string =
 
 (* nombre d'opérateurs différents *)
 let nb_op = 4
+let nb_diff = 6
 
+(*
 let rec var_of_int (n : int) : string =
   let s = String.make 1 (char_of_int ((int_of_char 'a') + (n mod 26))) in
   if n < 26 then s
   else (var_of_int (n/26))^s
+*)
+
+let var_of_int (n : int) : string = "x"^(string_of_int n)
+let fun_of_int (n : int) : string = "f"^(string_of_int n)
+
+(* Génère un atome, selon les options spécifiées *)
+let rec gen_term(nvar : int) (depth : int) : term =
+  if depth == 0 then Var(var_of_int (Random.int nvar))
+  else let f = fun_of_int (Random.int nvar) in
+       Fun(f,(gen_term_list nvar (depth-1) (Random.int width_term+1)))
+and gen_term_list(nvar : int) (depth : int) (w : int) : term list =
+  if w = 0 then []
+  else (gen_term nvar depth)::(gen_term_list nvar depth (w-1))
+  
+
+let gen_diff (nvar : int) : ineq =
+  let op = Random.int nb_diff and x1 = var_of_int (Random.int nvar) and x2 = var_of_int (Random.int nvar) in
+  if op = 0 then Leq(x1,x2)
+  else if op = 1 then Lt(x1,x2)
+  else if op = 2 then Geq(x1,x2)
+  else if op = 3 then Gt(x1,x2)
+  else if op = 4 then Eq(x1,x2)
+  else  Neq(x1,x2)
+
+let gen_atom (nvar : int) (depth : int) : atom =
+  match !mode_formula with
+  | Unknown_f -> V(var_of_int(Random.int nvar))
+  | Difference -> I(gen_diff nvar)
+  | Congruence -> let op = Random.int 2 and t1 = gen_term nvar depth and t2 = gen_term nvar depth in
+		  if op = 0 then Teq(t1,t2) else Tneq(t1,t2)
 
 (* Génère une formule aléatoirement.
    nvar : nombre total de variables (pas forcément toutes utilisées)
    depth : profondeur de l'arbre représentant la formule *)
-let rec gen_formula (nvar : int) (depth : int)  : formula =
-  if depth = 0 then Var(var_of_int (Random.int nvar))
+let rec gen_formula (nvar : int) (depth : int) (depth_term : int) : formula =
+  if depth = 0 then Atom(gen_atom nvar depth_term)
   else let op = Random.int nb_op in
-       let 	f1 = gen_formula nvar (depth-1) and
-	   				f2 = gen_formula nvar (depth-1) in
+       let 	f1 = gen_formula nvar (depth-1) depth_term and
+	   				f2 = gen_formula nvar (depth-1) depth_term in
        match op with
        | 0 -> And(f1,f2)
        | 1 -> Or(f1,f2)
        | 2 -> Imp(f1,f2)
  (*      | 3 -> Xor(f1,f2) *)
        | _ -> Not(f1)
+
+
        
 (* Génère et affiche la formule dans le fichier (stdin si nom de fichier vide) *)
-let print_formula (nb_var : int) (depth : int) (name_file : string) : unit =
+let print_formula (nb_var : int) (depth : int)(depth_term : int) (name_file : string) : unit =
   if not(nb_var > 0 && depth > 0) 
   then failwith "Incorrect depth and number of variables."
   else 
-  let f = gen_formula nb_var depth in
+  let f = gen_formula nb_var depth depth_term in
   let file = if name_file <> "" then open_out(name_file) else stdout in
   fprintf file "%s\n" (string_of_formula f) ;
   if(file <> stdout) then close_out(file)
@@ -296,12 +371,14 @@ let print_graph (nb_var : int) (nb_edge : int) (name_file : string) : unit =
 
 let speclist = [
     ("-nvar", Arg.Int    (fun n -> nvar := n),  "the number of variables to generate (clause set and formula generator).");
-    ("-nclause", Arg.Int    (fun n -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; nclause := n)),  "the number of clauses to generate (clause set generator).");
-    ("-sclause", Arg.Int    (fun n -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; sclause := n)),  "the size of the clauses to generate (clause set generator).");
-    ("-depth", Arg.Int    (fun n -> if !mode != Unknown && !mode != Formula then failwith "Contradictory options." else (mode := Formula ; depth := n)),  "the depth of the formula to generate (formula generator).");
-    ("-nedge", Arg.Int    (fun n -> if !mode != Unknown && !mode != Graph then failwith "Contradictory options." else (mode := Graph ; nedge := n)),  "the number of edges to generate (graph generator).");
+    ("-nclause", Arg.Int    (fun n -> if !mode <> Unknown && !mode <> Clause_set then failwith "Contradictory options." else (mode := Clause_set ; nclause := n)),  "the number of clauses to generate (clause set generator).");
+    ("-sclause", Arg.Int    (fun n -> if !mode <> Unknown && !mode <> Clause_set then failwith "Contradictory options." else (mode := Clause_set ; sclause := n)),  "the size of the clauses to generate (clause set generator).");
+    ("-depth", Arg.Int    (fun n -> if !mode <> Unknown && !mode <> Formula then failwith "Contradictory options." else (mode := Formula ; depth := n)),  "the depth of the formula to generate (formula generator).");
+    ("-difference", Arg.Unit    (fun () -> if (!mode <> Unknown && !mode <> Formula) || (!mode_formula <> Unknown_f && !mode_formula <> Difference) then failwith "Contradictory options." else (mode := Formula ; mode_formula := Difference )),  "generates formula for difference theory.");
+    ("-congruence", Arg.Int    (fun n -> if (!mode <> Unknown && !mode <> Formula) || (!mode_formula <> Unknown_f && !mode_formula <> Congruence) then failwith "Contradictory options." else (mode := Formula ; mode_formula := Congruence ; depth_term := n)),  "generates formula for congruence theory (terms of given size).");
+    ("-nedge", Arg.Int    (fun n -> if !mode <> Unknown && !mode <> Graph then failwith "Contradictory options." else (mode := Graph ; nedge := n)),  "the number of edges to generate (graph generator).");
     ("-pathologic", Arg.Unit    (fun () -> pathologic := true),  "Generation of pathologic case for dumb heuristic.");
-    ("-non_constant_sclause", Arg.Unit    (fun () -> if !mode != Unknown && !mode != Clause_set then failwith "Contradictory options." else (mode := Clause_set ; non_constant := true)),  "Generation of variable length clauses.");
+    ("-non_constant_sclause", Arg.Unit    (fun () -> if !mode <> Unknown && !mode <> Clause_set then failwith "Contradictory options." else (mode := Clause_set ; non_constant := true)),  "Generation of variable length clauses.");
     ("-o", Arg.String (fun s -> name_f := s), ": output file (stdout while be used if not specified).")
 ]
 
@@ -314,8 +391,12 @@ let main() =
   if !mode = Formula && !depth <= 0 then failwith "Please provide the depth of formula." ;
   if !mode = Graph && !nedge <= 0 then failwith "Please provide the number of edges of the graph." ;
   
+  if !mode_formula = Congruence && !depth_term <= 0 then failwith "Please provide the depth of the terms." ;
+
+
+
   if !mode = Clause_set then print_clause_set !nvar !nclause !sclause !name_f ;
-  if !mode = Formula then print_formula !nvar !depth !name_f ;
+  if !mode = Formula then print_formula !nvar !depth !depth_term !name_f ;
   if !mode = Graph then print_graph !nvar !nedge !name_f ;
 ;;
 main()
