@@ -11,6 +11,7 @@ class AbstractAssistant {
         virtual int on_flip(unsigned int variable) = 0;
 
         virtual bool is_state_consistent() = 0;
+        virtual bool detect_isolated_literals() = 0;
 
         virtual ~AbstractAssistant() {};
 };

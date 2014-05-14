@@ -86,10 +86,10 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             // made us deduce the value of the literal.
             formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant);
             contains_false_clause = formula->contains_false_clause(&clause_id);
-        }/*
-        else if((literal = formula->isolated_literal(&clause_id))) {
-            formula->deduce_true(literal,-1,NULL,NULL,NULL) ;
-        }*/
+        }
+        else if(assistant->detect_isolated_literals() && (literal = formula->isolated_literal(&clause_id))) {
+            formula->deduce_true(literal,-1,NULL,NULL,NULL, assistant) ;
+        }
         else {
             literal = formula->choose_literal(HEURISTIC) ;
             if (WITH_WL) {

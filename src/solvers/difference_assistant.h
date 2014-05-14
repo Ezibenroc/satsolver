@@ -37,6 +37,7 @@ class DifferenceAssistant : public AbstractAssistant {
         int learn_clause(std::list<path_item> &path, int atom_id);
 
         bool is_state_consistent();
+        bool detect_isolated_literals();
 
         const AdjGraph& get_graph() { return this->adj_graph; }
 };

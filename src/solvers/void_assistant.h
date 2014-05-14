@@ -7,6 +7,7 @@ namespace theorysolver {
 class VoidAssistant : public AbstractAssistant {
     public:
         int on_flip(unsigned int variable);
+        virtual bool detect_isolated_literals();
         bool is_state_consistent();
 };
 

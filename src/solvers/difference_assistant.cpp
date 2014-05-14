@@ -187,3 +187,7 @@ int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
 bool DifferenceAssistant::is_state_consistent() {
     return this->consistent_state;
 }
+
+bool DifferenceAssistant::detect_isolated_literals() {
+    return false;
+}
