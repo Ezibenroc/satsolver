@@ -2,11 +2,51 @@
 
 #include "structures/congruence_atom.h"
 
+#define CA theorysolver::CongruenceAtom
+#define SPCA std::shared_ptr<CA>
+
 using namespace theorysolver;
 
 Term::Term(unsigned int symbol_id) : type(Term::SYMBOL), symbol_id(symbol_id), function_name(), arguments() {
 }
 Term::Term(std::string function_name, std::vector<std::shared_ptr<Term>> arguments) : type(Term::FUNCTION), symbol_id(0), function_name(function_name), arguments(arguments) {
+}
+Term::Term(const Term &t) : type(t.type), symbol_id(t.symbol_id), function_name(t.function_name), arguments(t.arguments) {
+}
+
+bool CongruenceAtom::is_atom_variable(std::string variable) {
+    return variable.c_str()[0] == '#';
+}
+bool CongruenceAtom::is_atom_literal(const std::map<int, std::string> &literal_to_name, unsigned int literal) {
+    return CongruenceAtom::is_atom_variable(literal_to_name.at(literal));
+}
+
+unsigned int CongruenceAtom::atom_id_from_literal(const std::map<int, std::string> &variable_to_name, unsigned int literal) {
+    unsigned int atom_id;
+    atom_id = atoi(variable_to_name.at(literal).c_str()+1);
+    return atom_id;
+}
+
+std::string CongruenceAtom::variable_name_from_atom_id(unsigned long int atom_id) {
+    return "#" + std::to_string(atom_id);
+}
+int CongruenceAtom::literal_from_atom_id(const std::map<std::string, int> &name_to_variable, unsigned int atom_id) {
+    return name_to_variable.at("#" + std::to_string(atom_id));
+}
+
+SPCA CongruenceAtom::SPCA_from_literal(const CA_list &literal_to_CA, std::map<int, std::string> &variable_to_name, unsigned int literal) {
+    unsigned int atom_id = CongruenceAtom::atom_id_from_literal(variable_to_name, literal);
+    assert(atom_id > 0);
+    assert(atom_id <= literal_to_CA.size());
+    return literal_to_CA[atom_id-1];
+}
+
+long unsigned int CongruenceAtom::add_CA(CA_list &literal_to_CA, Term &left, Operator op, Term &right) {
+    literal_to_CA.push_back(SPCA(new CA(std::shared_ptr<Term>(new Term(left)), op, std::shared_ptr<Term>(new Term(right)))));
+    return literal_to_CA.size();
+}
+std::shared_ptr<CongruenceAtom> CongruenceAtom::SPCA_from_variable(const CA_list &literal_to_CA, std::string variable) {
+    return literal_to_CA[atoi(variable.c_str()+1)-1];
 }
 
 bool Term::operator==(const Term &that) const {
