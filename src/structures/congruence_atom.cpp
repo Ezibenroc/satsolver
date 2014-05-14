@@ -1,3 +1,4 @@
+#include <sstream>
 #include <cassert>
 
 #include "structures/congruence_atom.h"
@@ -13,6 +14,26 @@ Term::Term(std::string function_name, std::vector<std::shared_ptr<Term>> argumen
 }
 Term::Term(const Term &t) : type(t.type), symbol_id(t.symbol_id), function_name(t.function_name), arguments(t.arguments) {
 }
+
+std::string Term::to_string() const {
+    if (this->type == Term::SYMBOL)
+        return "x" + std::to_string(this->symbol_id);
+    else {
+        std::ostringstream oss;
+        oss << this->function_name + "(";
+        for (unsigned i=0; i<this->arguments.size(); i++) {
+            if (i)
+                oss << ", ";
+            oss << "x" + this->arguments[i]->to_string();
+        }
+        oss << ")";
+        return oss.str();
+    }
+}
+
+
+
+
 
 bool CongruenceAtom::is_atom_variable(std::string variable) {
     return variable.c_str()[0] == '#';
@@ -74,6 +95,5 @@ CongruenceAtom::CongruenceAtom(std::shared_ptr<Term> left, enum Operator op, std
 }
 
 std::string CongruenceAtom::to_string() const {
-    // TODO
-    return std::string();
+    return this->left->to_string() + (this->op == CongruenceAtom::EQUAL ? "=" : "!=") + this->right->to_string();
 }
