@@ -101,6 +101,19 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             }
         }
         while(contains_false_clause || !assistant->is_state_consistent()) {
+            while(!assistant->is_state_consistent()) {
+                if(formula->get_ded_depth() == 0)
+                    throw Conflict() ;
+                formula->back(assistant) ;
+                if(WITH_WL)
+                    contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant);
+                else {
+                    formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant);
+                    contains_false_clause = formula->contains_false_clause(&clause_id);
+                }
+            }
+            if(!contains_false_clause)
+                break ;
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
             // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral

@@ -54,6 +54,8 @@ std::unordered_set<int> Deductions::get_deductions(const satsolver::Affectation 
 }
 
 int Deductions::get_clause_id(int literal) const {
+    if(!(deduced_to_clause_id[abs(literal)]>=0))
+        std::cout << "Fail " << literal << std::endl ;
     assert(deduced_to_clause_id[abs(literal)]>=0) ;
     return deduced_to_clause_id[abs(literal)] ;
 }

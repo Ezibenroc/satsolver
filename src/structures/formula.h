@@ -74,12 +74,16 @@ class Formula {
         // Sinon, renvoie faux ssi x est déjà affecté, à faux
         // claude_id est l'indice de la clause qui est l'origine de cette déduction
         // pas de clause origine si clause_id = -1 (survient lors des déductions des littéraux isolés)
+        // clause1 et clause2 sont mis à jour avec les indices des clauses en conflit
+        // si création d'un état inconsistant, clause1 est mis à jour avec l'indice de la clause apprise
         bool deduce_true(int x, int clause_id, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant) ;
         bool deduce_false(int x, int clause_id, theorysolver::AbstractAssistant *assistant) ;
 
         // Pari sur l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
         // Sinon, renvoie faux ssi x est déjà affecté, à faux
+        // clause1 et clause2 sont mis à jour avec les indices des clauses en conflit
+        // si création d'un état inconsistant, clause1 est mis à jour avec l'indice de la clause apprise
         bool bet_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant) ;
         bool bet_false(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant) ;
 

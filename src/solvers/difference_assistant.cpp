@@ -97,7 +97,7 @@ int DifferenceAssistant::on_flip(unsigned int variable) {
     if (!DifferenceAtom::is_atom_literal(this->variable_to_name, variable)) {
         if (VERBOSE_ASSISTANT && VERBOSE)
             std::cout << ", which is not an atom." << std::endl;
-        return true; // We care only about variables matching atoms.
+        return -1; // We care only about variables matching atoms.
     }
     assert(variable <= static_cast<unsigned int>(this->formula->get_nb_variables()));
     atom_id = DifferenceAtom::atom_id_from_literal(this->variable_to_name, variable);
@@ -177,11 +177,21 @@ int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
 }
 
 int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
+    int max_depth=0, max_depth_l=0 ;
+    int lit_conf, lit = this->literal_from_atom_id(atom_id) ;
+    int tmp ;
     std::unordered_set<int> clause;
-    clause.insert(this->literal_from_atom_id(atom_id));
-    for (auto it : path)
-        clause.insert(this->literal_from_atom_id(it.tag));
-    return static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
+    clause.insert(lit_conf);
+    for (auto it : path) {
+        clause.insert(lit=this->literal_from_atom_id(it.tag));
+        if(WITH_WL && lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
+            max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
+            max_depth_l = lit ;
+        }
+    }
+    tmp = static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
+    if(WITH_WL) this->formula->to_clauses_vector()[tmp]->init_WL_CL(lit_conf,max_depth_l) ;
+    return tmp ;
 }
 
 bool DifferenceAssistant::is_state_consistent() {

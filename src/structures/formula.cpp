@@ -119,8 +119,6 @@ std::vector<std::shared_ptr<Clause>>& Formula::to_clauses_vector() {
 }
 
 unsigned int Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
-    if(WITH_WL)
-        clause->init_WL() ;
     this->clauses.push_back(clause);
     return static_cast<unsigned int>(this->clauses.size())-1;
 }
@@ -129,6 +127,7 @@ unsigned int Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
 bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant) {
     int l ;
     int clause_id=-1 ;
+    int tmp ;
     std::unordered_set<std::pair<int,unsigned int>,Hash,Equal>::const_iterator it ;
     if(WITH_WL) {
         for(unsigned int i=0; i<this->clauses.size(); i++) {
@@ -151,8 +150,10 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
         }
     }
     this->aff->set_true(x) ;
-    if (!assistant->on_flip(abs(x)))
+    if ((tmp=assistant->on_flip(abs(x)))!=-1) {
+        *clause1 = tmp ;
         return false;
+    }
     if(!this->to_do.empty()) { // on doit affecter ces littéraux
         l = this->to_do.begin()->first ;
         clause_id= this->to_do.begin()->second ;
