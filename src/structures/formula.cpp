@@ -526,17 +526,6 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
     clause_id2 = this->ded->get_clause_id(literal) ;
     std::unordered_set<int> clause = this->clauses[clause_id1]->whole_to_set() ;
     std::unordered_set<int> clause2 = this->clauses[clause_id2]->whole_to_set() ;
-/*
-        std::cout << "CLAUSE1 : " ;
-        for(auto l : clause)
-            std::cout << l << " " ;
-        std::cout << std::endl ;
-
-        std::cout << "CLAUSE2 : " ;
-        for(auto l : clause2)
-            std::cout << l << " " ;
-        std::cout << std::endl << std::endl  ;
-*/
     clause.insert(clause2.begin(), clause2.end());
     clause.erase(literal) ;
     clause.erase(-literal);
@@ -561,17 +550,6 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
         } while(clause.find(-lit_conf) == clause.end() && clause.find(lit_conf) == clause.end()) ;
         clause_id2 = this->ded->get_clause_id(lit_conf) ;
         clause2 = this->clauses[clause_id2]->whole_to_set(); // Clause correspondante
-/*
-        std::cout << "CLAUSE1 : " ;
-        for(auto l : clause)
-            std::cout << l << " " ;
-        std::cout << std::endl ;
-        std::cout << "Literal=" << lit_conf << std::endl ;
-        std::cout << "CLAUSE2 : " ;
-        for(auto l : clause2)
-            std::cout << l << " " ;
-        std::cout << std::endl << std::endl  ;
-*/
         // Resolution
         proof->insert_top(lit_conf, std::make_pair(clause_id1, Clause(nb_variables, clause)), std::make_pair(clause_id2, Clause(nb_variables, clause2)));
         clause.insert(clause2.begin(), clause2.end());
