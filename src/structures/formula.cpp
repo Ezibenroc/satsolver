@@ -127,7 +127,6 @@ unsigned int Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
 
 
 bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant) {
- //   std::cout << this->aff->to_string() << std::endl ;
     int l ;
     int clause_id=-1 ;
     std::unordered_set<std::pair<int,unsigned int>,Hash,Equal>::const_iterator it ;
@@ -151,7 +150,6 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
             }
         }
     }
-    std::cout << "=== " << x << " ===" << std::endl;
     this->aff->set_true(x) ;
     if (!assistant->on_flip(abs(x)))
         return false;
@@ -173,7 +171,6 @@ bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int 
             std::cout << this->clauses[clause_id]->to_string() << " => " << x << std::endl;
         }
     }
-    std::cout << "--- " << x << " ---" << std::endl;
     if(this->aff->is_unknown(x)) {
         if(WITH_CL || CL_INTERACT) {
             if(clause_id >= 0)
@@ -198,7 +195,6 @@ bool Formula::bet_true(int x, int *clause1, int *clause2, int *literal, theoryso
         std::cout << "Bet " << x << std::endl ;
     }
     this->ded_depth ++ ;
-    std::cout << "*-- " << x << " ---" << std::endl;
     if(this->aff->is_unknown(x)) {
         this->ded->add_bet(x,this->ded_depth) ;
         this->mem.push_back(std::pair<int,bool>(x,false)) ;
@@ -221,7 +217,6 @@ int Formula::back(theorysolver::AbstractAssistant *assistant) {
     while(!this->mem.empty()) {
         p = this->mem.back() ;
         if(VERBOSE) std::cout << p.first << " " ;
-        std::cout << "**- " << p.first << " ---" << std::endl;
         this->aff->set_unknown(p.first) ;
         this->mem.pop_back() ;
         this->ded->remove_deduction(p.first) ;

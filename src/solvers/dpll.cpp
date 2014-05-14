@@ -151,7 +151,6 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             }
             if(WITH_WL && (WITH_CL || CL_INTERACT)) { // nettoyage
                 formula->get_ded()->remove_deduction(literal_sav) ;
-                std::cout << "*== " << literal_sav << " ===" << std::endl;
                 formula->get_aff()->set_unknown(literal_sav) ;
             }
             if(literal == 0)

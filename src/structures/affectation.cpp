@@ -43,7 +43,6 @@ bool Affectation::is_unknown(int x) const {
 void Affectation::set_true(int x) {
     if(x>0) {
         assert(abs(x) <= this->aff.size() && x!=0) ;
-        std::cout << "=== " << x << " ==*" << std::endl;
         assert(this->is_unknown(x)) ;
         if(is_unknown(x))
             this->nb_unknown -- ;
@@ -55,7 +54,6 @@ void Affectation::set_true(int x) {
 void Affectation::set_false(int x) {
     if(x>0) {
         assert(abs(x) <= this->aff.size() && x!=0) ;
-        std::cout << "=== " << x << " =**" << std::endl;
         assert(this->is_unknown(x)) ;
         if(is_unknown(x))
             this->nb_unknown -- ;
@@ -68,7 +66,6 @@ void Affectation::set_unknown(int x) {
     if(x>0) {
         assert(abs(x) <= this->aff.size());
         assert(x!=0) ;
-        std::cout << "=== " << x << " ***" << std::endl;
         if(!is_unknown(x))
             this->nb_unknown ++ ;
         this->aff[abs(x)-1] = UN ;
