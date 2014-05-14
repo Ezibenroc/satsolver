@@ -105,9 +105,9 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                     throw Conflict() ;
                 formula->back(assistant) ;
                 if(WITH_WL)
-                    contains_false_clause = !formula->deduce_true(literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                    contains_false_clause = !formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
                 else {
-                    formula->deduce_true(literal, clause_assistant,&clause_id,NULL,NULL, assistant, &clause_assistant);
+                    formula->deduce_true(-literal, clause_assistant,&clause_id,NULL,NULL, assistant, &clause_assistant);
                     contains_false_clause = formula->contains_false_clause(&clause_id);
                 }
             }

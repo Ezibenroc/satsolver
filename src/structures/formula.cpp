@@ -156,7 +156,7 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
             print_space(this->ded_depth);
             std::cout << "Theory inconsistency. Learned a clause.\n" ;
             print_space(this->ded_depth) ;
-            std::cout << this->clauses[tmp]->to_string() << " => " << x << std::endl ;
+            std::cout << this->clauses[tmp]->to_string() << " => " << -x << std::endl ;
         }
         return false;
     }
