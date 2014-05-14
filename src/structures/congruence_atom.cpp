@@ -17,6 +17,8 @@ bool Term::operator==(const Term &that) const {
     else if (this->type == Term::FUNCTION) {
         if (this->arguments.size() != that.arguments.size())
             return false;
+        if (this->function_name != that.function_name)
+            return false;
         for (unsigned i=0; i<this->arguments.size(); i++)
             if (!(this->arguments[i] == that.arguments[i]))
                 return false;
