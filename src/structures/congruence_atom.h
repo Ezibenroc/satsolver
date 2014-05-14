@@ -21,6 +21,9 @@ class Term {
         Term(unsigned int symbol_id);
         Term(std::string function_name, std::vector<std::shared_ptr<Term>> arguments);
 
+        bool operator==(const Term &that) const;
+        bool operator!=(const Term &that) const { return !this->operator==(that); }
+
         std::string to_string() const;
 };
 
