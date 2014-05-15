@@ -6,7 +6,7 @@ bool tseitin_reduction(bool DISPLAY_SAT, std::shared_ptr<satsolver::ExtendedForm
     return tseitin_reduction(DISPLAY_SAT, ext_formula, name_to_variable, formula, NULL);
 }
 bool tseitin_reduction(bool DISPLAY_SAT, std::shared_ptr<satsolver::ExtendedFormula> ext_formula, std::shared_ptr<std::map<std::string, int>> &name_to_variable, std::shared_ptr<satsolver::Formula> &formula, std::vector<unsigned int> *affected_literals) {
-    ext_formula = ext_formula->simplify();
+    *ext_formula = *ext_formula->simplify();
     if (VERBOSE)
         std::cout << "Reduction of formula to: " << ext_formula->to_string() << std::endl;
     try {

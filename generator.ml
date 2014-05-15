@@ -274,8 +274,8 @@ let rec var_of_int (n : int) : string =
   else (var_of_int (n/26))^s
 *)
 
-let var_of_int (n : int) : string = "x"^(string_of_int n)
-let fun_of_int (n : int) : string = "f"^(string_of_int n)
+let var_of_int (n : int) : string = "x"^(string_of_int (n+1))
+let fun_of_int (n : int) : string = "f"^(string_of_int (n+1))
 
 (* Génère un atome, selon les options spécifiées *)
 let rec gen_term(nvar : int) (depth : int) : term =
