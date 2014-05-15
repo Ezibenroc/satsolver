@@ -15,8 +15,10 @@ bool tseitin_reduction(bool DISPLAY_SAT, std::shared_ptr<satsolver::ExtendedForm
     catch (satsolver::Conflict) {
         return false;
     }
-    if (!formula)
-        return false;
+    if (!formula) {
+        formula = std::shared_ptr<satsolver::Formula>(new satsolver::Formula({std::shared_ptr<satsolver::Clause>(new satsolver::Clause(1, {1}))}, 1));
+        return true;
+    }
 
     if (VERBOSE)
         std::cout << "Reduction of formula to SAT: " << formula->to_string() << std::endl;

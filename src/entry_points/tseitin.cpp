@@ -62,9 +62,11 @@ void parser_result(SPEF ext_formula) {
      ********************/
     if (VERBOSE)
         std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
-    for (auto literal : *literals) {
-        std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
-    }
+    if (name_to_variable)
+        for (auto literal : *literals)
+            std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
+    else
+        std::cout << "The formula is a tautology." << std::endl;
 }
 
 int main (int argc, char *argv[]) {
