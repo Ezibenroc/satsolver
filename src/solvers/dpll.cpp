@@ -74,29 +74,28 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
     unsigned int steps_before_next_stats_print = STEPS_BETWEEN_STATS;
     bool with_proof;
     CLProof *proof;
-    int clause_id, tmp;
+    int clause_id, tmp, clause_assistant;
     bool contains_false_clause;
     unsigned int skip_conflicts = 1; // Number of conflicts we will skip before showing another prompt
     int last_bet = 0; // Used for generating the graph.
     unsigned int depth_back ;
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
-        formula->get_ded()->print() ;
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
             // We set the clause identified by “claused_id” as the one which
             // made us deduce the value of the literal.
-            formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant);
+            formula->deduce_true(literal, clause_id,&clause_id,NULL,NULL, assistant,&clause_assistant);
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }
         else if(assistant->detect_isolated_literals() && (literal = formula->isolated_literal(&clause_id))) {
-            formula->deduce_true(literal,-1,NULL,NULL,NULL, assistant) ;
+            formula->deduce_true(literal,-1,NULL,NULL,NULL, assistant,&clause_assistant) ;
         }
         else {
             literal = formula->choose_literal(HEURISTIC) ;
             if (WITH_WL) {
-                contains_false_clause = !formula->bet_true(literal,&clause_id,&tmp,&literal, assistant);
+                contains_false_clause = !formula->bet_true(literal,&clause_id,&tmp,&literal, assistant, &clause_assistant);
             }
             else {
-                formula->bet_true(literal,NULL,NULL,NULL, assistant);
+                formula->bet_true(literal,&clause_id,NULL,NULL, assistant, &clause_assistant);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }
@@ -106,9 +105,9 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                     throw Conflict() ;
                 formula->back(assistant) ;
                 if(WITH_WL)
-                    contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant);
+                    contains_false_clause = !formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
                 else {
-                    formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant);
+                    formula->deduce_true(-literal, clause_assistant,&clause_id,NULL,NULL, assistant, &clause_assistant);
                     contains_false_clause = formula->contains_false_clause(&clause_id);
                 }
             }
@@ -169,10 +168,10 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             if(literal == 0)
                 throw Conflict() ;
             if (WITH_WL) {
-                contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant);
+                contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant, &clause_assistant);
             }
             else {
-                formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant);
+                formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant, &clause_assistant);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }

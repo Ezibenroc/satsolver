@@ -177,18 +177,20 @@ int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
 }
 
 int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
-    int max_depth=0, max_depth_l=0 ;
-    int lit_conf, lit = this->literal_from_atom_id(atom_id) ;
+    int max_depth=-1, max_depth_l=0 ;
+    int lit, lit_conf = this->literal_from_atom_id(atom_id) ;
     int tmp ;
     std::unordered_set<int> clause;
-    clause.insert(lit_conf);
+    clause.insert(-lit_conf);
     for (auto it : path) {
-        clause.insert(lit=this->literal_from_atom_id(it.tag));
+        clause.insert(lit=-this->literal_from_atom_id(it.tag));
         if(WITH_WL && lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
             max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
             max_depth_l = lit ;
         }
     }
+    assert(clause.size()>=2) ;
+    assert(!WITH_WL || max_depth_l) ;
     tmp = static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
     if(WITH_WL) this->formula->to_clauses_vector()[tmp]->init_WL_CL(lit_conf,max_depth_l) ;
     return tmp ;
