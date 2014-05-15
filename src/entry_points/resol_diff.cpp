@@ -63,6 +63,18 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
         std::cout << "s UNSATISFIABLE" << std::endl;
         return;
     }
+    if (!name_to_variable) {
+        switch (ext_formula->get_type()) {
+            case EF::TRUE:
+                std::cout << "s SATISFIABLE (tautology)" << std::endl;
+                return;
+            case EF::FALSE:
+                std::cout << "s UNSATISFIABLE" << std::endl;
+                return;
+            default:
+                assert(false);
+        }
+    }
     assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, formula);
     for (auto it : affected_literals) {
         if (!assistant->on_flip(it)) {

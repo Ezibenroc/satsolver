@@ -19,6 +19,33 @@ using namespace theorysolver;
 SPEF canonize_atom(SPDA atom, std::vector<SPDA> &literal_to_DA, std::string literal) {
     unsigned long int id1, id2;
     assert(atom);
+    if (atom->i == atom->j) {
+        bool v;
+        switch (atom->op) {
+            case DA::LOWER:
+                v = atom->n > 0;
+                break;
+            case DA::LEQ:
+                v = atom->n >= 0;
+                break;
+            case DA::GREATER:
+                v = atom->n < 0;
+                break;
+            case DA::GEQ:
+                v = atom->n <= 0;
+                break;
+            case DA::EQUAL:
+                v = atom->n == 0;
+                break;
+            case DA::UNEQUAL:
+                v = atom->n != 0;
+                break;
+            default:
+                assert(false);
+        }
+        atom->canonical = SPEF(new EF(v ? EF::TRUE : EF::FALSE));
+        return atom->canonical;
+    }
     switch (atom->op) {
         case DA::LOWER: // xi - xj < n   -->   xi - xj <= n-1
             id1 = DifferenceAtom::add_DA(literal_to_DA, atom->i, atom->j, DA::LEQ, atom->n-1);
