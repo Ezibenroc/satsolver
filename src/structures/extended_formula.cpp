@@ -401,7 +401,7 @@ bool EF::is_true(Affectation *aff, std::shared_ptr<std::map<std::string, int>> n
             return true;
         case EF::FALSE:
             return false;
-        case EF::LITERAL:
+        case EF::LITERAL: 
             return aff->is_true(name_to_variable->at(this->literal));
         case EF::NOT:
             return this->f1->is_false(aff, name_to_variable);
@@ -422,7 +422,7 @@ bool EF::is_false(Affectation *aff, std::shared_ptr<std::map<std::string, int>> 
             return false;
         case EF::FALSE:
             return true;
-        case EF::LITERAL:
+        case EF::LITERAL: 
             return aff->is_false(name_to_variable->at(this->literal));
         case EF::NOT:
             return this->f1->is_true(aff, name_to_variable);

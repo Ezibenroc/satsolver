@@ -108,7 +108,12 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
         catch (std::out_of_range) {
             SPEF f = literal_to_DA[atoi(literal.c_str()+1)-1]->canonical;
             std::cout << literal << " (inferred from " << f->to_string() << ")" << " = ";
-            std::cout << (f->is_true(formula->get_aff(), name_to_variable) ? "true" : "false") << std::endl;
+            try {
+                std::cout << (f->is_true(formula->get_aff(), name_to_variable) ? "true" : "false") << std::endl;
+            }
+            catch (std::out_of_range) {
+                std::cout << "can be true or false" << std::endl ;
+            }
         }
     }
     delete assistant;
