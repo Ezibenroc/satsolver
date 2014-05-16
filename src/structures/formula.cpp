@@ -124,7 +124,7 @@ unsigned int Formula::add_clause(std::shared_ptr<satsolver::Clause> clause) {
 }
 
 
-bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) {
+bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant) {
     int l ;
     int clause_id=-1 ;
     int tmp ;
@@ -152,7 +152,6 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
     this->aff->set_true(x) ;
     if ((tmp=assistant->on_flip(abs(x)))!=-1) {
         *clause_assistant = tmp ;
-        *literal_assistant = x ;
         if(VERBOSE) {
             print_space(this->ded_depth);
             std::cout << "Theory inconsistency. Learned a clause.\n" ;
@@ -165,13 +164,12 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
         l = this->to_do.begin()->first ;
         clause_id= this->to_do.begin()->second ;
         this->to_do.erase(this->to_do.begin()) ;
-        return deduce_true(l, clause_id, clause1, clause2, literal, assistant,clause_assistant,literal_assistant) ;
+        return deduce_true(l, clause_id, clause1, clause2, literal, assistant,clause_assistant) ;
     }
     return true ;
 }
 
-bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) {
-    assert(clause_id == -1 || this->clauses[clause_id]->contains_literal(x)) ;
+bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant) {
     if(VERBOSE) {
         print_space(this->ded_depth) ;
         std::cout << "Deduce " << x << std::endl ;
@@ -181,22 +179,24 @@ bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int 
         }
     }
     if(this->aff->is_unknown(x)) {
-        if((WITH_CL || CL_INTERACT) && clause_id >= 0) 
-            this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
-        else
-            this->ded->add_bet(x,this->ded_depth) ;
+        if(WITH_CL || CL_INTERACT) {
+            if(clause_id >= 0)
+                this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
+            else
+                this->ded->add_bet(x,this->ded_depth) ; // pas déduit grâce à une clause, on sauvegarde simplement sa profondeur
+        }
         this->mem.push_back(std::pair<int,bool>(x,true)) ;
-        return this->set_true(x, clause1, clause2, literal, assistant, clause_assistant,literal_assistant) ;
+        return this->set_true(x, clause1, clause2, literal, assistant, clause_assistant) ;
     }
     else {
         return this->aff->is_true(x) ;
     }
 }
-bool Formula::deduce_false(int x, int clause_id, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) {
-    return deduce_true(-x, clause_id, NULL, NULL, NULL, assistant, clause_assistant,literal_assistant) ;
+bool Formula::deduce_false(int x, int clause_id, theorysolver::AbstractAssistant *assistant, int *clause_assistant) {
+    return deduce_true(-x, clause_id, NULL, NULL, NULL, assistant, clause_assistant) ;
 }
 
-bool Formula::bet_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) {
+bool Formula::bet_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant) {
     if(VERBOSE) {
         print_space(this->ded_depth) ;
         std::cout << "Bet " << x << std::endl ;
@@ -205,13 +205,13 @@ bool Formula::bet_true(int x, int *clause1, int *clause2, int *literal, theoryso
     if(this->aff->is_unknown(x)) {
         this->ded->add_bet(x,this->ded_depth) ;
         this->mem.push_back(std::pair<int,bool>(x,false)) ;
-        return this->set_true(x,clause1,clause2,literal, assistant, clause_assistant, literal_assistant) ;
+        return this->set_true(x,clause1,clause2,literal, assistant, clause_assistant) ;
     }
     else
         return this->aff->is_true(x) ;
 }
-bool Formula::bet_false(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) {
-    return bet_true(-x,clause1,clause2,literal, assistant, clause_assistant, literal_assistant) ;
+bool Formula::bet_false(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant) {
+    return bet_true(-x,clause1,clause2,literal, assistant, clause_assistant) ;
 }
 
 int Formula::back(theorysolver::AbstractAssistant *assistant) {
@@ -369,7 +369,6 @@ void Formula::clean(std::vector<unsigned int> *affected_literals) {
         }
         if(literal) {
             this->aff->set_true(literal) ;
-            this->ded->add_bet(literal,0) ;
             if (affected_literals)
                 affected_literals->push_back(abs(literal));
             this->mem.push_back(std::pair<int,bool>(literal,true)) ;

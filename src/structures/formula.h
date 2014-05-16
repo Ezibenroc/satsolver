@@ -42,8 +42,8 @@ class Formula {
         // Affectation d'un litéral x
         // Si WITH_WL, renvoie faux ssi un conflit est généré
         // Si WITH_WL et un conflit est généré, alors clause1 et clause2 sont mis à jour avec les indices des clauses en conflit (ainsi que literal)
-        // si création d'un état inconsistant, clause_assistant est mis à jour avec l'indice de la clause apprise, et literal_assistant avec le litteral à déduire
-        bool set_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) ;
+        // si création d'un état inconsistant, clause_assistant est mis à jour avec l'indice de la clause apprise
+        bool set_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant) ;
 
 
     public :
@@ -76,18 +76,18 @@ class Formula {
         // claude_id est l'indice de la clause qui est l'origine de cette déduction
         // pas de clause origine si clause_id = -1 (survient lors des déductions des littéraux isolés)
         // clause1 et clause2 sont mis à jour avec les indices des clauses en conflit
-        // si création d'un état inconsistant, clause_assistant est mis à jour avec l'indice de la clause apprise, et literal_assistant avec le litteral à déduire
-        bool deduce_true(int x, int clause_id, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) ;
-        bool deduce_false(int x, int clause_id, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) ;
+        // si création d'un état inconsistant, clause_assistant est mis à jour avec l'indice de la clause apprise
+        bool deduce_true(int x, int clause_id, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant) ;
+        bool deduce_false(int x, int clause_id, theorysolver::AbstractAssistant *assistant, int *clause_assistant) ;
 
         // Pari sur l'affectation d'un littéral
         // Si WITH_WL, renvoie faux ssi conflit
         // Sinon, renvoie faux ssi x est déjà affecté, à faux
         // clause1 et clause2 sont mis à jour avec les indices des clauses en conflit
         // si création d'un état inconsistant, clause1 est mis à jour avec l'indice de la clause apprise
-        // si création d'un état inconsistant, clause_assistant est mis à jour avec l'indice de la clause apprise, et literal_assistant avec le litteral à déduire
-        bool bet_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) ;
-        bool bet_false(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant, int *literal_assistant) ;
+        // si création d'un état inconsistant, clause_assistant est mis à jour avec l'indice de la clause apprise
+        bool bet_true(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant) ;
+        bool bet_false(int x, int *clause1, int *clause2, int *literal, theorysolver::AbstractAssistant *assistant, int *clause_assistant) ;
 
         // Retourne en arrière jusqu'au dernier pari
         // Renvoie le dernier littéral parié (0 si inexistant)
