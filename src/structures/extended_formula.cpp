@@ -192,6 +192,15 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
     std::vector<std::shared_ptr<satsolver::Clause>> clauses;
     std::shared_ptr<std::vector<int>> int_literals;
     std::string string_literal;
+    
+    if(this->get_type() == TRUE) {
+        return std::shared_ptr<Formula>(new Formula(clauses, nb_variables, affected_literals));
+    }
+    
+    if(this->get_type() == FALSE) {
+        clauses.push_back(std::shared_ptr<satsolver::Clause>(new satsolver::Clause(nb_variables, std::unordered_set<int>())));
+        return std::shared_ptr<Formula>(new Formula(clauses, nb_variables, affected_literals));
+    }
 
     // Force the literal representing the root to be true (because we want the
     // whole formula to be true, not a subset).
@@ -227,8 +236,8 @@ std::shared_ptr<Formula> EF::reduce_to_formula(std::shared_ptr<std::map<std::str
         delete raw_clause;
     }
     delete raw_clauses;
-    if (clauses.size() == 1) // Conjonction of one clause (the literal of the “root” formula)
-        return NULL;
+//    if (clauses.size() == 1) // Conjonction of one clause (the literal of the “root” formula)
+//        return NULL;
 
     if (name_to_variable_ptr)
         *name_to_variable_ptr = name_to_variable;

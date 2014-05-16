@@ -358,7 +358,7 @@ bool to_delete(std::shared_ptr<Clause> c, std::unordered_set<int> &literals_to_d
 void Formula::clean(std::vector<unsigned int> *affected_literals) {
     // Affectation des monomes
     std::unordered_set<int> literals_to_delete = std::unordered_set<int>() ;
-    int literal ;
+    int literal=0 ;
     do {
         for(auto c : this->clauses) {
             literal = c->monome_begin();
