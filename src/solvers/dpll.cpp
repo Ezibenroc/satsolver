@@ -100,79 +100,80 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             }
         }
         while(contains_false_clause || !assistant->is_state_consistent()) {
-            while(!assistant->is_state_consistent()) {
-                if(formula->get_ded_depth() == 0)
+            if(contains_false_clause) {
+                // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
+                // Cette mise à jour sera annulée par le backtrack
+                // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
+                if(formula->get_ded_depth() == 0) { // clause fausse sans aucun paris, donc insatisfiable
                     throw Conflict() ;
-                formula->back(assistant) ;
-                if(WITH_WL)
-                    contains_false_clause = !formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                }
+                if(CL_INTERACT || WITH_CL) {
+                    if(!WITH_WL) { // formalités administratives un peu moches
+                        tmp = formula->get_ded()->get_clause_id(literal) ;
+                        formula->get_ded()->remove_deduction(literal);
+                    }
+                    formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
+                    if(WITH_WL) {
+                        formula->get_aff()->set_true(literal) ;
+                    }
+                    literal_sav = literal ;
+                    clause_id = tmp ;
+                    if(formula->to_clauses_vector()[clause_id]->get_size() <= 1 && formula->to_clauses_vector()[tmp]->get_size() <= 1)
+                        throw Conflict() ;
+                }
+                with_proof = false;
+                if (CL_INTERACT && --skip_conflicts == 0) {
+                    last_bet = formula->last_bet() ;
+                    assert(last_bet);
+                    skip_conflicts = cl_interac(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);
+                }
+                if (WITH_CL) {
+                    proof = new CLProof();
+                    literal = formula->learn_clause(proof,&clause_id, &depth_back, literal, &learned_clause);
+                    nb_learned_clauses++;
+                    nb_learned_literals += static_cast<unsigned int>(learned_clause.whole_to_set().size());
+                    if (CL_STATS && !--steps_before_next_stats_print) {
+                        steps_before_next_stats_print = STEPS_BETWEEN_STATS;
+                        std::cout << "Stats: " << nb_learned_clauses << " clauses learned (";
+                        printf("%.2g", static_cast<double>(nb_learned_clauses)*100./static_cast<double>(formula->get_size()));
+                        std::cout << "% of all clauses), averaging ";
+                        printf("%.3g", static_cast<double>(nb_learned_literals)/static_cast<double>(nb_learned_clauses));
+                        std::cout << " literals per clause." << std::endl;
+                    }
+                    if (with_proof)
+                        proof->to_latex_file(CL_PROOF_FILE_NAME);
+                    delete proof;
+                    formula->back(assistant, depth_back);
+                }
                 else {
-                    formula->deduce_true(-literal, clause_assistant,&clause_id,NULL,NULL, assistant, &clause_assistant);
+                    literal = -formula->back(assistant) ;
+                    clause_id = -1 ;
+                }
+                if(WITH_WL && (WITH_CL || CL_INTERACT)) { // nettoyage
+                    formula->get_ded()->remove_deduction(literal_sav) ;
+                    formula->get_aff()->set_unknown(literal_sav) ;
+                }
+                if(literal == 0)
+                    throw Conflict() ;
+                if (WITH_WL) {
+                    contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                }
+                else {
+                    formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant, &clause_assistant);
                     contains_false_clause = formula->contains_false_clause(&clause_id);
                 }
             }
-            if(!contains_false_clause)
-                break ;
-            // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
-            // Cette mise à jour sera annulée par le backtrack
-            // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
-            if(formula->get_ded_depth() == 0) { // clause fausse sans aucun paris, donc insatisfiable
-                throw Conflict() ;
-            }
-            if(CL_INTERACT || WITH_CL) {
-                if(!WITH_WL) { // formalités administratives un peu moches
-                    tmp = formula->get_ded()->get_clause_id(literal) ;
-                    formula->get_ded()->remove_deduction(literal);
-                }
-                formula->get_ded()->add_deduction(literal, formula->to_clauses_vector()[clause_id]->whole_to_set(),clause_id,formula->get_ded_depth());
-                if(WITH_WL) {
-                    formula->get_aff()->set_true(literal) ;
-                }
-                literal_sav = literal ;
-                clause_id = tmp ;
-                if(formula->to_clauses_vector()[clause_id]->get_size() <= 1 && formula->to_clauses_vector()[tmp]->get_size() <= 1)
+            while(!contains_false_clause && !assistant->is_state_consistent()) {
+                if(formula->get_ded_depth() == 0)
                     throw Conflict() ;
-            }
-            with_proof = false;
-            if (CL_INTERACT && --skip_conflicts == 0) {
-                last_bet = formula->last_bet() ;
-                assert(last_bet);
-                skip_conflicts = cl_interac(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);
-            }
-            if (WITH_CL) {
-                proof = new CLProof();
-                literal = formula->learn_clause(proof,&clause_id, &depth_back, literal, &learned_clause);
-                nb_learned_clauses++;
-                nb_learned_literals += static_cast<unsigned int>(learned_clause.whole_to_set().size());
-                if (CL_STATS && !--steps_before_next_stats_print) {
-                    steps_before_next_stats_print = STEPS_BETWEEN_STATS;
-                    std::cout << "Stats: " << nb_learned_clauses << " clauses learned (";
-                    printf("%.2g", static_cast<double>(nb_learned_clauses)*100./static_cast<double>(formula->get_size()));
-                    std::cout << "% of all clauses), averaging ";
-                    printf("%.3g", static_cast<double>(nb_learned_literals)/static_cast<double>(nb_learned_clauses));
-                    std::cout << " literals per clause." << std::endl;
-                }
-                if (with_proof)
-                    proof->to_latex_file(CL_PROOF_FILE_NAME);
-                delete proof;
-                formula->back(assistant, depth_back);
-            }
-            else {
-                literal = -formula->back(assistant) ;
-                clause_id = -1 ;
-            }
-            if(WITH_WL && (WITH_CL || CL_INTERACT)) { // nettoyage
-                formula->get_ded()->remove_deduction(literal_sav) ;
-                formula->get_aff()->set_unknown(literal_sav) ;
-            }
-            if(literal == 0)
-                throw Conflict() ;
-            if (WITH_WL) {
-                contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant, &clause_assistant);
-            }
-            else {
-                formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant, &clause_assistant);
-                contains_false_clause = formula->contains_false_clause(&clause_id);
+                formula->back(assistant) ;
+                // Si on n'a dépilé qu'un seul littéral de la clause, on doit faire une propagation unitaire.
+                // Dans le cas sans WL, elle se fera toute seule par la suite.
+                if(WITH_WL && (formula->get_aff()->is_false(formula->to_clauses_vector()[clause_assistant]->fst_WL()) 
+                            || formula->get_aff()->is_false(formula->to_clauses_vector()[clause_assistant]->snd_WL())))
+                    contains_false_clause = !formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                else 
+                    contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }
     }

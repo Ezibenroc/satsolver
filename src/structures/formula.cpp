@@ -154,9 +154,8 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
         *clause_assistant = tmp ;
         if(VERBOSE) {
             print_space(this->ded_depth);
-            std::cout << "Theory inconsistency. Learned a clause.\n" ;
-            print_space(this->ded_depth) ;
-            std::cout << this->clauses[tmp]->to_string() << " => " << -x << std::endl ;
+            std::cout << "Theory inconsistency. Learned a clause : " ;
+            std::cout << this->clauses[tmp]->to_string()  << std::endl ;
         }
         return false;
     }

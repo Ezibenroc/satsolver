@@ -211,6 +211,7 @@ int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
     clause.insert(-lit_conf);
     for (auto it : path) {
         clause.insert(lit=-this->literal_from_atom_id(it.tag));
+        assert(this->formula->get_aff()->is_false(lit)) ;
         if(WITH_WL && lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
             max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
             max_depth_l = lit ;
