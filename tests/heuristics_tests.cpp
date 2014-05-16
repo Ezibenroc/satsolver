@@ -57,7 +57,7 @@ void HeuristicsTests::testRandom() {
     		c = true ;
     }
     CPPUNIT_ASSERT(a && b && c) ;
-    f->bet_true(1,NULL,NULL,NULL, &assistant,NULL) ;
+    f->bet_true(1,NULL,NULL,NULL, &assistant,NULL,NULL) ;
     for(int i = 0 ; i < 1000 ; i++) {
     	CPPUNIT_ASSERT(f->choose_literal_random() == 2) ;
     }

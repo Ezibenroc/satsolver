@@ -61,6 +61,8 @@ int Deductions::get_clause_id(int literal) const {
 }
 
 int Deductions::get_deduction_depth(int literal) const {
+    if(!(deduction_depth[abs(literal)]>=0))
+        std::cout << "FAIL " << literal << std::endl ;
     assert(deduction_depth[abs(literal)]>=0) ;
     return deduction_depth[abs(literal)] ;
 }
