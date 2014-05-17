@@ -19,6 +19,7 @@
 
 void TheoryTests::testDifferencesObviousFail() {
     INIT;
+    int flag = 0 ;
     theorysolver::DifferenceAssistant *assistant;
 
     ef = SPEF(new EF(EF::AND,
@@ -30,8 +31,13 @@ void TheoryTests::testDifferencesObviousFail() {
     ef = theorysolver::DifferenceAssistant::canonize_formula(ef, literal_to_DA);
     CPPUNIT_ASSERT(tseitin_reduction(false, ef, name_to_variable, f, &affected_literals));
     assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, f);
-    CPPUNIT_ASSERT(-1 == assistant->on_flip(name_to_variable->at("#3")));
-    CPPUNIT_ASSERT(-1 != assistant->on_flip(name_to_variable->at("#4")));
+    for(auto i : affected_literals) {
+        if(-1!=assistant->on_flip(i)) {
+            flag = i ;
+            break ;
+        }
+    }
+    CPPUNIT_ASSERT(flag);
 }
 
 void TheoryTests::testDifferencesLessObviousFail() {
