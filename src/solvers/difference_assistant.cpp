@@ -205,10 +205,10 @@ int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
 
 int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
     int max_depth=-1, max_depth_l=0 ;
-    int lit, lit_conf = this->literal_from_atom_id(atom_id) ;
+    int lit, lit_conf = -this->literal_from_atom_id(atom_id) ;
     int tmp ;
     std::unordered_set<int> clause;
-    clause.insert(-lit_conf);
+    clause.insert(lit_conf);
     for (auto it : path) {
         clause.insert(lit=-this->literal_from_atom_id(it.tag));
         assert(this->formula->get_aff()->is_false(lit)) ;
