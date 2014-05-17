@@ -1,4 +1,5 @@
 #include "solvers/void_assistant.h"
+#include <cassert>
 
 using namespace theorysolver;
 
@@ -11,4 +12,9 @@ bool VoidAssistant::detect_isolated_literals() {
 }
 bool VoidAssistant::is_state_consistent() {
     return true;
+}
+
+unsigned int VoidAssistant::get_depth_back() {
+    assert(false) ;
+    return 0 ;
 }

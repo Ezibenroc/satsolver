@@ -26,8 +26,9 @@ class DifferenceAssistant : public AbstractAssistant {
         // of the graphe.
         std::pair<std::pair<unsigned int, unsigned int>, unsigned int> edge_of_cycle; // ((u, v), tag)
         std::vector<int> old_polarity;
-
+        int depth_back ; // niveau du backtrack éventuel à faire
         int literal_from_atom_id(int atom_id) const;
+        
     public:
         static std::shared_ptr<satsolver::ExtendedFormula> canonize_formula(std::shared_ptr<satsolver::ExtendedFormula> formula, std::vector<std::shared_ptr<DifferenceAtom>> &literal_to_DA);
         DifferenceAssistant(std::vector<std::shared_ptr<DifferenceAtom>> &literal_to_DA, std::shared_ptr<std::map<std::string, int>> name_to_variable, std::shared_ptr<satsolver::Formula> formula);
@@ -40,6 +41,8 @@ class DifferenceAssistant : public AbstractAssistant {
         bool detect_isolated_literals();
 
         const AdjGraph& get_graph() { return this->adj_graph; }
+        
+        unsigned int get_depth_back() ;
 };
 
 }

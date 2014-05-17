@@ -100,6 +100,22 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             }
         }
         while(contains_false_clause || !assistant->is_state_consistent()) {
+            if(!assistant->is_state_consistent()) {
+                // On backtrack au niveau du dernier littéral de la clause apprise (éventuellement aucun backtrack)
+                if((depth_back = assistant->get_depth_back())< static_cast<unsigned int>(formula->get_ded_depth())) {
+                    formula->back(assistant,depth_back) ;
+                    // On est sur que seul literal est unknown dans la clause apprise, tous les autres sont faux
+                    if (WITH_WL) {
+                        contains_false_clause = !formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                    }
+                    else {
+                        formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                        contains_false_clause = formula->contains_false_clause(&clause_id);
+                    }
+                    continue ; // on n'a peut être plus de clause fausse
+                }
+                // sinon on fait un backtrack classique
+            }
             // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
             // Cette mise à jour sera annulée par le backtrack
             // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
@@ -155,7 +171,7 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                 contains_false_clause = !formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant, &clause_assistant);
             }
             else {
-                formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant, &clause_assistant);
+                formula->deduce_true(literal,clause_id,&clause_id,&tmp,&literal, assistant, &clause_assistant);
                 contains_false_clause = formula->contains_false_clause(&clause_id);
             }
         }

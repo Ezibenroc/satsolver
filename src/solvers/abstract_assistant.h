@@ -12,6 +12,8 @@ class AbstractAssistant {
 
         virtual bool is_state_consistent() = 0;
         virtual bool detect_isolated_literals() = 0;
+        
+        virtual unsigned int get_depth_back() = 0 ;
 
         virtual ~AbstractAssistant() {};
 };

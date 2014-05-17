@@ -9,6 +9,7 @@ class VoidAssistant : public AbstractAssistant {
         int on_flip(unsigned int variable);
         virtual bool detect_isolated_literals();
         bool is_state_consistent();
+        unsigned int get_depth_back() ;
 };
 
 }

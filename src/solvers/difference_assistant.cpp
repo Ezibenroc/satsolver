@@ -107,7 +107,7 @@ SPEF DifferenceAssistant::canonize_formula(SPEF formula, std::vector<SPDA> &lite
 
 
 DifferenceAssistant::DifferenceAssistant(std::vector<SPDA> &literal_to_DA, std::shared_ptr<std::map<std::string, int>> name_to_variable, std::shared_ptr<satsolver::Formula> formula) :
-    formula(formula), literal_to_DA(literal_to_DA), name_to_variable(*name_to_variable), variable_to_name(), adj_graph(), consistent_state(true), edge_of_cycle(std::make_pair(0, 0), 0), old_polarity(formula->get_nb_variables()+1, 0) {
+    formula(formula), literal_to_DA(literal_to_DA), name_to_variable(*name_to_variable), variable_to_name(), adj_graph(), consistent_state(true), edge_of_cycle(std::make_pair(0, 0), 0), old_polarity(formula->get_nb_variables()+1, 0), depth_back(-1) {
     for (auto it : *name_to_variable)
         this->variable_to_name.insert(make_pair(it.second, it.first));
 }
@@ -212,13 +212,14 @@ int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
     for (auto it : path) {
         clause.insert(lit=-this->literal_from_atom_id(it.tag));
         assert(this->formula->get_aff()->is_false(lit)) ;
-        if(WITH_WL && lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
+        if(lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
             max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
             max_depth_l = lit ;
         }
     }
+    assert(max_depth >= 0);
+    this->depth_back = max_depth ;
     assert(clause.size()>=2) ;
-    assert(!WITH_WL || max_depth_l) ;
     tmp = static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
     if(WITH_WL) this->formula->to_clauses_vector()[tmp]->init_WL_CL(lit_conf,max_depth_l) ;
     return tmp ;
@@ -230,4 +231,11 @@ bool DifferenceAssistant::is_state_consistent() {
 
 bool DifferenceAssistant::detect_isolated_literals() {
     return false;
+}
+
+unsigned int DifferenceAssistant::get_depth_back() {
+    assert(this->depth_back>=0) ;
+    unsigned int tmp = static_cast<unsigned int>(this->depth_back) ; // cette fonction ne doit être appelée qu'une fois par clause apprise
+    this->depth_back = -1 ;
+    return tmp ;
 }

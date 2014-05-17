@@ -57,14 +57,20 @@ void TheoryTests::testDifferencesLessObviousFail() {
     ef = theorysolver::DifferenceAssistant::canonize_formula(ef, literal_to_DA);
     CPPUNIT_ASSERT(tseitin_reduction(false, ef, name_to_variable, f, &affected_literals));
     assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, f);
-    if (f->get_aff()->is_unknown(name_to_variable->at("#4")))
+    if (f->get_aff()->is_unknown(name_to_variable->at("#4"))) {
         f->get_aff()->set_true(name_to_variable->at("#4"));
+        f->get_ded()->add_bet(name_to_variable->at("#4"),0) ;
+    }
     CPPUNIT_ASSERT(-1 == assistant->on_flip(name_to_variable->at("#4")));
     CPPUNIT_ASSERT(assistant->is_state_consistent());
-    if (f->get_aff()->is_unknown(name_to_variable->at("#5")))
+    if (f->get_aff()->is_unknown(name_to_variable->at("#5"))) {
         f->get_aff()->set_false(name_to_variable->at("#5"));
-    if (f->get_aff()->is_unknown(name_to_variable->at("#6")))
+        f->get_ded()->add_bet(name_to_variable->at("#5"),0) ;
+    }
+    if (f->get_aff()->is_unknown(name_to_variable->at("#6"))) {
         f->get_aff()->set_true(name_to_variable->at("#6"));
+        f->get_ded()->add_bet(name_to_variable->at("#6"),0) ;
+    }
     CPPUNIT_ASSERT(-1 != assistant->on_flip(name_to_variable->at("#5")) || -1 != assistant->on_flip(name_to_variable->at("#6")));
     CPPUNIT_ASSERT(!assistant->is_state_consistent());
 

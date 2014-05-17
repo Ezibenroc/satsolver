@@ -129,6 +129,8 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
     int clause_id=-1 ;
     int tmp ;
     std::unordered_set<std::pair<int,unsigned int>,Hash,Equal>::const_iterator it ;
+    if(clause_assistant)
+        *clause_assistant = -1 ;
     this->aff->set_true(x) ;
     if(WITH_WL) {
         for(unsigned int i=0; i<this->clauses.size(); i++) {
