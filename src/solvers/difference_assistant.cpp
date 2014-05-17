@@ -209,6 +209,7 @@ int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
     int tmp ;
     std::unordered_set<int> clause;
     clause.insert(lit_conf);
+    assert(this->formula->get_aff()->is_false(lit_conf)) ;
     for (auto it : path) {
         clause.insert(lit=-this->literal_from_atom_id(it.tag));
         assert(this->formula->get_aff()->is_false(lit)) ;
