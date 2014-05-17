@@ -207,13 +207,13 @@ int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
 
 int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
     int max_depth=-1, max_depth_l=0 ;
-    int lit, lit_conf = this->literal_from_atom_id(atom_id) ;
+    int lit, lit_conf = invert_polarity(this->literal_from_atom_id(atom_id)) ;
     int tmp ;
     std::unordered_set<int> clause;
-    clause.insert(invert_polarity(lit_conf));
+    clause.insert(lit_conf);
     for (auto it : path) {
-        lit = this->literal_from_atom_id(it.tag);
-        clause.insert(invert_polarity(lit));
+        lit = invert_polarity(this->literal_from_atom_id(it.tag));
+        clause.insert(lit);
         if(lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
             max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
             max_depth_l = lit ;
