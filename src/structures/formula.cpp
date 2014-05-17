@@ -129,6 +129,7 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
     int clause_id=-1 ;
     int tmp ;
     std::unordered_set<std::pair<int,unsigned int>,Hash,Equal>::const_iterator it ;
+    this->aff->set_true(x) ;
     if(WITH_WL) {
         for(unsigned int i=0; i<this->clauses.size(); i++) {
             l = this->clauses[i]->set_true(x) ;
@@ -149,11 +150,11 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
             }
         }
     }
-    this->aff->set_true(x) ;
     if ((tmp=assistant->on_flip(abs(x)))!=-1) {
         *clause_assistant = tmp ;
         if(WITH_WL) {
             *clause1 = tmp ;
+            *clause2 = -1 ;
             *literal = x ;   
         }
         if(VERBOSE) {
@@ -370,6 +371,7 @@ void Formula::clean(std::vector<unsigned int> *affected_literals) {
         }
         if(literal) {
             this->aff->set_true(literal) ;
+            this->ded->add_bet(literal,0);
             if (affected_literals)
                 affected_literals->push_back(abs(literal));
             this->mem.push_back(std::pair<int,bool>(literal,true)) ;
