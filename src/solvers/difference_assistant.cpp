@@ -203,16 +203,17 @@ int DifferenceAssistant::literal_from_atom_id(int atom_id) const {
         return -DifferenceAtom::literal_from_atom_id(this->name_to_variable, static_cast<unsigned int>(-atom_id));
 }
 
+#define invert_polarity(lit) this->formula->get_aff()->is_true(lit) ? -lit : lit
+
 int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
     int max_depth=-1, max_depth_l=0 ;
-    int lit, lit_conf = -this->literal_from_atom_id(atom_id) ;
+    int lit, lit_conf = this->literal_from_atom_id(atom_id) ;
     int tmp ;
     std::unordered_set<int> clause;
-    clause.insert(lit_conf);
-    assert(this->formula->get_aff()->is_false(lit_conf)) ;
+    clause.insert(invert_polarity(lit_conf));
     for (auto it : path) {
-        clause.insert(lit=-this->literal_from_atom_id(it.tag));
-        assert(this->formula->get_aff()->is_false(lit)) ;
+        lit = this->literal_from_atom_id(it.tag);
+        clause.insert(invert_polarity(lit));
         if(lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
             max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
             max_depth_l = lit ;
