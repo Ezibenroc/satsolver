@@ -77,7 +77,7 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
     }
     assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, formula);
     for (auto it : affected_literals) {
-        if (!assistant->on_flip(it)) {
+        if (1!=assistant->on_flip(it)) {
             std::cout << "s UNSATISFIABLE" << std::endl;
             return;
         }
