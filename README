@@ -205,6 +205,41 @@ Puis on en déduit 4 vu la troisième clause, puis on déduit -6 puisqu’il app
 uniquement avec cette polarité, etc…
 
 
+Résolution de théories
+======================
+
+Principe
+--------
+
+Nous implémentons les solveurs de théorie sous forme d’« assistants » à
+DPLL : ils fournissent des informations supplémentaires à DPLL, par exemple
+le fait qu’une valuation soit cohérente vis-à-vis de la signification réelle
+des atomes (l’assistant qui dit que la valuation est toujours cohérente
+correspond à la résolution du problème SAT classiques).
+
+Pour cela, la méthode « on_flip » de l’assistant est appelée à chaque
+modification de la polarité (vrai/faux/inconue) d’une variable, et celle-ci
+vérifie que l’état est cohérent, et en informe DPLL. Si nécessaire,
+elle peut également ajouter des clauses au problème pour empêcher DPLL
+de faire une « erreur » similaire dans le futur.
+
+Théorie de differences
+----------------------
+
+L’assistant pour la théorie de différences maintient un multigraphe orienté
+et pondéré, où chaque arête correspond à un atome.
+
+Comme un état est cohérent si et seulement si il n’y a pas de cycle de poids
+négatif.
+Donc, pour tester si l’état reste cohérent, il suffit, lorsque l’on ajoute
+une arête uv de poids w, de vérifier qu’il n’y a pas de chemin de v à u de
+poids strictement inférieur à -w (ce qui revient à chercher un chemin de
+poids minimal).
+
+Théorie d’égalités
+------------------
+
+
 
 Répartition du travail
 ======================
@@ -226,6 +261,7 @@ Valentin :
 * Réduction problème de graphe -> formule étendue
 * Graphe de conflits
 * Apprentissage de clauses sans les littéraux surveillés, preuves
+* « Assistant » de théorie de différence
 
 Fichiers
 --------
