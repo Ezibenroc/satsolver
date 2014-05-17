@@ -178,12 +178,10 @@ bool Formula::deduce_true(int x, int clause_id, int *clause1, int *clause2, int 
         }
     }
     if(this->aff->is_unknown(x)) {
-        if(WITH_CL || CL_INTERACT) {
-            if(clause_id >= 0)
-                this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
-            else
-                this->ded->add_bet(x,this->ded_depth) ; // pas déduit grâce à une clause, on sauvegarde simplement sa profondeur
-        }
+        if((WITH_CL || CL_INTERACT) && clause_id >= 0) 
+            this->ded->add_deduction(x, this->clauses[clause_id]->whole_to_set(),clause_id,this->ded_depth);
+        else
+            this->ded->add_bet(x,this->ded_depth) ; 
         this->mem.push_back(std::pair<int,bool>(x,true)) ;
         return this->set_true(x, clause1, clause2, literal, assistant, clause_assistant) ;
     }
