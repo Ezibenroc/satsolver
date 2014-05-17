@@ -100,7 +100,7 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
             }
         }
         while(contains_false_clause || !assistant->is_state_consistent()) {
-            if(contains_false_clause) {
+       //     if(contains_false_clause) {
                 // On met à jour la deduction "artificiellement" (ça n'impacte que la déduction, pas le reste de la formule)
                 // Cette mise à jour sera annulée par le backtrack
                 // On sauvegarde avant l'indice de la clause ayant permi de déduire le littéral
@@ -162,19 +162,20 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                     formula->deduce_true(literal, clause_id,NULL,NULL,NULL, assistant, &clause_assistant);
                     contains_false_clause = formula->contains_false_clause(&clause_id);
                 }
-            }
-            while(!contains_false_clause && !assistant->is_state_consistent()) {
+    //        }
+         /*   while(!contains_false_clause && !assistant->is_state_consistent()) {
                 if(formula->get_ded_depth() == 0)
                     throw Conflict() ;
                 formula->back(assistant) ;
                 // Si on n'a dépilé qu'un seul littéral de la clause, on doit faire une propagation unitaire.
                 // Dans le cas sans WL, elle se fera toute seule par la suite.
-                if(WITH_WL && (formula->get_aff()->is_false(formula->to_clauses_vector()[clause_assistant]->fst_WL()) 
-                            || formula->get_aff()->is_false(formula->to_clauses_vector()[clause_assistant]->snd_WL())))
-                    contains_false_clause = !formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                if(WITH_WL && (formula->get_aff()->is_false(formula->to_clauses_vector()[clause_assistant]->fst_WL())))
+                    contains_false_clause = !formula->deduce_true(formula->to_clauses_vector()[clause_assistant]->snd_WL(), clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                else if(WITH_WL && (formula->get_aff()->is_false(formula->to_clauses_vector()[clause_assistant]->snd_WL())))
+                    contains_false_clause = !formula->deduce_true(formula->to_clauses_vector()[clause_assistant]->fst_WL(), clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
                 else 
                     contains_false_clause = formula->contains_false_clause(&clause_id);
-            }
+            }*/
         }
     }
     return formula->get_aff() ;

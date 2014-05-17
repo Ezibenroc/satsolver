@@ -152,6 +152,10 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
     this->aff->set_true(x) ;
     if ((tmp=assistant->on_flip(abs(x)))!=-1) {
         *clause_assistant = tmp ;
+        if(WITH_WL) {
+            *clause1 = tmp ;
+            *literal = x ;   
+        }
         if(VERBOSE) {
             print_space(this->ded_depth);
             std::cout << "Theory inconsistency. Learned a clause : " ;
