@@ -23,7 +23,7 @@ void print_space(int depth) {
 
 // Avoid code duplication without using constructor delegation (see <http://stackoverflow.com/a/14477257/539465>)
 #define FORMULA_INIT_LIST(v, nb_variables, affected_literals) aff(new Affectation(nb_variables)), clauses(v), nb_variables(nb_variables), mem(), to_do(), ded(new Deductions(nb_variables)),ded_depth(0)
-#define FORMULA_INIT \
+#define FORMULA_INIT(v, nb_variables, affected_literals) \
     for(auto c : this->clauses) {\
         c->set_affectation(this->aff) ;\
     }\
@@ -36,9 +36,10 @@ void print_space(int depth) {
     }
 
 Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables) : FORMULA_INIT_LIST(v, nb_variables, NULL) {
+    FORMULA_INIT(v, nb_variables, NULL)
 }
 Formula::Formula(std::vector<std::shared_ptr<Clause>> v, int nb_variables, std::vector<unsigned int> *affected_literals) : FORMULA_INIT_LIST(v, nb_variables, affected_literals) { 
-    FORMULA_INIT
+    FORMULA_INIT(v, nb_variables, affected_literals)
 }
 
 satsolver::Formula::Formula(const satsolver::Formula &that) : aff(new Affectation(that.aff)), clauses(), nb_variables(that.nb_variables), mem(that.mem), to_do(that.to_do), ded(new Deductions(that.ded)), ded_depth(that.ded_depth)  {
