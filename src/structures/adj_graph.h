@@ -20,7 +20,7 @@ struct adj_list_item {
 
 typedef std::list<adj_list_item> adj_list;
 
-// A directed graph using adjacency lists, with taggable edges.
+// A directed multigraph using adjacency lists, with taggable edges.
 // worst case O(1) deletion, and access to edges
 // amortized O(1) insertion of edges.
 class AdjGraph {
