@@ -6,7 +6,7 @@
 
 using namespace theorysolver;
 
-#define VERBOSE_ASSISTANT false
+#define VERBOSE_ASSISTANT true
 
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
@@ -80,6 +80,7 @@ int EqualityAssistant::on_flip(unsigned int variable) {
     if (VERBOSE_ASSISTANT && VERBOSE)
         std::cout << ", whose atom is: " << atom_id << ", and whose new state is: ";
     if (this->formula->get_aff()->is_true(variable)) {
+        std::cout << "--1" << std::endl;
         if (VERBOSE_ASSISTANT && VERBOSE)
             std::cout << "true" << std::endl;
         assert(this->consistent_state);
@@ -116,13 +117,13 @@ int EqualityAssistant::on_flip(unsigned int variable) {
     return clause_id;
 }
 
-int EqualityAssistant::insert_atom(unsigned int i, unsigned int j, bool equal, int atom_id, int lit_conf) {
+int EqualityAssistant::insert_atom(unsigned int i, unsigned int j, bool equal, unsigned int atom_id, int lit_conf) {
     if (equal) {
-        this->union_find.merge(lit_conf, i, j);
+        this->union_find.merge(atom_id, i, j);
         for (auto it : this->unequal) {
             if (this->union_find.find(it.second.first) == this->union_find.find(it.second.second)) {
                 this->consistent_state = false;
-                return this->learn_clause(it.first, i, j, lit_conf);
+                return this->learn_clause(it.first, i, j, atom_id);
             }
         }
     }
@@ -130,7 +131,7 @@ int EqualityAssistant::insert_atom(unsigned int i, unsigned int j, bool equal, i
         this->consistent_state = (this->union_find.find(i) != this->union_find.find(j));
         this->unequal.push_back(std::make_pair(lit_conf, std::make_pair(i, j)));
         if (!this->consistent_state)
-            return this->learn_clause(atom_id, i, j, lit_conf);
+            return this->learn_clause(atom_id, i, j, atom_id);
     }
     return -1;
 }
@@ -149,15 +150,23 @@ int EqualityAssistant::learn_clause(int unequal_atomid, int i, int j, int lit_co
     int max_depth=-1, max_depth_l=0 ;
     int lit;
     int tmp;
+    std::cout << "1" << std::endl;
     clause.insert(invert_polarity(this->literal_from_atom_id(unequal_atomid)));
+    std::cout << "2" << std::endl;
     for (auto it : this->union_find.get_path(i)) {
+        std::cout << "a" << std::endl;
+        std::cout << it << std::endl;
         lit = invert_polarity(this->literal_from_atom_id(it));
+        std::cout << "b" << std::endl;
         clause.insert(lit);
+        std::cout << "c" << std::endl;
         if(lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
             max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
             max_depth_l = lit ;
         }
+        std::cout << "d" << std::endl;
     }
+    std::cout << "3" << std::endl;
     for (auto it : this->union_find.get_path(j)) {
         lit = invert_polarity(this->literal_from_atom_id(it));
         clause.insert(lit);

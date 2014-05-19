@@ -20,7 +20,7 @@ void UnionFind::expand(unsigned int size) {
 }
 
 
-void UnionFind::merge(int tag, unsigned int i, unsigned j) {
+void UnionFind::merge(unsigned int tag, unsigned int i, unsigned j) {
     struct uf_node *node;
     this->expand(i+1);
     this->expand(j+1);
@@ -37,7 +37,8 @@ void UnionFind::merge(int tag, unsigned int i, unsigned j) {
 
 unsigned int UnionFind::find(unsigned int i) {
     uf_node *node;
-    assert(i<this->nodes.size());
+    if (i>=this->nodes.size())
+        return i;
     node = this->nodes[i];
     while (node->parent)
         node = node->parent;

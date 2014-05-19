@@ -12,7 +12,7 @@ struct uf_node {
     uf_node(unsigned int v, struct uf_node *parent, unsigned int nb_childs) : v(v), parent(parent), edge_tag(0), nb_childs(nb_childs) {}
     unsigned int v;
     struct uf_node *parent;
-    int edge_tag;
+    unsigned int edge_tag;
     unsigned int nb_childs;
 };
 
@@ -30,7 +30,7 @@ class UnionFind {
         UnionFind();
         UnionFind(unsigned int size_hint);
 
-        void merge(int tag, unsigned int i, unsigned int j);
+        void merge(unsigned int tag, unsigned int i, unsigned int j);
         unsigned int find(unsigned int i);
         unsigned int unmerge();
         std::unordered_set<int> get_path(unsigned int i);

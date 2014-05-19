@@ -27,7 +27,7 @@ class EqualityAssistant : public AbstractAssistant {
         std::vector<int> old_polarity;
 
         int literal_from_atom_id(int atom_id) const;
-        int insert_atom(unsigned int i, unsigned int j, bool equal, int atom_id, int lit_conf);
+        int insert_atom(unsigned int i, unsigned int j, bool equal, unsigned int atom_id, int lit_conf);
         int learn_clause(int unequal_atomid, int i, int j, int lit_conf);
     public:
         static std::shared_ptr<satsolver::ExtendedFormula> canonize_formula(std::shared_ptr<satsolver::ExtendedFormula> formula, std::vector<std::shared_ptr<EqualityAtom>> &literal_to_EA);
