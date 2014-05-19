@@ -12,26 +12,26 @@ UnionFind::UnionFind(unsigned int size_hint) : UnionFind() {
 }
 
 void UnionFind::expand(unsigned int size) {
-    assert(size >= this->nodes.size());
+    if (size < this->nodes.size())
+        return;
     nodes.reserve(size);
     for (unsigned i=static_cast<unsigned>(this->nodes.size()); i<size; i++)
         this->nodes.push_back(new uf_node(i, NULL, 0));
 }
 
 
-void UnionFind::merge(unsigned int i, unsigned j) {
+void UnionFind::merge(int tag, unsigned int i, unsigned j) {
     struct uf_node *node;
-    if (i >= this->nodes.size())
-        this->expand(i);
-    if (j >= this->nodes.size())
-        this->expand(j);
+    this->expand(i+1);
+    this->expand(j+1);
     if (this->nodes[i]->nb_childs < this->nodes[j]->nb_childs)
-        return this->merge(j, i);
+        return this->merge(tag, j, i);
     node = this->nodes[j];
     this->merges.push(node);
     while (node->parent)
         node = node->parent;
     node->parent = this->nodes[i];
+    node->edge_tag = tag;
     this->nodes[i]->nb_childs++;
 }
 
@@ -43,6 +43,17 @@ unsigned int UnionFind::find(unsigned int i) {
         node = node->parent;
     //this->compress(this->nodes[i], node);
     return node->v;
+}
+std::unordered_set<int> UnionFind::get_path(unsigned int i) {
+    std::unordered_set<int> path;
+    uf_node *node;
+    assert(i<this->nodes.size());
+    node = this->nodes[i];
+    do {
+        path.insert(node->edge_tag);
+        node = node->parent;
+    } while (node->parent);
+    return path;
 }
 /*
 void UnionFind::compress(uf_node *node, uf_node *parent) {

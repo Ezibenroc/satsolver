@@ -20,16 +20,15 @@ class EqualityAssistant : public AbstractAssistant {
         std::map<std::string, int> name_to_variable;
         std::map<int, std::string> variable_to_name;
         UnionFind union_find;
-        std::vector<std::pair<unsigned int, unsigned int>> unequal;
+        std::vector<std::pair<unsigned int, std::pair<unsigned int, unsigned int>>> unequal;
         bool consistent_state;
-        // As we forbid adding an edge when there is a negative cycle,
-        // the following edge belong to *all* possible negative cycles
-        // of the graphe.
-        std::pair<std::pair<unsigned int, unsigned int>, unsigned int> edge_of_cycle; // ((u, v), tag)
+        int depth_back ; // niveau du backtrack éventuel à faire
+
         std::vector<int> old_polarity;
 
         int literal_from_atom_id(int atom_id) const;
-        void insert_atom(unsigned int i, unsigned int j, bool equal);
+        int insert_atom(unsigned int i, unsigned int j, bool equal, int atom_id, int lit_conf);
+        int learn_clause(int unequal_atomid, int i, int j, int lit_conf);
     public:
         static std::shared_ptr<satsolver::ExtendedFormula> canonize_formula(std::shared_ptr<satsolver::ExtendedFormula> formula, std::vector<std::shared_ptr<EqualityAtom>> &literal_to_EA);
         EqualityAssistant(std::vector<std::shared_ptr<EqualityAtom>> &literal_to_EA, std::shared_ptr<std::map<std::string, int>> name_to_variable, std::shared_ptr<satsolver::Formula> formula);

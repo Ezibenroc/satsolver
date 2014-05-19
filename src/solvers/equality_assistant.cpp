@@ -58,7 +58,7 @@ SPEF EqualityAssistant::canonize_formula(SPEF formula, std::vector<SPEA> &litera
 
 
 EqualityAssistant::EqualityAssistant(std::vector<SPEA> &literal_to_EA, std::shared_ptr<std::map<std::string, int>> name_to_variable, std::shared_ptr<satsolver::Formula> formula) :
-    formula(formula), literal_to_EA(literal_to_EA), name_to_variable(*name_to_variable), variable_to_name(), union_find(), unequal(), consistent_state(true), edge_of_cycle(std::make_pair(0, 0), 0), old_polarity(formula->get_nb_variables()+1, 0) {
+    formula(formula), literal_to_EA(literal_to_EA), name_to_variable(*name_to_variable), variable_to_name(), union_find(), unequal(), consistent_state(true), depth_back(-1), old_polarity(formula->get_nb_variables()+1, 0) {
     for (auto it : *name_to_variable)
         this->variable_to_name.insert(make_pair(it.second, it.first));
 }
@@ -85,7 +85,7 @@ int EqualityAssistant::on_flip(unsigned int variable) {
         assert(this->consistent_state);
         if (this->old_polarity[variable] == 1)
             return -1;
-        this->insert_atom(atom->left, atom->right, atom->op == EA::EQUAL);
+        clause_id = this->insert_atom(atom->left, atom->right, atom->op == EA::EQUAL, atom_id, variable);
         this->old_polarity[variable] = 1;
     }
     else if (this->formula->get_aff()->is_false(variable)) {
@@ -94,7 +94,7 @@ int EqualityAssistant::on_flip(unsigned int variable) {
         assert(this->consistent_state);
         if (this->old_polarity[variable] == -1)
             return -1;
-        this->insert_atom(atom->left, atom->right, atom->op == EA::UNEQUAL);
+        clause_id = this->insert_atom(atom->left, atom->right, atom->op == EA::UNEQUAL, -atom_id, variable);
         this->old_polarity[variable] = -1;
     }
     else {
@@ -106,28 +106,33 @@ int EqualityAssistant::on_flip(unsigned int variable) {
             this->union_find.unmerge();
         }
         else {
+            assert(this->unequal.back().first == atom_id);
             this->unequal.pop_back();
         }
+        this->consistent_state = true;
 
         this->old_polarity[variable] = 0;
     }
     return clause_id;
 }
 
-void EqualityAssistant::insert_atom(unsigned int i, unsigned int j, bool equal) {
+int EqualityAssistant::insert_atom(unsigned int i, unsigned int j, bool equal, int atom_id, int lit_conf) {
     if (equal) {
-        this->union_find.merge(i, j);
+        this->union_find.merge(lit_conf, i, j);
         for (auto it : this->unequal) {
-            if (this->union_find.find(it.first) == this->union_find.find(it.first)) {
+            if (this->union_find.find(it.second.first) == this->union_find.find(it.second.second)) {
                 this->consistent_state = false;
-                break;
+                return this->learn_clause(it.first, i, j, lit_conf);
             }
         }
     }
     else {
         this->consistent_state = (this->union_find.find(i) != this->union_find.find(j));
-        this->unequal.push_back(std::make_pair(i, j));
+        this->unequal.push_back(std::make_pair(lit_conf, std::make_pair(i, j)));
+        if (!this->consistent_state)
+            return this->learn_clause(atom_id, i, j, lit_conf);
     }
+    return -1;
 }
 
 int EqualityAssistant::literal_from_atom_id(int atom_id) const {
@@ -137,14 +142,38 @@ int EqualityAssistant::literal_from_atom_id(int atom_id) const {
         return -EqualityAtom::literal_from_atom_id(this->name_to_variable, static_cast<unsigned int>(-atom_id));
 }
 
-/*
-int EqualityAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
+#define invert_polarity(lit) this->formula->get_aff()->is_true(lit) ? -lit : lit
+
+int EqualityAssistant::learn_clause(int unequal_atomid, int i, int j, int lit_conf) {
     std::unordered_set<int> clause;
-    clause.insert(this->literal_from_atom_id(atom_id));
-    for (auto it : path)
-        clause.insert(this->literal_from_atom_id(it.tag));
-    return static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
-}*/
+    int max_depth=-1, max_depth_l=0 ;
+    int lit;
+    int tmp;
+    clause.insert(invert_polarity(this->literal_from_atom_id(unequal_atomid)));
+    for (auto it : this->union_find.get_path(i)) {
+        lit = invert_polarity(this->literal_from_atom_id(it));
+        clause.insert(lit);
+        if(lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
+            max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
+            max_depth_l = lit ;
+        }
+    }
+    for (auto it : this->union_find.get_path(j)) {
+        lit = invert_polarity(this->literal_from_atom_id(it));
+        clause.insert(lit);
+        if(lit!=lit_conf && this->formula->get_ded()->get_deduction_depth(lit) > max_depth) {
+            max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
+            max_depth_l = lit ;
+        }
+    }
+    assert(max_depth >= 0);
+    this->depth_back = max_depth ;
+    assert(clause.size()>=2) ;
+    assert(this->formula->get_aff());
+    tmp = static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
+    if(WITH_WL) this->formula->to_clauses_vector()[tmp]->init_WL_CL(lit_conf,max_depth_l) ;
+    return tmp ;
+}
 
 bool EqualityAssistant::is_state_consistent() {
     return this->consistent_state;
