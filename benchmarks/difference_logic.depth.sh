@@ -6,12 +6,13 @@ echo "Please provide the number of tests to perform."
 exit 1
 fi
 
+NB_VAR=5
 NB_TEST=$1						    # nombre de tests pour chaque configuration
 DIRECTORY=/tmp						# endroit de sauvegarde des fichiers temporaires
 EXEC="./resol_diff"						# executable
-OUTPUT_WITHWL=diff_logic.depth.with_WL.dat
-OUTPUT_WITHOUTWL=diff_logic.depth.without_WL.dat
-NB_VAR=5
+OUTPUT_WITHWL="diff_logic.depth.with_WL_"$NB_VAR"var.dat"
+OUTPUT_WITHOUTWL="diff_logic.depth.without_WL_"$NB_VAR"var.dat"
+
 
 rm -f $OUTPUT_WITHWL
 rm -f $OUTPUT_WITHOUTWL

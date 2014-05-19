@@ -19,14 +19,21 @@ set pointsize 0.1   # la taille des points
 
 set logscale y
 
-set title "Génération de formules (logique de différence), avec WL"
+set title "Génération de formules (logique de différence, 5 variables), avec WL"
 set xlabel "Profondeur"
-plot for [IDX=2:9] "diff_logic.depth.with_WL.dat" using 1:IDX title columnheader(IDX)
+plot for [IDX=2:9] "diff_logic.depth.with_WL_5var.dat" using 1:IDX title columnheader(IDX)
 
-set title "Génération de formules (logique de différence), sans WL"
+set title "Génération de formules (logique de différence, 5 variables), sans WL"
 set xlabel "Profondeur"
-plot for [IDX=2:9] "diff_logic.depth.without_WL.dat" using 1:IDX title columnheader(IDX)
+plot for [IDX=2:9] "diff_logic.depth.without_WL_5var.dat" using 1:IDX title columnheader(IDX)
 
+set title "Génération de formules (logique de différence, 50 variables), avec WL"
+set xlabel "Profondeur"
+plot for [IDX=2:9] "diff_logic.depth.with_WL_50var.dat" using 1:IDX title columnheader(IDX)
+
+set title "Génération de formules (logique de différence, 50 variables), sans WL"
+set xlabel "Profondeur"
+plot for [IDX=2:9] "diff_logic.depth.without_WL_50var.dat" using 1:IDX title columnheader(IDX)
 
 
 

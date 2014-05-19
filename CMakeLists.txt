@@ -137,7 +137,7 @@ target_link_libraries(resol_diff CommandLineParser ExtendedFormula Formula DPLL 
 # Benchmarks
 ###########################################
 
-file(GLOB HelperFiles ${CMAKE_SOURCE_DIR}/benchmarks/* ${CMAKE_SOURCE_DIR}/benchmarks_results/rendu3/* ${CMAKE_SOURCE_DIR}/check_result.py)
+file(GLOB HelperFiles ${CMAKE_SOURCE_DIR}/benchmarks/* ${CMAKE_SOURCE_DIR}/benchmarks_results/rendu*/* ${CMAKE_SOURCE_DIR}/check_result.py)
 
 add_custom_target(Helpers SOURCES ${HelperFile})
 foreach(HelperFile ${HelperFiles})
