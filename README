@@ -218,12 +218,28 @@ des atomes (l’assistant qui dit que la valuation est toujours cohérente
 correspond à la résolution du problème SAT classiques).
 
 Pour cela, la méthode « on_flip » de l’assistant est appelée à chaque
-modification de la polarité (vrai/faux/inconue) d’une variable, et celle-ci
+modification de la polarité (vrai/faux/inconnue) d’une variable, et celle-ci
 vérifie que l’état est cohérent, et en informe DPLL. Si nécessaire,
 elle peut également ajouter des clauses au problème pour empêcher DPLL
 de faire une « erreur » similaire dans le futur.
 
-Théorie de differences
+Lors de l'apprentissage d'une clause par la théorie, on reprend des idées de 
+l'apprentissage d'une clause classique.
+Si l'état initial est consistant, alors une inconsistance ne peut être 
+introduite que si l'on a une clause xi-xj>a1 et une clause xj-xi>a2 (cas de la
+théorie de différences). Donc toute clause apprise est de taille au moins 2.
+On définit alors facilement les littéraux surveillés comme étant le littéral
+qui vient d'être affecté, et un littéral de niveau de déduction maximal.
+On effectue ensuite un backtrack au niveau de déduction maximal (sans compter
+le dernier littéral affecté).
+Si ce niveau est égal au niveau courant, il n'y a pas de backtrack. La clause que
+l'on vient d'ajouter est donc fausse : on laisse alors la suite de l'algorithme
+s'en occuper (backtrack classique).
+Sinon, ce niveau est strictement inférieur au niveau courant. Donc après le 
+backtrack, la clause apprise ne contiendra qu'un littéral inconnu, tous les autres
+étant faux. On peut donc déduire immédiatement ce littéral comme étant vrai.
+
+Théorie de différences
 ----------------------
 
 L’assistant pour la théorie de différences maintient un multigraphe orienté
@@ -251,8 +267,9 @@ Tom :
 * Structures du rendu 1
 * Ajout des littéraux surveillés à l’algorithme de DPLL
 * Heuristiques
-* Tests de performances, moulinettes
+* Générateur de données, tests de performances, moulinettes
 * Apprentissage de clause avec littéraux surveillés
+* Intégration de l'assistant avec WL et/ou CL.
 
 Valentin :
 * Parseur de CNF et EDGE
