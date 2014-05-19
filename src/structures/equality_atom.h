@@ -9,32 +9,11 @@
 
 namespace theorysolver {
 
-class CongruenceAtom;
+class EqualityAtom;
 
-typedef std::vector<std::shared_ptr<CongruenceAtom>> CA_list;
+typedef std::vector<std::shared_ptr<EqualityAtom>> EA_list;
 
-class Term {
-    public:
-        enum Type {
-            FUNCTION, SYMBOL
-        };
-
-        enum Type type;
-        unsigned int symbol_id;
-        std::string function_name;
-        std::vector<std::shared_ptr<Term>> arguments;
-
-        Term(unsigned int symbol_id);
-        Term(std::string function_name, std::vector<std::shared_ptr<Term>> arguments);
-        Term(const Term &t);
-
-        bool operator==(const Term &that) const;
-        bool operator!=(const Term &that) const { return !this->operator==(that); }
-
-        std::string to_string() const;
-};
-
-class CongruenceAtom {
+class EqualityAtom {
     public:
         enum Operator {
             EQUAL, UNEQUAL
@@ -50,20 +29,20 @@ class CongruenceAtom {
         static std::string variable_name_from_atom_id(unsigned long int atom_id);
         static int literal_from_atom_id(const std::map<std::string, int> &name_to_variable, unsigned int atom_id);
         // If literal represents an atom in the original formula, return this atom.
-        static std::shared_ptr<CongruenceAtom> SPCA_from_literal(const CA_list &literal_to_CA, std::map<int, std::string> &literal_to_name, unsigned int literal);
+        static std::shared_ptr<EqualityAtom> SPEA_from_literal(const EA_list &literal_to_EA, std::map<int, std::string> &literal_to_name, unsigned int literal);
         // If literal represents an atom in the original extended formula, return this atom.
-        static std::shared_ptr<CongruenceAtom> SPCA_from_variable(const CA_list &literal_to_CA, std::string variable);
-        // Add a CongruenceAtom and return its id.
-        static long unsigned int add_CA(CA_list &literal_to_CA, Term &left, Operator op, Term &right);
+        static std::shared_ptr<EqualityAtom> SPEA_from_variable(const EA_list &literal_to_EA, std::string variable);
+        // Add a EqualityAtom and return its id.
+        static long unsigned int add_EA(EA_list &literal_to_EA, unsigned int left, Operator op, unsigned int right);
 
 
 
-        std::shared_ptr<Term> left, right;
+        unsigned int left, right;
         Operator op;
 
         std::shared_ptr<satsolver::ExtendedFormula> canonical;
 
-        CongruenceAtom(std::shared_ptr<Term> left, enum Operator op, std::shared_ptr<Term> right);
+        EqualityAtom(unsigned int left, enum Operator op, unsigned int right);
         std::string to_string() const;
 };
 

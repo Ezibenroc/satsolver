@@ -9,15 +9,15 @@
 #include "parsers/cli.h"
 #include "solvers/dpll.h"
 #include "solvers/tseitin.h"
-#include "structures/difference_atom.h"
+#include "structures/equality_atom.h"
 #include "structures/extended_formula.h"
-#include "solvers/difference_assistant.h"
-#include "extended_formula.y.hpp"
+#include "solvers/equality_assistant.h"
+#include "equality.y.hpp"
 
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
-#define DA theorysolver::DifferenceAtom
-#define SPDA std::shared_ptr<DA>
+#define EA theorysolver::EqualityAtom
+#define SPEA std::shared_ptr<EA>
 
 extern FILE *yyin;
 extern int yyparse();
@@ -29,11 +29,11 @@ bool DISPLAY_ATOMS;
 bool DISPLAY_FORMULA;
 satsolver::Heuristic HEURISTIC = satsolver::DUMB ;
 
-void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
+void parser_result(SPEF ext_formula, std::vector<SPEA> &literal_to_EA) {
     /*********************
      * Reduce
      ********************/
-    theorysolver::DifferenceAssistant *assistant;
+    theorysolver::EqualityAssistant *assistant;
     satsolver::Affectation *sat_solution;
     std::vector<unsigned int> affected_literals;
     std::shared_ptr<std::map<std::string, int>> name_to_variable;
@@ -45,16 +45,16 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
         std::cout << "Interpreted formula as: " << ext_formula->to_string() << std::endl;
     if (VERBOSE || DISPLAY_ATOMS) {
         std::cout << "Atoms:" << std::endl;
-        for (unsigned int i=0; i<literal_to_DA.size(); i++)
-            std::cout << "\t#" << i+1 << ": " << literal_to_DA[i]->to_string() << std::endl;
+        for (unsigned int i=0; i<literal_to_EA.size(); i++)
+            std::cout << "\t#" << i+1 << ": " << literal_to_EA[i]->to_string() << std::endl;
     }
-    ext_formula = theorysolver::DifferenceAssistant::canonize_formula(ext_formula, literal_to_DA);
+    ext_formula = theorysolver::EqualityAssistant::canonize_formula(ext_formula, literal_to_EA);
     if (VERBOSE || DISPLAY_FORMULA)
         std::cout << "Canonized formula as: " << ext_formula->to_string() << std::endl;
     if (VERBOSE || DISPLAY_ATOMS) {
         std::cout << "Atoms:" << std::endl;
-        for (unsigned int i=0; i<literal_to_DA.size(); i++)
-            std::cout << "\t#" << i+1 << ": " << literal_to_DA[i]->to_string() << std::endl;
+        for (unsigned int i=0; i<literal_to_EA.size(); i++)
+            std::cout << "\t#" << i+1 << ": " << literal_to_EA[i]->to_string() << std::endl;
     }
     if (!tseitin_reduction(DISPLAY_SAT, ext_formula, name_to_variable, formula, &affected_literals)) {
         // The formula is always false
@@ -72,13 +72,12 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
                 std::cout << "s UNSATISFIABLE" << std::endl;
                 return;
             default:
-                std::cout << "s SATISFIABLE" << std::endl;
-                return;
+                assert(false);
         }
     }
-    assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, formula);
+    assistant = new theorysolver::EqualityAssistant(literal_to_EA, name_to_variable, formula);
     for (auto it : affected_literals) {
-        if (1!=assistant->on_flip(it)) {
+        if (!assistant->on_flip(it)) {
             std::cout << "s UNSATISFIABLE" << std::endl;
             return;
         }
@@ -100,21 +99,16 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
     assert(assistant->is_state_consistent());
     if (VERBOSE) {
         std::cout << "Solution to SAT problem: " << sat_solution->to_string() << std::endl;
-        std::cout << assistant->get_graph().to_string() << std::endl;
+        /* std::cout << assistant->get_graph().to_string() << std::endl; */
     }
     for (auto literal : *literals) {
         try {
             std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
         }
         catch (std::out_of_range) {
-            SPEF f = literal_to_DA[atoi(literal.c_str()+1)-1]->canonical;
+            SPEF f = literal_to_EA[atoi(literal.c_str()+1)-1]->canonical;
             std::cout << literal << " (inferred from " << f->to_string() << ")" << " = ";
-            try {
-                std::cout << (f->is_true(formula->get_aff(), name_to_variable) ? "true" : "false") << std::endl;
-            }
-            catch (std::out_of_range) {
-                std::cout << "can be true or false" << std::endl ;
-            }
+            std::cout << (f->is_true(formula->get_aff(), name_to_variable) ? "true" : "false") << std::endl;
         }
     }
     delete assistant;

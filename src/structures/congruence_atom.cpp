@@ -91,7 +91,7 @@ bool Term::operator==(const Term &that) const {
 
 
 
-CongruenceAtom::CongruenceAtom(std::shared_ptr<Term> left, enum Operator op, std::shared_ptr<Term> right) : left(left), right(right), op(op) {
+CongruenceAtom::CongruenceAtom(std::shared_ptr<Term> left, enum Operator op, std::shared_ptr<Term> right) : left(left), right(right), op(op), canonical(NULL) {
 }
 
 std::string CongruenceAtom::to_string() const {

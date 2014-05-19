@@ -222,6 +222,7 @@ int DifferenceAssistant::learn_clause(std::list<path_item> &path, int atom_id) {
     assert(max_depth >= 0);
     this->depth_back = max_depth ;
     assert(clause.size()>=2) ;
+    assert(this->formula->get_aff());
     tmp = static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
     if(WITH_WL) this->formula->to_clauses_vector()[tmp]->init_WL_CL(lit_conf,max_depth_l) ;
     return tmp ;
