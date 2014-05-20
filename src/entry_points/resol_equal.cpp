@@ -77,14 +77,12 @@ void parser_result(SPEF ext_formula, std::vector<SPEA> &literal_to_EA) {
         }
     }
     assistant = new theorysolver::EqualityAssistant(literal_to_EA, name_to_variable, formula);
-    std::cout << "============" << std::endl;
     for (auto it : affected_literals) {
         if (!assistant->on_flip(it)) {
             std::cout << "s UNSATISFIABLE" << std::endl;
             return;
         }
     }
-    std::cout << "============" << std::endl;
 
     /*********************
      * Solve

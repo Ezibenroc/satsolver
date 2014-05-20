@@ -4,6 +4,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <iostream>
 #include <unordered_set>
 
 namespace theorysolver {
@@ -22,6 +23,8 @@ class UnionFind {
     private:
         std::vector<uf_node*> nodes;
         std::stack<uf_node*> merges; // (clause_id, atom)
+
+        std::vector<std::pair<unsigned int, std::pair<unsigned int, unsigned int>>> pending;
         
         void expand(unsigned int size);
         void compress(uf_node *node, uf_node *parent);

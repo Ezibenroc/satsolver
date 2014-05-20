@@ -80,7 +80,6 @@ int EqualityAssistant::on_flip(unsigned int variable) {
     if (VERBOSE_ASSISTANT && VERBOSE)
         std::cout << ", whose atom is: " << atom_id << ", and whose new state is: ";
     if (this->formula->get_aff()->is_true(variable)) {
-        std::cout << "--1" << std::endl;
         if (VERBOSE_ASSISTANT && VERBOSE)
             std::cout << "true" << std::endl;
         assert(this->consistent_state);
