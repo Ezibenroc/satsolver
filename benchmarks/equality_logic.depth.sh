@@ -9,9 +9,9 @@ fi
 NB_VAR=5
 NB_TEST=$1						    # nombre de tests pour chaque configuration
 DIRECTORY=/tmp						# endroit de sauvegarde des fichiers temporaires
-EXEC="./resol_diff"						# executable
-OUTPUT_WITHWL="diff_logic.depth.with_WL_"$NB_VAR"var.dat"
-OUTPUT_WITHOUTWL="diff_logic.depth.without_WL_"$NB_VAR"var.dat"
+EXEC="./resol_equal"				# executable
+OUTPUT_WITHWL="eq_logic.depth.with_WL_"$NB_VAR"var.dat"
+OUTPUT_WITHOUTWL="eq_logic.depth.without_WL_"$NB_VAR"var.dat"
 
 
 rm -f $OUTPUT_WITHWL
@@ -47,7 +47,7 @@ for depth in `seq 1 20`; do
 	for test in `seq 1 $NB_TEST` ; do
 		echo -e "\t\tTest $test"
 		# Génération de la formule dans le fichier $DIRECTORY/formula
-		./generator -nvar $NB_VAR -depth $depth -difference -o $DIRECTORY/formula 
+		./generator -nvar $NB_VAR -depth $depth -congruence 0 -o $DIRECTORY/formula 
 
 
 		# Résolution de la formule (en vérifiant la correction de la solution)
