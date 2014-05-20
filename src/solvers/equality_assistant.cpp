@@ -135,7 +135,7 @@ int EqualityAssistant::insert_atom(unsigned int i, unsigned int j, bool equal, u
         for (auto it : this->unequal) {
             if (this->union_find.find(it.second.first) == this->union_find.find(it.second.second)) {
                 this->consistent_state = false;
-                return this->learn_clause(it.first, i, j, atom_id);
+                return this->learn_clause(it.first, i, j, lit_conf);
             }
         }
     }
@@ -162,7 +162,13 @@ int EqualityAssistant::learn_clause(int unequal_atomid, int i, int j, int lit_co
     int max_depth=-1, max_depth_l=0 ;
     int lit;
     int tmp;
-    clause.insert(invert_polarity(this->literal_from_atom_id(unequal_atomid)));
+    lit_conf = invert_polarity(lit_conf) ;
+    clause.insert(lit_conf);
+    clause.insert(lit=invert_polarity(this->literal_from_atom_id(unequal_atomid)));
+    if(lit!=lit_conf) {
+        max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
+        max_depth_l = lit ;
+    }
     for (auto it : this->union_find.get_path(i)) {
         lit = invert_polarity(this->literal_from_atom_id(it));
         clause.insert(lit);
@@ -170,7 +176,7 @@ int EqualityAssistant::learn_clause(int unequal_atomid, int i, int j, int lit_co
             max_depth = this->formula->get_ded()->get_deduction_depth(lit) ;
             max_depth_l = lit ;
         }
-    }
+    } 
     for (auto it : this->union_find.get_path(j)) {
         lit = invert_polarity(this->literal_from_atom_id(it));
         clause.insert(lit);
@@ -184,6 +190,7 @@ int EqualityAssistant::learn_clause(int unequal_atomid, int i, int j, int lit_co
     assert(clause.size()>=2) ;
     assert(this->formula->get_aff());
     tmp = static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
+    std::cout << "Learn : " << this->formula->to_clauses_vector()[tmp]->to_string() << " with " << lit_conf << " " << max_depth_l << std::endl ;
     if(WITH_WL) this->formula->to_clauses_vector()[tmp]->init_WL_CL(lit_conf,max_depth_l) ;
     return tmp ;
 }
