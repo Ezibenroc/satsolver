@@ -255,6 +255,24 @@ poids minimal).
 Théorie d’égalités
 ------------------
 
+On utilise une forme d’union-find, mais qui gère la « désunion » (nécessitant
+donc de ne pas compresser les chemins) et qui mémorise l’union de deux éléments
+déjà dans le même ensemble, c’est-à-dire que par exemple, si on dit deux fois
+que x1 et x2 sont dans la même classe d’équivalence, si on ne fait qu’une seule
+désunion, il seront toujours dans la même.
+
+L’ajout de clause se fait lorsque l’on rajoute un atome xi!=xj si xi et xj
+sont dans la même classe d’équivalence, ou un atome xi=xj et que cela
+place dans la même classe d’équivalence deux variables censées être
+différents.
+Dans ce cas, la cause ajoutée contient tous les littéraux intervenant
+dans le fait que xi et xj soient dans la même classe d’équivalence,
+ainsi que le littéral correspondant à la diségalité engendrant le
+conflit.
+Elle n’est certe pas minimale dans le cas général, mais reste de taille
+tout à fait raisonnable.
+
+
 
 
 Répartition du travail
@@ -269,16 +287,16 @@ Tom :
 * Heuristiques
 * Générateur de données, tests de performances, moulinettes
 * Apprentissage de clause avec littéraux surveillés
-* Intégration de l'assistant avec WL et/ou CL.
+* Intégration des assistants avec WL et/ou CL.
 
 Valentin :
 * Parseur de CNF et EDGE
 * Algorithme de DPLL (sans les littéraux surveillés)
-* Classe et parseur pour les formules étendues ; réduction de Tseitin
+* Classe et parseur pour les formules étendues (+ pour SMT) ; réduction de Tseitin
 * Réduction problème de graphe -> formule étendue
 * Graphe de conflits
 * Apprentissage de clauses sans les littéraux surveillés, preuves
-* « Assistant » de théorie de différence
+* « Assistants » de théorie de différence et d’égalité
 
 Fichiers
 --------
