@@ -4,7 +4,7 @@ let nvar = ref 0
 let nclause = ref 0
 let sclause = ref 0
 let depth = ref 0
-let depth_term = ref 0
+let depth_term = ref (-1)
 let nedge = ref 0
 let pathologic = ref false
 let name_f = ref ""
@@ -392,7 +392,7 @@ let main() =
   if !mode = Formula && !depth <= 0 then failwith "Please provide the depth of formula." ;
   if !mode = Graph && !nedge <= 0 then failwith "Please provide the number of edges of the graph." ;
   
-  if !mode_formula = Congruence && !depth_term <= 0 then failwith "Please provide the depth of the terms." ;
+  if !mode_formula = Congruence && !depth_term < 0 then failwith "Please provide the depth of the terms." ;
 
 
 
