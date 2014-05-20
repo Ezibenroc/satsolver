@@ -351,6 +351,12 @@ SPEF EF::simplify() const {
             else if (f2->type == EF::FALSE)
                 return SPEF(new EF(EF::NOT, f1));
             break;
+        case EF::NOT:
+            if (f1->type == EF::FALSE)
+                return SPEF(new EF(EF::TRUE));
+            else if (f1->type == EF::TRUE)
+                return SPEF(new EF(EF::FALSE));
+            break;
         default:
             break;
     }
