@@ -389,29 +389,10 @@ void Formula::clean(std::vector<unsigned int> *affected_literals) {
             }
         }
     } while(literal != 0) ;
-    // Suppression des clauses
- //   int n = 0 ;
     std::vector<std::shared_ptr<Clause>> old_clauses(this->clauses) ;
     this->clauses.clear() ;
     this->clauses.reserve(old_clauses.size()) ;
-//    unsigned j ;
     for(unsigned i = 0 ; i < old_clauses.size() ; i++) {
-/*    Les lignes suivantes suppriment les clauses contenant d'autres clauses : cela prend beaucoup trop de temps
-        j = 0 ;
-        if(!to_delete(old_clauses[i],literals_to_delete)) {
-              while(j < old_clauses.size() && (old_clauses[j] == NULL || j == i
-                                             || !old_clauses[i]->contains_clause(*old_clauses[j]))) {
-                  j++ ;
-                }
-        }
-        if(j < old_clauses.size()) { // la clause i doit être supprimée
-            old_clauses[i] = NULL ;
-            n ++ ;
-        }
-        else {    // la clause i ne contient aucune autre clauses
-            this->clauses.push_back(old_clauses[i]) ;
-        }
-*/
         if(!to_delete(old_clauses[i],literals_to_delete))
             this->clauses.push_back(old_clauses[i]) ;
     }

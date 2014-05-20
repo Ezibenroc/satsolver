@@ -17,13 +17,7 @@ Clause::Clause(int nb_var, std::shared_ptr<std::vector<int>> literals) : literal
         assert(*it != 0 && abs(*it) <= nb_var);
         this->literals.insert(*it) ;
     }
-}/*
-Clause::Clause(int nb_var, std::set<int> literals) : literals(), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
-    for (auto it : literals) {
-        assert(it != 0 && abs(it) <= nb_var);
-        this->literals.insert(it) ;
-    }
-}*/
+}
 Clause::Clause(int nb_var, std::unordered_set<int> literals) : literals(), nb_variables(nb_var), watched(std::pair<int,int>(0,0)), aff(NULL) {
     for (auto it : literals) {
         assert(it != 0 && abs(it) <= nb_var);

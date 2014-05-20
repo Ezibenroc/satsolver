@@ -61,17 +61,6 @@ std::unordered_set<int> UnionFind::get_path(unsigned int i) {
     }
     return path;
 }
-/*
-void UnionFind::compress(uf_node *node, uf_node *parent) {
-    uf_node *node2;
-    while (node->parent != parent) {
-        node2 = node->parent;
-        node->parent = parent;
-        node = node2;
-        parent->nb_childs++;
-        node2->nb_childs--;
-    }
-}*/
 void UnionFind::unmerge() {
     std::list<std::pair<unsigned int, std::pair<unsigned int, unsigned int>>>::iterator it, it2;
     uf_node *node;
