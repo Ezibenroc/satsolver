@@ -1,6 +1,7 @@
 #ifndef STRUCTURES_UNION_FIND_H
 #define STRUCTURES_UNION_FIND_H
 
+#include <list>
 #include <stack>
 #include <string>
 #include <vector>
@@ -17,14 +18,23 @@ struct uf_node {
     unsigned int nb_childs;
 };
 
+struct node_or_pending_item {
+    uf_node *node;
+    std::list<std::pair<unsigned int, std::pair<unsigned int, unsigned int>>>::iterator pending_item;
+
+    node_or_pending_item(uf_node *node) : node(node), pending_item() {}
+    node_or_pending_item(std::list<std::pair<unsigned int, std::pair<unsigned int, unsigned int>>>::iterator pending_item) : node(NULL), pending_item(pending_item) {}
+};
+
+
 /* An implementation of union-find with no compression, but with taggable and
  * reversable unions */
 class UnionFind {
     private:
         std::vector<uf_node*> nodes;
-        std::stack<uf_node*> merges; // (clause_id, atom)
+        std::stack<node_or_pending_item> merges; // (clause_id, atom)
 
-        std::vector<std::pair<unsigned int, std::pair<unsigned int, unsigned int>>> pending;
+        std::list<std::pair<unsigned int, std::pair<unsigned int, unsigned int>>> pending;
         
         void expand(unsigned int size);
         void compress(uf_node *node, uf_node *parent);
@@ -35,7 +45,7 @@ class UnionFind {
 
         void merge(unsigned int tag, unsigned int i, unsigned int j);
         unsigned int find(unsigned int i);
-        unsigned int unmerge();
+        void unmerge();
         std::unordered_set<int> get_path(unsigned int i);
 
         std::string to_string() const;
