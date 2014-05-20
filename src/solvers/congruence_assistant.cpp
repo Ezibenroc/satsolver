@@ -19,16 +19,28 @@ using namespace theorysolver;
 SPEF canonize_atom(SPCA atom, std::vector<SPCA> &literal_to_CA, std::string literal) {
     unsigned long int id1;
     assert(atom);
-    switch (atom->op) {
-        case CA::EQUAL: // t1 = t2   --> t1 = t2
-            atom->canonical = SPEF(new EF(EF::LITERAL, literal));
-            break;
-        case CA::UNEQUAL: // t2 != t2   -->   ~(t1 = t2)
-            id1 = CongruenceAtom::add_CA(literal_to_CA, *atom->left, CA::EQUAL, *atom->right);
-            atom->canonical = SPEF(new EF(EF::NOT,
-                        SPEF(new EF(EF::LITERAL, CongruenceAtom::variable_name_from_atom_id(id1)))
-                   ));
-            break;
+    if(atom->left==atom->right) {
+        switch (atom->op) {
+            case CA::EQUAL: // t1 = t1   
+                atom->canonical = SPEF(new EF(EF::TRUE));
+                break;
+            case CA::UNEQUAL: // t1 != t1  
+                atom->canonical = SPEF(new EF(EF::FALSE));
+                break;      
+        } 
+    }
+    else {
+        switch (atom->op) {
+            case CA::EQUAL: // t1 = t2   --> t1 = t2
+                atom->canonical = SPEF(new EF(EF::LITERAL, literal));
+                break;
+            case CA::UNEQUAL: // t2 != t2   -->   ~(t1 = t2)
+                id1 = CongruenceAtom::add_CA(literal_to_CA, *atom->left, CA::EQUAL, *atom->right);
+                atom->canonical = SPEF(new EF(EF::NOT,
+                            SPEF(new EF(EF::LITERAL, CongruenceAtom::variable_name_from_atom_id(id1)))
+                       ));
+                break;
+        }
     }
     return atom->canonical;
 }
