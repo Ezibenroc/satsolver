@@ -82,7 +82,7 @@ void UnionFind::unmerge() {
         node->parent = NULL;
         it=this->pending.begin();
         while (it!=this->pending.end()) {
-            it2 = it++;
+            it2 = ++it;
             it--;
             if (this->find(it->second.first) != this->find(it->second.second)) {
                 this->merge(it->first, it->second.first, it->second.second);
