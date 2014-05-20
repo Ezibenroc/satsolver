@@ -204,5 +204,8 @@ bool EqualityAssistant::detect_isolated_literals() {
 }
 
 unsigned int EqualityAssistant::get_depth_back() {
-    return -1;
+    assert(this->depth_back>=0) ;
+    unsigned int tmp = static_cast<unsigned int>(this->depth_back) ; // cette fonction ne doit être appelée qu'une fois par clause apprise
+    this->depth_back = -1 ;
+    return tmp ;
 }
