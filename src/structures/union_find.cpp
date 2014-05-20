@@ -87,6 +87,7 @@ void UnionFind::unmerge() {
             if (this->find(it->second.first) != this->find(it->second.second)) {
                 this->merge(it->first, it->second.first, it->second.second);
                 this->pending.erase(it);
+                break;
             }
             it = it2;
         }
