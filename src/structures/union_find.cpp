@@ -54,10 +54,11 @@ std::unordered_set<int> UnionFind::get_path(unsigned int i) {
     uf_node *node;
     assert(i<this->nodes.size());
     node = this->nodes[i];
-    do {
+    assert(node);
+    while (node->parent) {
         path.insert(node->edge_tag);
         node = node->parent;
-    } while (node->parent);
+    }
     return path;
 }
 /*
