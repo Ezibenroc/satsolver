@@ -6,7 +6,7 @@
 
 using namespace theorysolver;
 
-#define VERBOSE_ASSISTANT true
+#define VERBOSE_ASSISTANT false
 
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
@@ -190,7 +190,6 @@ int EqualityAssistant::learn_clause(int unequal_atomid, int i, int j, int lit_co
     assert(clause.size()>=2) ;
     assert(this->formula->get_aff());
     tmp = static_cast<int>(this->formula->add_clause(std::make_shared<satsolver::Clause>(this->formula->get_nb_variables(), clause, this->formula->get_aff())));
-    std::cout << "Learn : " << this->formula->to_clauses_vector()[tmp]->to_string() << " with " << lit_conf << " " << max_depth_l << std::endl ;
     if(WITH_WL) this->formula->to_clauses_vector()[tmp]->init_WL_CL(lit_conf,max_depth_l) ;
     return tmp ;
 }
