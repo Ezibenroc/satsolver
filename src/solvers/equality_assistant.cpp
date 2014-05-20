@@ -72,7 +72,7 @@ int EqualityAssistant::on_flip(unsigned int variable) {
     if (!EqualityAtom::is_atom_literal(this->variable_to_name, variable)) {
         if (VERBOSE_ASSISTANT && VERBOSE)
             std::cout << ", which is not an atom." << std::endl;
-        return true; // We care only about variables matching atoms.
+        return -1; // We care only about variables matching atoms.
     }
     assert(variable <= static_cast<unsigned int>(this->formula->get_nb_variables()));
     atom_id = EqualityAtom::atom_id_from_literal(this->variable_to_name, variable);
