@@ -302,7 +302,7 @@ Valentin :
 * Réduction problème de graphe -> formule étendue
 * Graphe de conflits
 * Apprentissage de clauses sans les littéraux surveillés, preuves
-* « Assistants » de théorie de différence et d’égalité
+* « Assistants » de théorie de différence et d’égalité + AdjGraph & UnionFind
 
 Fichiers
 --------
