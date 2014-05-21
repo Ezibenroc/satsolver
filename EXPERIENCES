@@ -176,3 +176,56 @@ Conclusion
 L'apprentissage de clause ne semble pas apporter de gain significatif pour les
 heuristiques rapides. Dans certains cas il entraîne une perte de performances 
 non négligeable.
+
+
+
+Expériences RENDU 4
+===================
+
+Par manque de temps, ces expériences ont surtout permis de repérer puis corriger
+des bugs.
+Nous avons modifié le générateur (generator.ml) afin qu'il puisse générer des 
+formules dont les termes sont des atomes des logiques de différence, égalité, 
+ou congruence.
+  * Génération d'une formule de profondeur 3, pour 5 variables, en logique de 
+  différence :            
+    ./generator -nvar 5 -depth 3 -difference
+  * Génération d'une formule de profondeur 3, pour 5 variables, en logique de 
+  congruence, avec des termes de profondeur 2 :            
+    ./generator -nvar 5 -depth 3 -congruence 2
+  * Génération d'une formule de profondeur 3, pour 5 variables, en logique  
+  d'égalité :            
+    ./generator -nvar 5 -depth 3 -congruence 0
+    
+Pour mesurer les performances de notre solveur de théorie, nous avons résolu
+des formules de tailles croissantes (de 1 à 11), avec 5 variables.
+Il aurait bien entendu été préférable de mener des réflexions plus poussées.
+Par exemple, le nombre de variables influe peut être sur la complexité du problème.
+Certains motifs de formules sont aussi susceptibles d'être plus difficiles que 
+d'autres à résoudre.
+
+Les résultats obtenus sont présents dans le dossier benchmarks_results/rendu4/.
+Les courbes correspondantes sont visibles sur le fichier courbes.pdf.
+
+
+Observation des courbes
+-----------------------
+
+On observe tout d'abord que l'heuristique RAND est la meilleure pour les formules
+de logique d'égalité. Une explication est que cette heuristique favorise
+les littéraux apparaissant souvent dans l'ensemble de clauses (choix équiprobable
+pour chaque occurrence de littéral).
+
+On observe également que l'apprentissage de clause ne produit pas de résultats 
+catastrophiques. Au contraire, il y a parfois un gain (par exemple, la théorie
+de l'égalité, heuristique RAND). C'est peut être simplement parce que l'on se
+limite à des formules de petite taille.
+
+
+Conclusion
+----------
+
+Nous n'obersons plus de bugs, et les résultats expérimentaux semblent raisonnables.
+Des tests plus poussés sont nécessaires.
+Il serait aussi judicieux d'implémenter un programme vérifiant les solutions
+fournies par nos solveurs.
