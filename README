@@ -273,6 +273,10 @@ conflit.
 Elle n’est certe pas minimale dans le cas général, mais reste de taille
 tout à fait raisonnable.
 
+À la fin de la résolution d’un problème d’égalité, on affiche aussi une
+affectation des variables. (Il suffit d’afficher l’indice du représentant
+de la classe d’équivalence de chacune des variables.)
+
 
 
 
