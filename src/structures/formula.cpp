@@ -160,8 +160,9 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
     }
     if ((tmp=assistant->on_flip(abs(x)))!=-1) {
         *clause_assistant = tmp ;
+        assert(clause1);
+        *clause1 = tmp ;
         if(WITH_WL) {
-            *clause1 = tmp ;
             *clause2 = -1 ;
             *literal = x ;   
         }

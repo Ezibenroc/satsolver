@@ -109,7 +109,7 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                         contains_false_clause = !formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
                     }
                     else {
-                        formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
+                        formula->deduce_true(-literal, clause_id,&clause_id,NULL,NULL, assistant,&clause_assistant);
                         contains_false_clause = formula->contains_false_clause(&clause_id);
                     }
                     continue ; // on n'a peut être plus de clause fausse
@@ -134,12 +134,13 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                     throw Conflict() ;
             }
             with_proof = false;
-            if (assistant->is_state_consistent() && CL_INTERACT && --skip_conflicts == 0) {
+            if (CL_INTERACT && --skip_conflicts == 0) {
                 last_bet = formula->last_bet() ;
                 assert(last_bet);
                 skip_conflicts = cl_interac(*formula->get_ded(), formula->get_aff(), last_bet, literal, &with_proof);
             }
-            if (assistant->is_state_consistent() && WITH_CL) { // pas de CL si l'état est inconsistent
+            if (WITH_CL) { // pas de CL si l'état est inconsistent
+                if(clause_id == -1 && !assistant->is_state_consistent()) clause_id = clause_assistant ;
                 proof = new CLProof();
                 literal = formula->learn_clause(proof,&clause_id, &depth_back, literal, &learned_clause);
                 nb_learned_clauses++;
