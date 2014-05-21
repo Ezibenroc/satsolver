@@ -27,13 +27,14 @@ set title "Génération de formules (logique de différence, 5 variables), sans 
 set xlabel "Profondeur"
 plot for [IDX=2:9] "diff_logic.depth.without_WL_5var.dat" using 1:IDX title columnheader(IDX)
 
-set title "Génération de formules (logique de différence, 50 variables), avec WL"
+set title "Génération de formules (logique d'égalité, 5 variables), avec WL"
 set xlabel "Profondeur"
-plot for [IDX=2:9] "diff_logic.depth.with_WL_50var.dat" using 1:IDX title columnheader(IDX)
+plot for [IDX=2:9] "eq_logic.depth.with_WL_5var.dat" using 1:IDX title columnheader(IDX)
 
-set title "Génération de formules (logique de différence, 50 variables), sans WL"
+set title "Génération de formules (logique d'égailté, 5 variables), sans WL"
 set xlabel "Profondeur"
-plot for [IDX=2:9] "diff_logic.depth.without_WL_50var.dat" using 1:IDX title columnheader(IDX)
+plot for [IDX=2:9] "eq_logic.depth.without_WL_5var.dat" using 1:IDX title columnheader(IDX)
+
 
 
 
