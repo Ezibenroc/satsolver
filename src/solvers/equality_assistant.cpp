@@ -208,3 +208,10 @@ unsigned int EqualityAssistant::get_depth_back() {
     this->depth_back = -1 ;
     return tmp ;
 }
+
+unsigned int EqualityAssistant::get_component(unsigned int i) const {
+    return this->union_find.find(i);
+}
+unsigned int EqualityAssistant::get_max_node() const {
+    return this->union_find.get_max_node();
+}

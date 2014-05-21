@@ -125,7 +125,12 @@ void parser_result(SPEF ext_formula, std::vector<SPEA> &literal_to_EA) {
         for (unsigned long i=offset; i<40; i++)
             std::cout << " ";
         std::cout << literal_to_EA[atoi(literal.c_str()+1)-1]->to_string() << " = " << aff << std::endl;
+
     }
+
+    std::cout << "Affectation of variables: " << std::endl;
+    for (unsigned i=1; i<assistant->get_max_node(); i++)
+        std::cout << "\tx" << std::to_string(i) << " = \t" << assistant->get_component(i) << std::endl;
     delete assistant;
 }
 

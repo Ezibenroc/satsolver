@@ -40,6 +40,8 @@ class EqualityAssistant : public AbstractAssistant {
         bool detect_isolated_literals();
 
         unsigned int get_depth_back();
+        unsigned int get_component(unsigned int i) const;
+        unsigned int get_max_node() const;
 };
 
 }

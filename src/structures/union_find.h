@@ -44,11 +44,13 @@ class UnionFind {
         UnionFind(unsigned int size_hint);
 
         void merge(unsigned int tag, unsigned int i, unsigned int j);
-        unsigned int find(unsigned int i);
+        unsigned int find(unsigned int i) const;
         void unmerge();
         std::unordered_set<int> get_path(unsigned int i);
 
         std::string to_string() const;
+
+        unsigned get_max_node() const;
 };
 
 }

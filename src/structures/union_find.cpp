@@ -39,7 +39,7 @@ void UnionFind::merge(unsigned int tag, unsigned int i, unsigned j) {
     this->merges.push(node_or_pending_item(node));
 }
 
-unsigned int UnionFind::find(unsigned int i) {
+unsigned int UnionFind::find(unsigned int i) const {
     uf_node *node;
     if (i>=this->nodes.size())
         return i;
@@ -85,4 +85,8 @@ void UnionFind::unmerge() {
         this->pending.erase(this->merges.top().pending_item);
         this->merges.pop();
     }
+}
+
+unsigned UnionFind::get_max_node() const {
+    return static_cast<unsigned>(this->nodes.size());
 }
