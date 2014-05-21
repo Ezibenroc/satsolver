@@ -170,6 +170,7 @@ bool Formula::set_true(int x, int *clause1, int *clause2, int *literal, theoryso
             std::cout << "Theory inconsistency. Learned a clause : " ;
             std::cout << this->clauses[tmp]->to_string()  << std::endl ;
         }
+        this->to_do.clear();
         return false;
     }
     if(!this->to_do.empty()) { // on doit affecter ces littéraux
