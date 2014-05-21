@@ -13,6 +13,7 @@
 #include "structures/extended_formula.h"
 #include "solvers/difference_assistant.h"
 #include "extended_formula.y.hpp"
+#include "utils.h"
 
 #define EF satsolver::ExtendedFormula
 #define SPEF std::shared_ptr<EF>
@@ -78,7 +79,7 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
     }
     assistant = new theorysolver::DifferenceAssistant(literal_to_DA, name_to_variable, formula);
     for (auto it : affected_literals) {
-        if (1!=assistant->on_flip(it)) {
+        if (-1!=assistant->on_flip(it)) {
             std::cout << "s UNSATISFIABLE" << std::endl;
             return;
         }
@@ -103,19 +104,27 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
         std::cout << assistant->get_graph().to_string() << std::endl;
     }
     for (auto literal : *literals) {
+        std::cout << literal;
+        unsigned long offset = literal.size();
+        std::string aff;
         try {
-            std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
+            aff = sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false";
+            std::cout << ": ";
         }
         catch (std::out_of_range) {
             SPEF f = literal_to_DA[atoi(literal.c_str()+1)-1]->canonical;
-            std::cout << literal << " (inferred from " << f->to_string() << ")" << " = ";
+            std::cout << " (inferred from " << f->to_string() << ")" << ": ";
+            offset += unisize((" (inferred from "+f->to_string()+")").c_str());
             try {
-                std::cout << (f->is_true(formula->get_aff(), name_to_variable) ? "true" : "false") << std::endl;
+                aff = f->is_true(formula->get_aff(), name_to_variable) ? "true" :" false";
             }
             catch (std::out_of_range) {
-                std::cout << "can be true or false" << std::endl ;
+                aff = "can be true or false";
             }
         }
+        for (unsigned long i=offset; i<40; i++)
+            std::cout << " ";
+        std::cout << literal_to_DA[atoi(literal.c_str()+1)-1]->to_string() << " = " << aff << std::endl;
     }
     delete assistant;
 }

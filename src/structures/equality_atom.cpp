@@ -50,5 +50,5 @@ EqualityAtom::EqualityAtom(unsigned int left, enum Operator op, unsigned int rig
 }
 
 std::string EqualityAtom::to_string() const {
-    return std::to_string(this->left) + (this->op == EqualityAtom::EQUAL ? "=" : "!=") + std::to_string(this->right);
+    return "x" + std::to_string(this->left) + (this->op == EqualityAtom::EQUAL ? "=" : "!=") + "x" + std::to_string(this->right);
 }
