@@ -120,7 +120,7 @@ void parser_result(SPEF ext_formula, std::vector<SPEA> &literal_to_EA) {
                 aff = f->is_true(formula->get_aff(), name_to_variable) ? "true" :" false";
             }
             catch (std::out_of_range) {
-                std::cout << "can be true or false" << std::endl ;
+                aff = "can be true or false"  ;
             }
         }
         for (unsigned long i=offset; i<40; i++)
