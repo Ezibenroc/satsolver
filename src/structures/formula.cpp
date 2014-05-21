@@ -18,7 +18,7 @@ using namespace satsolver;
 void print_space(int depth) {
     std::cout << "TIME : " << (static_cast<float>(clock()))/CLOCKS_PER_SEC << "\t" ;
     for(int i = 0 ; i < depth ; i++)
-        std::cout << "\t" ;
+        std::cout << "  " ;
 }
 
 // Avoid code duplication without using constructor delegation (see <http://stackoverflow.com/a/14477257/539465>)
@@ -527,9 +527,11 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
     clause_id2 = this->ded->get_clause_id(literal) ;
     std::unordered_set<int> clause = this->clauses[clause_id1]->whole_to_set() ;
     std::unordered_set<int> clause2 = this->clauses[clause_id2]->whole_to_set() ;
+
     clause.insert(clause2.begin(), clause2.end());
     clause.erase(literal) ;
     clause.erase(-literal);
+
     while (true) {
         // Recherche d'un UIP (seul littéral de la clause affecté au niveau d'affectation courant)
         nb_same_lvl = 0 ;
@@ -549,8 +551,10 @@ int Formula::learn_clause(CLProof *proof, int *clause_id, unsigned int *new_dept
           assert(this->mem[i_conf].second) ;
           lit_conf = this->mem[i_conf].first ;
         } while(clause.find(-lit_conf) == clause.end() && clause.find(lit_conf) == clause.end()) ;
+
         clause_id2 = this->ded->get_clause_id(lit_conf) ;
         clause2 = this->clauses[clause_id2]->whole_to_set(); // Clause correspondante
+
         // Resolution
         proof->insert_top(lit_conf, std::make_pair(clause_id1, Clause(nb_variables, clause)), std::make_pair(clause_id2, Clause(nb_variables, clause2)));
         clause.insert(clause2.begin(), clause2.end());

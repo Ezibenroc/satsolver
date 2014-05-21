@@ -81,8 +81,6 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
     unsigned int depth_back ;
     while(formula->get_aff()->get_nb_unknown() != 0 && !formula->only_true_clauses(NULL)) {
         if(!WITH_WL && (literal = formula->monome(&clause_id))) {
-            // We set the clause identified by “claused_id” as the one which
-            // made us deduce the value of the literal.
             formula->deduce_true(literal, clause_id,&clause_id,NULL,NULL, assistant,&clause_assistant);
             contains_false_clause = formula->contains_false_clause(&clause_id);
         }
@@ -109,7 +107,7 @@ Affectation* satsolver::solve(std::shared_ptr<Formula> formula, theorysolver::Ab
                         contains_false_clause = !formula->deduce_true(-literal,clause_assistant,&clause_id,&tmp,&literal, assistant, &clause_assistant);
                     }
                     else {
-                        formula->deduce_true(-literal, clause_id,&clause_id,NULL,NULL, assistant,&clause_assistant);
+                        formula->deduce_true(-literal, clause_assistant,&clause_id,NULL,NULL, assistant,&clause_assistant);
                         contains_false_clause = formula->contains_false_clause(&clause_id);
                     }
                     continue ; // on n'a peut être plus de clause fausse
