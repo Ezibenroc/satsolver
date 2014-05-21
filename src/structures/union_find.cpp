@@ -7,7 +7,7 @@ using namespace theorysolver;
 UnionFind::UnionFind() : nodes(), merges(), pending() {
 }
 
-UnionFind::UnionFind(unsigned int size_hint) : UnionFind() {
+UnionFind::UnionFind(unsigned int size_hint) : nodes(), merges(), pending() {
     this->expand(size_hint);
 }
 
