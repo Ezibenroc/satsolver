@@ -226,8 +226,9 @@ de faire une « erreur » similaire dans le futur.
 Lors de l'apprentissage d'une clause par la théorie, on reprend des idées de 
 l'apprentissage d'une clause classique.
 Si l'état initial est consistant, alors une inconsistance ne peut être 
-introduite que si l'on a une clause xi-xj>a1 et une clause xj-xi>a2 (cas de la
-théorie de différences). Donc toute clause apprise est de taille au moins 2.
+introduite que si l'on a une clause représentant xi-xj>a1 et une clause 
+représentant xj-xi>a2 (cas de la théorie de différences). Donc toute clause 
+apprise est de taille au moins 2.
 On définit alors facilement les littéraux surveillés comme étant le littéral
 qui vient d'être affecté, et un littéral de niveau de déduction maximal.
 On effectue ensuite un backtrack au niveau de déduction maximal (sans compter
@@ -265,7 +266,7 @@ L’ajout de clause se fait lorsque l’on rajoute un atome xi!=xj si xi et xj
 sont dans la même classe d’équivalence, ou un atome xi=xj et que cela
 place dans la même classe d’équivalence deux variables censées être
 différents.
-Dans ce cas, la cause ajoutée contient tous les littéraux intervenant
+Dans ce cas, la clause ajoutée contient tous les littéraux intervenant
 dans le fait que xi et xj soient dans la même classe d’équivalence,
 ainsi que le littéral correspondant à la diségalité engendrant le
 conflit.
@@ -288,6 +289,7 @@ Tom :
 * Générateur de données, tests de performances, moulinettes
 * Apprentissage de clause avec littéraux surveillés
 * Intégration des assistants avec WL et/ou CL.
+* Correction de bugs.
 
 Valentin :
 * Parseur de CNF et EDGE
