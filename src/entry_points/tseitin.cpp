@@ -22,6 +22,7 @@
 
 extern FILE *yyin;
 extern int yyparse();
+extern int yylex_destroy();
 
 bool VERBOSE = false;
 bool WITH_WL = false;
@@ -67,6 +68,7 @@ void parser_result(SPEF ext_formula) {
             std::cout << literal << " = " << (sat_solution->is_true(name_to_variable->at(literal)) ? "true" : "false") << std::endl;
     else
         std::cout << "The formula is a tautology." << std::endl;
+    yylex_destroy();
 }
 
 int main (int argc, char *argv[]) {

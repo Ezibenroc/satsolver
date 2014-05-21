@@ -42,6 +42,7 @@ class UnionFind {
     public:
         UnionFind();
         UnionFind(unsigned int size_hint);
+        ~UnionFind();
 
         void merge(unsigned int tag, unsigned int i, unsigned int j);
         unsigned int find(unsigned int i) const;

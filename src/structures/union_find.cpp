@@ -11,6 +11,11 @@ UnionFind::UnionFind(unsigned int size_hint) : UnionFind() {
     this->expand(size_hint);
 }
 
+UnionFind::~UnionFind() {
+    for (unsigned i=0; i<this->nodes.size(); i++)
+        delete this->nodes.at(i);
+}
+
 void UnionFind::expand(unsigned int size) {
     if (size < this->nodes.size())
         return;

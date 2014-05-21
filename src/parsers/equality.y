@@ -52,8 +52,8 @@ whole_formula:
 
 
 equality_atom:
-      VAR EQUAL VAR { $$ = new EA(atoi($1+1), EA::EQUAL, atoi($3+1)); }
-    | VAR UNEQUAL VAR { $$ = new EA(atoi($1+1), EA::UNEQUAL, atoi($3+1)); }
+      VAR EQUAL VAR { $$ = new EA(atoi($1+1), EA::EQUAL, atoi($3+1)); free($1); free($3); }
+    | VAR UNEQUAL VAR { $$ = new EA(atoi($1+1), EA::UNEQUAL, atoi($3+1));; free($1); free($3); }
     ;
 
 

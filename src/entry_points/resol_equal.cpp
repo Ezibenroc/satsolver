@@ -22,6 +22,7 @@
 
 extern FILE *yyin;
 extern int yyparse();
+extern int yylex_destroy();
 
 bool VERBOSE = false;
 bool WITH_WL = false;
@@ -132,6 +133,7 @@ void parser_result(SPEF ext_formula, std::vector<SPEA> &literal_to_EA) {
     for (unsigned i=1; i<assistant->get_max_node(); i++)
         std::cout << "\tx" << std::to_string(i) << " = \t" << assistant->get_component(i) << std::endl;
     delete assistant;
+    yylex_destroy();
 }
 
 int main (int argc, char *argv[]) {

@@ -22,6 +22,7 @@
 
 extern FILE *yyin;
 extern int yyparse();
+extern int yylex_destroy();
 
 bool VERBOSE = false;
 bool WITH_WL = false;
@@ -127,6 +128,7 @@ void parser_result(SPEF ext_formula, std::vector<SPDA> &literal_to_DA) {
         std::cout << literal_to_DA[atoi(literal.c_str()+1)-1]->to_string() << " = " << aff << std::endl;
     }
     delete assistant;
+    yylex_destroy();
 }
 
 int main (int argc, char *argv[]) {
