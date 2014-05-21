@@ -27,9 +27,9 @@ void UnionFind::expand(unsigned int size) {
 
 void UnionFind::merge(unsigned int tag, unsigned int i, unsigned j) {
     struct uf_node *node;
-    if (j < i)
+    if (j < i) // Make sure there is no cycle.
         return this->merge(tag, j, i);
-    if (this->find(i) == this->find(j)) {
+    if (this->find(i) == this->find(j)) { // The two nodes are already in the same component
         this->pending.push_front(std::make_pair(tag, std::make_pair(i, j)));
         this->merges.push(node_or_pending_item(this->pending.begin()));
         return;
@@ -51,7 +51,6 @@ unsigned int UnionFind::find(unsigned int i) const {
     node = this->nodes[i];
     while (node->parent)
         node = node->parent;
-    //this->compress(this->nodes[i], node);
     return node->v;
 }
 std::unordered_set<int> UnionFind::get_path(unsigned int i) {
@@ -71,9 +70,11 @@ void UnionFind::unmerge() {
     uf_node *node;
     assert(this->merges.size());
     node = this->merges.top().node;
-    if (node) {
+    if (node) { // The last merge is between different components
         this->merges.pop();
         node->parent = NULL;
+
+        // Apply a pending merge, if any.
         it=this->pending.begin();
         while (it!=this->pending.end()) {
             it2 = ++it;
@@ -86,7 +87,7 @@ void UnionFind::unmerge() {
             it = it2;
         }
     }
-    else {
+    else { // The last merge is between nodes of the same component
         this->pending.erase(this->merges.top().pending_item);
         this->merges.pop();
     }
